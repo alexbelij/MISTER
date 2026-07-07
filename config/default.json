@@ -1,0 +1,83 @@
+{
+  "app": {
+    "name": "MISTER",
+    "version": "1.0.0",
+    "env": "development"
+  },
+  "model": {
+    "llm": "Qwen3-1.7B",
+    "vlm": "SmolVLM2-500M",
+    "quantization": "Q4_0",
+    "maxTokens": 512,
+    "temperature": 0.7,
+    "fallbackQuantization": "Q8_0"
+  },
+  "finetune": {
+    "defaultEpochs": 3,
+    "gateEpochs": 2,
+    "learningRate": 1e-4,
+    "causalLearningRate": 5e-5,
+    "loraModules": ["q_proj", "k_proj", "v_proj", "o_proj"],
+    "assistantLossOnly": true,
+    "evalSplit": 0.1,
+    "checkpointEveryNEpochs": 1,
+    "outputDir": "adapters",
+    "outputFormat": "gguf"
+  },
+  "rag": {
+    "chunkSize": 384,
+    "chunkOverlap": 64,
+    "topK": 3,
+    "minScore": 0.1
+  },
+  "voice": {
+    "ttsEnabled": true,
+    "sttEnabled": true,
+    "ttsVoice": "default",
+    "sttLanguage": "en",
+    "briefingMaxDuration": 120
+  },
+  "pears": {
+    "storageDir": "peers-storage",
+    "adapterBlobName": "adapter-blobs",
+    "planBlobName": "plan-blobs",
+    "modelLogName": "model-log",
+    "discoveryTimeout": 30000
+  },
+  "wdk": {
+    "enabled": true,
+    "network": "sepolia",
+    "paymasterAddress": "",
+    "entryPointAddress": "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
+    "marketplaceFee": 0,
+    "currency": "USDt"
+  },
+  "eval": {
+    "holdoutPath": "eval/holdout_set.json",
+    "resultsDir": "eval/results",
+    "llmJudgeEnabled": true,
+    "llmJudgeModel": "Qwen3-1.7B",
+    "scoringWeights": {
+      "terminology": 0.4,
+      "principles": 0.35,
+      "styleMatch": 0.25
+    },
+    "goThreshold": 0.15,
+    "marginalThreshold": 0.05,
+    "pivotThreshold": 0.05
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "dir": "logs",
+    "maxFiles": 10
+  },
+  "paths": {
+    "data": "data",
+    "processed": "data/processed",
+    "adapters": "adapters",
+    "eval": "eval",
+    "ui": "ui",
+    "logs": "logs"
+  }
+}

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MISTER — Club Brain</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; height: 100vh; overflow: hidden; user-select: none; }
+    
+    /* Header */
+    .header { background: #161b22; padding: 12px 16px; border-bottom: 1px solid #30363d; display: flex; align-items: center; justify-content: space-between; }
+    .header h1 { font-size: 18px; }
+    .header .status { font-size: 11px; color: #8b949e; }
+    .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+    .status-dot.ready { background: #3fb950; }
+    .status-dot.idle { background: #8b949e; }
+    .status-dot.loading { background: #d29922; }
+    
+    /* Main content */
+    .content { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 80px; }
+    
+    /* Chat */
+    .chat-msg { margin-bottom: 12px; max-width: 90%; }
+    .chat-msg.user { margin-left: auto; }
+    .chat-msg .bubble { padding: 10px 14px; border-radius: 16px; font-size: 15px; line-height: 1.5; white-space: pre-wrap; }
+    .chat-msg.user .bubble { background: #1f6feb; color: #fff; border-bottom-right-radius: 4px; }
+    .chat-msg.assistant .bubble { background: #161b22; border: 1px solid #30363d; border-bottom-left-radius: 4px; }
+    .chat-msg .role { font-size: 10px; color: #8b949e; margin-bottom: 2px; }
+    .chat-msg .rag { font-size: 10px; color: #8b949e; margin-top: 4px; }
+    
+    /* Camera */
+    .camera-view { text-align: center; padding: 20px; }
+    .camera-view video { max-width: 100%; border-radius: 12px; margin-bottom: 16px; }
+    .camera-view canvas { display: none; }
+    .mode-selector { display: flex; gap: 8px; margin-bottom: 16px; }
+    .mode-btn { flex: 1; padding: 12px; background: #21262d; border: 1px solid #30363d; border-radius: 8px; color: #e6edf3; font-size: 14px; cursor: pointer; }
+    .mode-btn.active { background: #238636; border-color: #238636; }
+    .capture-btn { width: 70px; height: 70px; border-radius: 50%; background: #238636; border: 4px solid #0d1117; margin: 16px auto; cursor: pointer; }
+    .capture-btn:active { transform: scale(0.95); }
+    .ocr-result { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px; margin-top: 16px; text-align: left; font-size: 14px; }
+    
+    /* Voice */
+    .voice-view { text-align: center; padding: 40px 20px; }
+    .mic-btn { width: 100px; height: 100px; border-radius: 50%; background: #21262d; border: 2px solid #30363d; margin: 20px auto; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+    .mic-btn.recording { background: #da3633; border-color: #da3633; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    .transcript { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px; margin-top: 16px; text-align: left; font-size: 14px; min-height: 60px; }
+    
+    /* Settings */
+    .settings-view { padding: 16px; }
+    .setting-item { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 14px; margin-bottom: 8px; }
+    .setting-item label { font-size: 14px; color: #e6edf3; display: block; margin-bottom: 4px; }
+    .setting-item .desc { font-size: 12px; color: #8b949e; }
+    .setting-item select, .setting-item input { width: 100%; padding: 8px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #e6edf3; font-size: 14px; }
+    .setting-item button { width: 100%; padding: 12px; background: #238636; border: none; border-radius: 8px; color: #fff; font-size: 14px; cursor: pointer; }
+    .setting-item button.danger { background: #da3633; }
+    .setting-item button.secondary { background: #21262d; border: 1px solid #30363d; }
+    
+    /* QR */
+    .qr-view { text-align: center; padding: 20px; }
+    .qr-code { margin: 16px auto; max-width: 250px; }
+    .qr-input { width: 100%; padding: 12px; background: #0d1117; border: 1px solid #30363d; border-radius: 8px; color: #e6edf3; font-size: 14px; margin-bottom: 8px; }
+    
+    /* Bottom nav */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #161b22; border-top: 1px solid #30363d; display: flex; height: 60px; }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8b949e; font-size: 10px; cursor: pointer; }
+    .nav-item.active { color: #f78166; }
+    .nav-item .icon { font-size: 22px; margin-bottom: 2px; }
+    
+    /* Chat input */
+    .chat-input-bar { position: fixed; bottom: 60px; left: 0; right: 0; background: #161b22; border-top: 1px solid #30363d; padding: 8px; display: flex; gap: 8px; }
+    .chat-input-bar input { flex: 1; padding: 10px 14px; background: #0d1117; border: 1px solid #30363d; border-radius: 20px; color: #e6edf3; font-size: 15px; }
+    .chat-input-bar button { width: 40px; height: 40px; border-radius: 50%; background: #238636; border: none; color: #fff; font-size: 18px; cursor: pointer; }
+    
+    /* Spinner */
+    .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid #30363d; border-top-color: #f78166; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Offline indicator */
+    .offline-badge { background: #da3633; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; }
+    .online-badge { background: #238636; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 10px; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <h1>🧠 MISTER</h1>
+    <div class="status">
+      <span class="status-dot idle" id="statusDot"></span>
+      <span id="statusText">Offline</span>
+    </div>
+  </div>
+  
+  <!-- Content area -->
+  <div class="content" id="content">
+    <!-- Chat tab (default) -->
+    <div id="tab-chat">
+      <div id="chatMessages">
+        <div class="chat-msg assistant">
+          <div class="role">Club Brain</div>
+          <div class="bubble">Hi! I'm your club brain. Ask about match prep, player evaluation, or tactics. All on-device, no cloud.</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Camera tab -->
+    <div id="tab-camera" style="display:none;">
+      <div class="camera-view">
+        <h2 style="margin-bottom: 16px;">📸 Camera</h2>
+        <div class="mode-selector">
+          <div class="mode-btn active" data-mode="ocr" onclick="selectMode('ocr')">📝 OCR Notes</div>
+          <div class="mode-btn" data-mode="vlm" onclick="selectMode('vlm')">🎬 Tactical Analysis</div>
+        </div>
+        <video id="cameraVideo" autoplay playsinline></video>
+        <canvas id="captureCanvas"></canvas>
+        <div class="capture-btn" onclick="capturePhoto()"></div>
+        <div id="cameraResult"></div>
+      </div>
+    </div>
+    
+    <!-- Voice tab -->
+    <div id="tab-voice" style="display:none;">
+      <div class="voice-view">
+        <h2 style="margin-bottom: 16px;">🎤 Voice</h2>
+        <div class="mic-btn" id="micBtn" onclick="toggleRecording()">🎙️</div>
+        <div id="recordingStatus">Tap to start recording</div>
+        <div class="transcript" id="transcriptDisplay">Transcript will appear here...</div>
+        <button style="margin-top:16px;padding:12px 24px;background:#238636;border:none;border-radius:8px;color:#fff;font-size:14px;" onclick="sendToChat()">Send to Chat</button>
+      </div>
+    </div>
+    
+    <!-- Settings tab -->
+    <div id="tab-settings" style="display:none;">
+      <div class="settings-view">
+        <h2 style="margin-bottom: 16px;">⚙️ Settings</h2>
+        
+        <div class="setting-item">
+          <label>Model</label>
+          <select id="modelSelect">
+            <option value="Qwen3-1.7B">Qwen3 1.7B (recommended)</option>
+            <option value="Qwen3-4B">Qwen3 4B (more powerful)</option>
+            <option value="Gemma3-1B">Gemma3 1B (lightest)</option>
+          </select>
+          <div class="desc">Choose based on your device RAM</div>
+        </div>
+        
+        <div class="setting-item">
+          <label>Quantization</label>
+          <select id="quantSelect">
+            <option value="Q4_0">Q4_0 (fastest, ~1GB)</option>
+            <option value="Q8_0">Q8_0 (better quality, ~2GB)</option>
+          </select>
+        </div>
+        
+        <div class="setting-item">
+          <label>Adapter</label>
+          <button class="secondary" onclick="loadAdapter()">📂 Load Adapter</button>
+          <div class="desc" id="adapterPath">No adapter loaded</div>
+        </div>
+        
+        <div class="setting-item">
+          <label>QR Exchange</label>
+          <button class="secondary" onclick="showQR()">📱 Generate QR</button>
+          <button class="secondary" onclick="scanQR()">📷 Scan QR</button>
+          <div class="desc">Share adapter with staff via QR code</div>
+        </div>
+        
+        <div class="setting-item">
+          <label>P2P Delegation</label>
+          <button class="secondary" onclick="connectDelegate()">🔗 Connect to Laptop</button>
+          <div class="desc">Delegate heavy inference to laptop</div>
+        </div>
+        
+        <div class="setting-item">
+          <label>Security</label>
+          <button class="secondary" onclick="setPassword()">🔒 Set Password</button>
+          <div class="desc">Encrypt club data (AES-256)</div>
+        </div>
+        
+        <div class="setting-item">
+          <label>Data Management (GDPR)</label>
+          <button class="secondary" onclick="exportData()">📤 Export All Data</button>
+          <button class="danger" onclick="deleteAllData()">🗑️ Delete All Data</button>
+          <div class="desc">Your data, your control</div>
+        </div>
+        
+        <div class="setting-item">
+          <label>Language</label>
+          <select id="langSelect">
+            <option value="en">English</option>
+            <option value="es">Español</option>
+            <option value="pt">Português</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="ja">日本語</option>
+          </select>
+          <div class="desc">Translate briefings for legionários</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Chat input (only on chat tab) -->
+  <div class="chat-input-bar" id="chatInputBar">
+    <input type="text" id="chatInput" placeholder="Ask your club brain..." onkeypress="if(event.key==='Enter') sendMessage()">
+    <button onclick="sendMessage()">↑</button>
+  </div>
+  
+  <!-- Bottom navigation -->
+  <div class="bottom-nav">
+    <div class="nav-item active" data-tab="chat" onclick="switchTab('chat')">
+      <div class="icon">💬</div>Chat
+    </div>
+    <div class="nav-item" data-tab="camera" onclick="switchTab('camera')">
+      <div class="icon">📸</div>Camera
+    </div>
+    <div class="nav-item" data-tab="voice" onclick="switchTab('voice')">
+      <div class="icon">🎤</div>Voice
+    </div>
+    <div class="nav-item" data-tab="settings" onclick="switchTab('settings')">
+      <div class="icon">⚙️</div>Settings
+    </div>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>

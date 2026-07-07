@@ -1,0 +1,46 @@
+{
+  "profiles": {
+    "gate": {
+      "description": "Day-0 GATE — quick validation (2 epochs, small dataset)",
+      "epochs": 2,
+      "learningRate": 1e-4,
+      "causalEpochs": 1,
+      "useAugmentation": false,
+      "maxSFTPairs": 50,
+      "expectedTime": "5-10 min"
+    },
+    "standard": {
+      "description": "Standard training — balanced speed and quality (3 epochs)",
+      "epochs": 3,
+      "learningRate": 1e-4,
+      "causalEpochs": 1,
+      "useAugmentation": true,
+      "maxSFTPairs": 100,
+      "expectedTime": "10-20 min"
+    },
+    "deep": {
+      "description": "Deep training — maximum quality (5 epochs, full augmentation)",
+      "epochs": 5,
+      "learningRate": 5e-5,
+      "causalEpochs": 2,
+      "useAugmentation": true,
+      "maxSFTPairs": 200,
+      "expectedTime": "20-40 min"
+    },
+    "style_only": {
+      "description": "Style-focused — vocabulary and tone only (causal-heavy)",
+      "epochs": 2,
+      "learningRate": 1e-4,
+      "causalEpochs": 3,
+      "useAugmentation": true,
+      "maxSFTPairs": 80,
+      "expectedTime": "10-15 min"
+    }
+  },
+  "selectionGuide": {
+    "firstRun": "Use 'gate' to validate fine-tuning works on your hardware",
+    "production": "Use 'standard' for the best balance of speed and quality",
+    "finalBuild": "Use 'deep' before submission for maximum quality",
+    "weakFinetune": "Use 'style_only' if factual accuracy is good but style is weak"
+  }
+}

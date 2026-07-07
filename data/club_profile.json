@@ -1,0 +1,87 @@
+{
+  "name": "FC Metall Nord",
+  "city": "Nordstadt",
+  "league": "Regional Liga Nord (3-й дивизион)",
+  "coach": "Thomas Voss",
+  "formation": "4-3-3",
+  "philosophy": "Verticality over possession. Press from the front. Win the ball in the opponent's half. Quick transitions. Flank overload with compact rest-defence.",
+  "terminology": {
+    "pressing_trigger": "Ball-side winger collapses on the CB when he receives facing his own goal — that's our green light.",
+    "rest_defence": "Back four stays compact, 18-20m between lines. No chasing shadows.",
+    "verticality": "Don't go sideways. If the 6 receives between lines, the first look is forward to the 10 or into the channel for the 9.",
+    "flank_overload": "Right winger pins the FB, 10 drifts wide to create 2v1, RB underlaps. Left side stays narrow as an outlet.",
+    "compact_block": "When we lose it, everyone within 30m of the ball. No one jogs back — sprint to position.",
+    "first_touch_pressure": "The moment their GK has it, the 9 cuts the passing lane to the CB. We don't let them breathe.",
+    "channel_run": "9 peels into the channel between CB and FB — drags a marker, opens the pocket for the 10.",
+    "switch_isolation": "If the left side gets isolated 1v1, the 7 takes him on. No double-team — trust your man.",
+    "build_patience": "If they sit in a mid-block, don't force it. Circulate at the back, wait for their 6 to step, then play through.",
+    "transition_lock": "When we win it back in their half, two touches max. Shot or cross. No recycling."
+  },
+  "principles": [
+    "Press from the front — the 9 is the first defender",
+    "Verticality: forward first, sideways only as a last resort",
+    "Compact rest-defence: never more than 20m between lines",
+    "Flank overload: create 2v1s on the ball side",
+    "Transition speed: win it, two touches, shot or cross",
+    "Trust the 1v1 on the weak side — don't overcommit",
+    "The 6 is the metronome — always available, always forward-thinking",
+    "GK plays as a sweeper-keeper, high line is non-negotiable"
+  ],
+  "players": [
+    {
+      "name": "Lukas Brandt",
+      "pos": "GK",
+      "profile": "Sweeper-keeper, good with feet, commands the high line. Distribution: 70% short to CBs, 30% long to channels."
+    },
+    {
+      "name": "Marco Heil",
+      "pos": "RB",
+      "profile": "Attacking fullback, underlaps well, recovery pace. Tends to get caught high on counters."
+    },
+    {
+      "name": "Stefan Kross",
+      "pos": "CB",
+      "profile": "Left-footed, aggressive in the air, leader. Steps into midfield when their 6 drops."
+    },
+    {
+      "name": "Daniel Vogt",
+      "pos": "CB",
+      "profile": "Right-footed, composed, reads the game. Stays as cover when Kross steps."
+    },
+    {
+      "name": "Philipp Auer",
+      "pos": "LB",
+      "profile": "Defensive-minded, stays compact, rarely overlaps. Good 1v1 defender."
+    },
+    {
+      "name": "Jonas Riedel",
+      "pos": "CM (6)",
+      "profile": "Metronome, always available, forward-thinking. Shield for the back four. Weakness: can be pressed into errors."
+    },
+    {
+      "name": "Erik Schäfer",
+      "pos": "CM (8)",
+      "profile": "Box-to-box, late runs into the box, pressing engine. Tires after 70 min."
+    },
+    {
+      "name": "Niklas Wendt",
+      "pos": "CM (10)",
+      "profile": "Creative, drifts wide to create overloads, vision. Not a defender — needs cover."
+    },
+    {
+      "name": "Tomas Krüger",
+      "pos": "RW",
+      "profile": "Pacey, pins the FB, cuts inside to shoot. Right foot dominant. Pressing trigger player."
+    },
+    {
+      "name": "Felix Hartmann",
+      "pos": "ST (9)",
+      "profile": "Channel runner, holds up play, presses the CB. Left foot. Link-up with the 10 is key."
+    },
+    {
+      "name": "Andreas Loth",
+      "pos": "LW",
+      "profile": "Isolation specialist, 1v1 threat, left foot. Stays wide. Weakness: tracks back late."
+    }
+  ]
+}

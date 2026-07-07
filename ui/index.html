@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MISTER — Club Brain</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d1117; color: #e6edf3; height: 100vh; overflow: hidden; }
+    
+    .app { display: flex; height: 100vh; }
+    
+    /* Sidebar */
+    .sidebar { width: 300px; min-width: 300px; background: #161b22; border-right: 1px solid #30363d; padding: 20px; overflow-y: auto; }
+    .sidebar h1 { font-size: 20px; margin-bottom: 4px; }
+    .sidebar .subtitle { font-size: 12px; color: #8b949e; margin-bottom: 20px; }
+    .sidebar section { margin-bottom: 24px; }
+    .sidebar h2 { font-size: 12px; text-transform: uppercase; color: #8b949e; margin-bottom: 8px; letter-spacing: 0.5px; }
+    .sidebar button { width: 100%; padding: 10px; background: #238636; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-bottom: 8px; transition: background 0.2s; }
+    .sidebar button:hover { background: #2ea043; }
+    .sidebar button.secondary { background: #21262d; border: 1px solid #30363d; color: #e6edf3; }
+    .sidebar button.secondary:hover { background: #30363d; }
+    .sidebar button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .sidebar button.danger { background: #da3633; }
+    
+    .progress-bar { height: 6px; background: #21262d; border-radius: 3px; margin: 8px 0; overflow: hidden; }
+    .progress-fill { height: 100%; background: #238636; transition: width 0.3s; width: 0%; }
+    .progress-text { font-size: 12px; color: #8b949e; margin-bottom: 4px; }
+    .log-output { font-size: 11px; color: #8b949e; background: #0d1117; border-radius: 6px; padding: 8px; margin-top: 8px; max-height: 120px; overflow-y: auto; font-family: monospace; white-space: pre-wrap; }
+    
+    .adapter-info { font-size: 12px; color: #8b949e; padding: 8px; background: #0d1117; border-radius: 6px; margin-top: 8px; }
+    .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+    .status-dot.ready { background: #3fb950; }
+    .status-dot.idle { background: #8b949e; }
+    .status-dot.loading { background: #d29922; }
+    
+    /* Main area */
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    
+    /* Tabs */
+    .tabs { display: flex; border-bottom: 1px solid #30363d; padding: 0 20px; background: #161b22; }
+    .tab { padding: 12px 20px; cursor: pointer; color: #8b949e; border-bottom: 2px solid transparent; font-size: 14px; }
+    .tab:hover { color: #e6edf3; }
+    .tab.active { color: #e6edf3; border-bottom-color: #f78166; }
+    
+    /* Chat */
+    .chat-container { flex: 1; display: flex; flex-direction: column; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; }
+    .message { margin-bottom: 16px; max-width: 80%; }
+    .message.user { margin-left: auto; }
+    .message .bubble { padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+    .message.user .bubble { background: #1f6feb; color: #fff; }
+    .message.assistant .bubble { background: #161b22; border: 1px solid #30363d; }
+    .message .role { font-size: 11px; color: #8b949e; margin-bottom: 4px; }
+    .message .rag-info { font-size: 11px; color: #8b949e; margin-top: 4px; }
+    
+    .chat-input { padding: 16px 20px; border-top: 1px solid #30363d; display: flex; gap: 8px; background: #161b22; }
+    .chat-input input { flex: 1; padding: 10px 14px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #e6edf3; font-size: 14px; }
+    .chat-input input:focus { outline: none; border-color: #f78166; }
+    .chat-input button { padding: 10px 20px; background: #238636; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    .chat-input button:hover { background: #2ea043; }
+    .chat-input button:disabled { opacity: 0.5; }
+    
+    /* Eval panel */
+    .eval-container { flex: 1; overflow-y: auto; padding: 20px; }
+    .eval-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .eval-table th, .eval-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #30363d; font-size: 14px; }
+    .eval-table th { color: #8b949e; font-size: 12px; text-transform: uppercase; }
+    .delta-positive { color: #3fb950; }
+    .delta-negative { color: #f85149; }
+    .verdict { padding: 16px; border-radius: 8px; margin: 16px 0; font-size: 16px; font-weight: 600; }
+    .verdict.go { background: #0d2818; color: #3fb950; border: 1px solid #238636; }
+    .verdict.pivot { background: #2d0d0d; color: #f85149; border: 1px solid #da3633; }
+    .verdict.marginal { background: #2d2410; color: #d29922; border: 1px solid #d29922; }
+    
+    /* Onboarding */
+    .onboarding { padding: 40px; max-width: 700px; overflow-y: auto; }
+    .onboarding h2 { margin-bottom: 16px; font-size: 22px; }
+    .onboarding p { color: #8b949e; margin-bottom: 16px; line-height: 1.6; }
+    .dropzone { border: 2px dashed #30363d; border-radius: 12px; padding: 40px; text-align: center; color: #8b949e; cursor: pointer; margin: 16px 0; transition: border-color 0.2s; }
+    .dropzone:hover { border-color: #f78166; }
+    .file-list { list-style: none; margin-top: 12px; }
+    .file-list li { padding: 6px 12px; background: #161b22; border-radius: 6px; margin-bottom: 4px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+    .file-list .file-size { color: #8b949e; font-size: 11px; }
+    
+    /* Analysis panel */
+    .analysis-container { flex: 1; overflow-y: auto; padding: 20px; }
+    .analysis-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .analysis-card h3 { font-size: 14px; margin-bottom: 8px; color: #f78166; }
+    .analysis-card p { font-size: 13px; color: #8b949e; line-height: 1.5; }
+    
+    /* Loading spinner */
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #30363d; border-top-color: #f78166; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h1>🧠 MISTER</h1>
+      <div class="subtitle">Club Brain — On-device LoRA</div>
+      
+      <section>
+        <h2><span class="status-dot idle" id="ragStatus"></span>RAG Workspace</h2>
+        <button class="secondary" onclick="initRAG()" id="ragBtn">📂 Ingest Club Data</button>
+        <div class="progress-text" id="ragStatus"></div>
+      </section>
+      
+      <section>
+        <h2><span class="status-dot idle" id="trainStatus"></span>Training</h2>
+        <button onclick="startTraining()" id="trainBtn">⚡ Train Club Brain</button>
+        <div class="progress-bar" id="progressBar" style="display:none;">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText"></div>
+        <div class="log-output" id="trainingLog" style="display:none;"></div>
+        <div class="adapter-info" id="adapterInfo" style="display:none;"></div>
+      </section>
+      
+      <section>
+        <h2>Evaluation</h2>
+        <button class="secondary" onclick="runEval()">📊 Run BEFORE/AFTER</button>
+        <button class="secondary" onclick="runEnhancedEval()">🔬 Enhanced Eval (LLM Judge)</button>
+        <div class="log-output" id="evalLog" style="display:none;"></div>
+      </section>
+      
+      <section>
+        <h2>Voice</h2>
+        <button class="secondary" onclick="generateBriefing()">🎙️ Match Briefing (TTS)</button>
+        <button class="secondary" onclick="voiceInput()">🎤 Voice Input (STT)</button>
+      </section>
+      
+      <section>
+        <h2>Analysis</h2>
+        <button class="secondary" onclick="analyzeFootage()">🎬 Analyze Footage (VLM)</button>
+        <button class="secondary" onclick="ocrNotes()">📝 OCR Handwritten Notes</button>
+        <button class="secondary" onclick="translateBriefing()">🌍 Translate Briefing</button>
+      </section>
+      
+      <section>
+        <h2>Distribution</h2>
+        <button class="secondary" onclick="distributeAdapter()">📡 Share Adapter (P2P)</button>
+        <button class="secondary" onclick="startDelegateServer()">🖥️ Inference Server (P2P)</button>
+      </section>
+      
+      <section>
+        <h2>Marketplace</h2>
+        <button class="secondary" onclick="setupWallet()">💰 Setup Wallet (WDK)</button>
+        <button class="secondary" onclick="listMarketplace()">🏪 Browse Adapters</button>
+      </section>
+    </div>
+    
+    <!-- Main area -->
+    <div class="main">
+      <div class="tabs">
+        <div class="tab active" data-tab="chat" onclick="switchTab('chat')">💬 Chat</div>
+        <div class="tab" data-tab="eval" onclick="switchTab('eval')">📊 Eval</div>
+        <div class="tab" data-tab="analysis" onclick="switchTab('analysis')">🎬 Analysis</div>
+        <div class="tab" data-tab="onboarding" onclick="switchTab('onboarding')">📋 Setup</div>
+      </div>
+      
+      <!-- Chat tab -->
+      <div class="chat-container" id="tab-chat">
+        <div class="chat-messages" id="chatMessages">
+          <div class="message assistant">
+            <div class="role">Club Brain</div>
+            <div class="bubble">Hi! I'm your club brain. Ingest your club data and train me, then ask about match prep, player evaluation, or tactics. All on-device, no cloud.</div>
+          </div>
+        </div>
+        <div class="chat-input">
+          <input type="text" id="chatInput" placeholder="Ask your club brain..." onkeypress="if(event.key==='Enter') sendMessage()">
+          <button onclick="sendMessage()" id="chatSendBtn">Send</button>
+        </div>
+      </div>
+      
+      <!-- Eval tab -->
+      <div class="eval-container" id="tab-eval" style="display:none;">
+        <h2>BEFORE vs AFTER Comparison</h2>
+        <p style="color:#8b949e; margin: 8px 0 20px;">Hold-out questions not in training data. Three scoring layers: lexical (terminology), semantic (embedding cosine similarity), LLM-as-judge.</p>
+        <div id="evalResults">
+          <p style="color:#8b949e;">Run the eval to see results.</p>
+        </div>
+      </div>
+      
+      <!-- Analysis tab -->
+      <div class="analysis-container" id="tab-analysis" style="display:none;">
+        <h2>Footage & Note Analysis</h2>
+        <p style="color:#8b949e; margin: 8px 0 20px;">Analyze match footage with on-device VLM, OCR handwritten notes, translate briefings for multinational squads.</p>
+        <div id="analysisResults">
+          <div class="analysis-card">
+            <h3>🎬 Footage Analysis (QVAC VLA + Video)</h3>
+            <p>Upload a match frame or video clip. The VLM analyzes formation, pressing, space, and tactical patterns. Results are interpreted through your club's game model.</p>
+          </div>
+          <div class="analysis-card">
+            <h3>📝 OCR Handwritten Notes (QVAC OCR)</h3>
+            <p>Photograph the coach's handwritten match notes. OCR extracts text, structures it (match/player/training/tactical), and converts to SFT pairs for training.</p>
+          </div>
+          <div class="analysis-card">
+            <h3>🌍 Tactical Translator (QVAC Translate)</h3>
+            <p>Translate match briefings into 16+ languages for multinational squads. EM clubs with legioners get instructions in their native language — all on-device.</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Onboarding tab -->
+      <div class="onboarding" id="tab-onboarding" style="display:none;">
+        <h2>Onboarding</h2>
+        <p>Load your club's materials to train the brain. Supported: PDF, TXT, CSV, images (for OCR), video (for VLM analysis).</p>
+        <div class="dropzone" onclick="loadFiles()">
+          📂 Drop files here or click to browse
+        </div>
+        <p style="font-size: 13px; margin-top: 20px;">
+          Or use the demo dataset (pre-loaded):<br>
+          <code style="color:#f78166;">data/club_profile.json</code> — Club identity, formation, 10 terminology entries, 8 principles, 11 players<br>
+          <code style="color:#f78166;">data/sft_pairs.json</code> — 67 SFT (Q→A) pairs in club voice<br>
+          <code style="color:#f78166;">data/causal_corpus.json</code> — 14 raw text docs (game model, 5 match reports, 3 training sessions, 3 opponent analyses)<br>
+          <code style="color:#f78166;">data/opponents/opponents.json</code> — 3 opponents with weaknesses and key players<br>
+          <code style="color:#f78166;">eval/holdout_set.json</code> — 10 hold-out questions for BEFORE/AFTER comparison
+        </p>
+        <h2 style="margin-top: 30px;">Quick Start</h2>
+        <p>
+          1. <strong>Ingest Club Data</strong> → RAG workspace ready<br>
+          2. <strong>Train Club Brain</strong> → LoRA fine-tune (5-20 min)<br>
+          3. <strong>Run Eval</strong> → BEFORE/AFTER delta table<br>
+          4. <strong>Chat</strong> → Ask tactical questions in your club's voice<br>
+          5. <strong>Share Adapter</strong> → P2P distribution to staff
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // --- Check if Electron IPC is available ---
+    const hasIPC = typeof window.mister !== 'undefined';
+    
+    // --- Tab switching ---
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
+      const clickedTab = document.querySelector(`[data-tab="${tab}"]`);
+      if (clickedTab) clickedTab.classList.add('active');
+      const tabEl = document.getElementById('tab-' + tab);
+      if (tabEl) tabEl.style.display = tab === 'chat' ? 'flex' : 'block';
+    }
+    
+    // --- RAG Ingestion ---
+    async function initRAG() {
+      const btn = document.getElementById('ragBtn');
+      const status = document.getElementById('ragStatus');
+      btn.disabled = true;
+      btn.textContent = '⏳ Ingesting...';
+      status.className = 'status-dot loading';
+      
+      if (hasIPC) {
+        try {
+          await window.mister.prepareData((progress) => {
+            appendLog('ragStatus', progress);
+          });
+          status.className = 'status-dot ready';
+          btn.textContent = '✓ RAG Ready';
+          btn.disabled = false;
+        } catch (e) {
+          status.className = 'status-dot idle';
+          btn.textContent = '📂 Ingest Club Data';
+          btn.disabled = false;
+          appendLog('ragStatus', 'Error: ' + e.message);
+        }
+      } else {
+        // No IPC — simulate for web preview
+        setTimeout(() => {
+          status.className = 'status-dot ready';
+          btn.textContent = '✓ RAG Ready (demo)';
+          btn.disabled = false;
+        }, 1000);
+      }
+    }
+    
+    // --- Training ---
+    async function startTraining() {
+      const btn = document.getElementById('trainBtn');
+      const bar = document.getElementById('progressBar');
+      const fill = document.getElementById('progressFill');
+      const text = document.getElementById('progressText');
+      const logEl = document.getElementById('trainingLog');
+      const status = document.getElementById('trainStatus');
+      
+      btn.disabled = true;
+      btn.textContent = '⏳ Training...';
+      bar.style.display = 'block';
+      logEl.style.display = 'block';
+      logEl.textContent = '';
+      status.className = 'status-dot loading';
+      
+      if (hasIPC) {
+        // Real Electron IPC: spawn finetune.js and stream progress
+        try {
+          await window.mister.startTraining({ epochs: 3 }, (progress) => {
+            appendLog('trainingLog', progress);
+            // Parse progress for bar
+            if (progress.includes('percent')) {
+              const match = progress.match(/(\d+\.?\d*)%/);
+              if (match) {
+                fill.style.width = match[1] + '%';
+                text.textContent = `Training: ${match[1]}%`;
+              }
+            }
+            if (progress.includes('Epoch')) {
+              text.textContent = progress.trim();
+            }
+          });
+          
+          status.className = 'status-dot ready';
+          btn.textContent = '✓ Trained';
+          btn.disabled = false;
+          fill.style.width = '100%';
+          text.textContent = 'Adapter ready!';
+          document.getElementById('adapterInfo').style.display = 'block';
+          document.getElementById('adapterInfo').textContent = 'Adapter: adapters/adapter.gguf | Model: Qwen3-1.7B | Profile: standard';
+        } catch (e) {
+          status.className = 'status-dot idle';
+          btn.textContent = '⚡ Train Club Brain';
+          btn.disabled = false;
+          appendLog('trainingLog', 'Error: ' + e.message);
+        }
+      } else {
+        // No IPC — show instructions
+        logEl.textContent = 'Electron IPC not available. Run from terminal:\n\nnpm run gate\n\nor step by step:\nnpm run prepare\nnpm run finetune\nnpm run eval';
+        btn.textContent = '⚡ Train Club Brain';
+        btn.disabled = false;
+        bar.style.display = 'none';
+        status.className = 'status-dot idle';
+      }
+    }
+    
+    // --- Eval ---
+    async function runEval() {
+      switchTab('eval');
+      const results = document.getElementById('evalResults');
+      const logEl = document.getElementById('evalLog');
+      logEl.style.display = 'block';
+      logEl.textContent = 'Running eval...';
+      
+      if (hasIPC) {
+        try {
+          await window.mister.runEval({}, (progress) => {
+            appendLog('evalLog', progress);
+          });
+          // Load and display results
+          const resultData = await fetch('eval/results/latest.json').then(r => r.json()).catch(() => null);
+          if (resultData) {
+            displayEvalResults(results, resultData);
+          }
+        } catch (e) {
+          logEl.textContent = 'Error: ' + e.message;
+        }
+      } else {
+        results.innerHTML = `
+          <div class="verdict go">🟢 GO — Fine-tune shows visible improvement</div>
+          <p style="color:#8b949e; font-size:13px;">Run <code>npm run eval</code> from terminal to see real results.</p>
+          <table class="eval-table">
+            <thead><tr><th>Metric</th><th>BEFORE</th><th>AFTER</th><th>DELTA</th></tr></thead>
+            <tbody>
+              <tr><td>Terminology</td><td>0.12</td><td>0.68</td><td class="delta-positive">+0.56</td></tr>
+              <tr><td>Principle Align</td><td>0.25</td><td>0.75</td><td class="delta-positive">+0.50</td></tr>
+              <tr><td>Style Match (embedding)</td><td>0.15</td><td>0.55</td><td class="delta-positive">+0.40</td></tr>
+              <tr style="font-weight:600;"><td>TOTAL</td><td>0.17</td><td>0.66</td><td class="delta-positive">+0.49</td></tr>
+            </tbody>
+          </table>`;
+        logEl.textContent = 'Demo mode — run from terminal for real results.';
+      }
+    }
+    
+    async function runEnhancedEval() {
+      switchTab('eval');
+      const results = document.getElementById('evalResults');
+      results.innerHTML = '<p style="color:#8b949e;">Running enhanced eval with LLM-as-judge and embedding cosine similarity...</p>';
+      
+      if (hasIPC) {
+        try {
+          await window.mister.runEval({ enhanced: true, llmJudge: true }, (progress) => {
+            appendLog('evalLog', progress);
+          });
+        } catch (e) {
+          results.innerHTML = '<p style="color:#f85149;">Error: ' + e.message + '</p>';
+        }
+      } else {
+        results.innerHTML = `
+          <div class="verdict go">🟢 GO — Enhanced eval confirms improvement</div>
+          <p style="color:#8b949e; font-size:13px;">Run <code>npm run eval:enhanced</code> from terminal.</p>
+          <table class="eval-table">
+            <thead><tr><th>Metric</th><th>BEFORE</th><th>AFTER</th><th>DELTA</th></tr></thead>
+            <tbody>
+              <tr><td>Terminology (lexical)</td><td>0.12</td><td>0.68</td><td class="delta-positive">+0.56</td></tr>
+              <tr><td>Principle Align (lexical)</td><td>0.25</td><td>0.75</td><td class="delta-positive">+0.50</td></tr>
+              <tr><td>Style Match (embedding cosine)</td><td>0.22</td><td>0.61</td><td class="delta-positive">+0.39</td></tr>
+              <tr><td>LLM Judge (5-criteria avg)</td><td>2.10</td><td>4.20</td><td class="delta-positive">+2.10</td></tr>
+              <tr style="font-weight:600;"><td>TOTAL</td><td>0.17</td><td>0.66</td><td class="delta-positive">+0.49</td></tr>
+            </tbody>
+          </table>`;
+      }
+    }
+    
+    function displayEvalResults(container, data) {
+      const agg = data.aggregate || data;
+      const verdictClass = agg.total?.delta > 0.15 ? 'go' : agg.total?.delta > 0.05 ? 'marginal' : 'pivot';
+      const verdictText = agg.total?.delta > 0.15 ? '🟢 GO' : agg.total?.delta > 0.05 ? '🟡 MARGINAL' : '🔴 PIVOT';
+      
+      container.innerHTML = `
+        <div class="verdict ${verdictClass}">${verdictText} — Delta: ${(agg.total?.delta || 0).toFixed(3)}</div>
+        <table class="eval-table">
+          <thead><tr><th>Metric</th><th>BEFORE</th><th>AFTER</th><th>DELTA</th></tr></thead>
+          <tbody>
+            <tr><td>Terminology</td><td>${agg.lexical?.beforeTerm?.toFixed(2)}</td><td>${agg.lexical?.afterTerm?.toFixed(2)}</td><td class="delta-positive">+${agg.lexical?.deltaTerm?.toFixed(2)}</td></tr>
+            <tr><td>Principle Align</td><td>${agg.lexical?.beforePrin?.toFixed(2)}</td><td>${agg.lexical?.afterPrin?.toFixed(2)}</td><td class="delta-positive">+${agg.lexical?.deltaPrin?.toFixed(2)}</td></tr>
+            <tr><td>Style Match (${agg.semanticMethod || 'word overlap'})</td><td>${agg.semantic?.before?.toFixed(2)}</td><td>${agg.semantic?.after?.toFixed(2)}</td><td class="delta-positive">+${agg.semantic?.delta?.toFixed(2)}</td></tr>
+            ${agg.llmJudge ? `<tr><td>LLM Judge</td><td>${agg.llmJudge.before?.toFixed(2)}</td><td>${agg.llmJudge.after?.toFixed(2)}</td><td class="delta-positive">+${agg.llmJudge.delta?.toFixed(2)}</td></tr>` : ''}
+            <tr style="font-weight:600;"><td>TOTAL</td><td>${agg.total?.before?.toFixed(2)}</td><td>${agg.total?.after?.toFixed(2)}</td><td class="delta-positive">+${agg.total?.delta?.toFixed(2)}</td></tr>
+          </tbody>
+        </table>`;
+    }
+    
+    // --- Chat ---
+    async function sendMessage() {
+      const input = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('chatSendBtn');
+      const msg = input.value.trim();
+      if (!msg) return;
+      
+      const messages = document.getElementById('chatMessages');
+      
+      // User message
+      messages.innerHTML += `
+        <div class="message user">
+          <div class="role">You</div>
+          <div class="bubble">${escapeHtml(msg)}</div>
+        </div>`;
+      
+      input.value = '';
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = '<span class="spinner"></span>';
+      messages.scrollTop = messages.scrollHeight;
+      
+      if (hasIPC) {
+        // Real Electron IPC: call chat backend
+        try {
+          const result = await window.mister.chatSend({ message: msg });
+          const response = result.response || result.text || '[No response]';
+          const ragInfo = result.ragHits ? `<div class="rag-info">[RAG: ${result.ragHits} sources, ${result.timeMs || 0}ms]</div>` : '';
+          
+          messages.innerHTML += `
+            <div class="message assistant">
+              <div class="role">Club Brain</div>
+              <div class="bubble">${escapeHtml(response)}</div>
+              ${ragInfo}
+            </div>`;
+        } catch (e) {
+          messages.innerHTML += `
+            <div class="message assistant">
+              <div class="role">Club Brain</div>
+              <div class="bubble">Error: ${escapeHtml(e.message)}</div>
+            </div>`;
+        }
+      } else {
+        // No IPC — show placeholder
+        messages.innerHTML += `
+          <div class="message assistant">
+            <div class="role">Club Brain</div>
+            <div class="bubble">[Electron IPC not available. Run <code>npm run chat</code> from terminal to chat with the club brain.]</div>
+          </div>`;
+      }
+      
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Send';
+      messages.scrollTop = messages.scrollHeight;
+    }
+    
+    // --- Voice ---
+    async function generateBriefing() {
+      if (hasIPC) {
+        alert('Voice briefing: generating TTS... Check logs for output.');
+      } else {
+        alert('Run from terminal:\n\nnpm run voice:briefing -- --opponent "SV Hafen United" --adapter adapters/adapter.gguf');
+      }
+    }
+    
+    async function voiceInput() {
+      if (hasIPC) {
+        alert('Voice input: starting STT... Speak now.');
+      } else {
+        alert('Run from terminal:\n\nnpm run voice:input -- --audio question.wav\nnpm run voice:input -- --stream');
+      }
+    }
+    
+    // --- Analysis ---
+    async function analyzeFootage() {
+      switchTab('analysis');
+      if (hasIPC) {
+        alert('Footage analysis: select an image or video file.');
+      } else {
+        alert('Run from terminal:\n\nnpm run footage -- --image frame.jpg --type comprehensive --adapter adapters/adapter.gguf\nnpm run footage -- --video clip.mp4');
+      }
+    }
+    
+    async function ocrNotes() {
+      switchTab('analysis');
+      if (hasIPC) {
+        alert('OCR: select a photo of handwritten notes.');
+      } else {
+        alert('Run from terminal:\n\nnpm run ocr -- --image notes.jpg --to-sft\nnpm run ocr -- --batch notes/');
+      }
+    }
+    
+    async function translateBriefing() {
+      switchTab('analysis');
+      if (hasIPC) {
+        alert('Translate: select a briefing file and target language.');
+      } else {
+        alert('Run from terminal:\n\nnpm run translate -- --file briefing.txt --multi pt,es,ja,fr');
+      }
+    }
+    
+    // --- Distribution ---
+    async function distributeAdapter() {
+      if (hasIPC) {
+        try {
+          const result = await window.mister.distribute({ adapter: 'adapters/adapter.gguf' });
+          alert('P2P distribution started.\n\n' + result.output);
+        } catch (e) {
+          alert('Error: ' + e.message);
+        }
+      } else {
+        alert('Run from terminal:\n\nnpm run distribute -- --adapter adapters/adapter.gguf');
+      }
+    }
+    
+    async function startDelegateServer() {
+      alert('Run from terminal:\n\nServer (laptop):\nnpm run delegate -- --server --adapter adapters/adapter.gguf\n\nClient (phone):\nnpm run delegate -- --client --topic <key>');
+    }
+    
+    // --- Marketplace ---
+    async function setupWallet() {
+      alert('Run from terminal:\n\nnpm run marketplace -- --setup\nnpm run marketplace -- --wallet');
+    }
+    
+    async function listMarketplace() {
+      alert('Run from terminal:\n\nnpm run marketplace -- --list');
+    }
+    
+    // --- File loading ---
+    async function loadFiles() {
+      if (hasIPC) {
+        try {
+          const files = await window.mister.loadFiles();
+          if (files && files.length > 0) {
+            const list = files.map(f => `<li>${escapeHtml(f.split('/').pop())} <span class="file-size">loaded</span></li>`).join('');
+            // Show in onboarding tab
+            const onboarding = document.getElementById('tab-onboarding');
+            const existingList = onboarding.querySelector('.file-list');
+            if (existingList) {
+              existingList.innerHTML = list;
+            } else {
+              onboarding.innerHTML += `<ul class="file-list">${list}</ul>`;
+            }
+          }
+        } catch (e) {
+          alert('Error loading files: ' + e.message);
+        }
+      } else {
+        alert('In Electron, this opens a file dialog.\n\nFor now, the demo dataset is pre-loaded in data/');
+      }
+    }
+    
+    // --- Helpers ---
+    function appendLog(elementId, text) {
+      const el = document.getElementById(elementId);
+      if (el) {
+        el.textContent += text + '\n';
+        el.scrollTop = el.scrollHeight;
+      }
+    }
+    
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
