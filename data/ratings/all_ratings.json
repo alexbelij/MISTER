@@ -1,0 +1,1322 @@
+[
+  {
+    "match_id": "m01",
+    "player_id": "p01",
+    "ratings": {
+      "pressing": 4.9,
+      "verticality": 4.2,
+      "compact_block": 3.2,
+      "flank_overload": 3.7,
+      "transition": 5.0,
+      "execution": 4.4,
+      "discipline": 4.8,
+      "fitness": 4.1
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m01",
+    "player_id": "p02",
+    "ratings": {
+      "pressing": 4.1,
+      "verticality": 4.5,
+      "compact_block": 4.4,
+      "flank_overload": 3.3,
+      "transition": 3.5,
+      "execution": 4.4,
+      "discipline": 5.0,
+      "fitness": 4.9
+    },
+    "overall": 4.4
+  },
+  {
+    "match_id": "m01",
+    "player_id": "p03",
+    "ratings": {
+      "pressing": 4.2,
+      "verticality": 4.4,
+      "compact_block": 3.7,
+      "flank_overload": 4.8,
+      "transition": 4.5,
+      "execution": 4.6,
+      "discipline": 4.0,
+      "fitness": 4.1
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m01",
+    "player_id": "p04",
+    "ratings": {
+      "pressing": 5.0,
+      "verticality": 4.5,
+      "compact_block": 3.9,
+      "flank_overload": 3.6,
+      "transition": 4.7,
+      "execution": 4.4,
+      "discipline": 4.5,
+      "fitness": 5.0
+    },
+    "overall": 4.6
+  },
+  {
+    "match_id": "m01",
+    "player_id": "p05",
+    "ratings": {
+      "pressing": 3.9,
+      "verticality": 4.4,
+      "compact_block": 4.3,
+      "flank_overload": 4.6,
+      "transition": 4.3,
+      "execution": 4.2,
+      "discipline": 4.7,
+      "fitness": 4.4
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m01",
+    "player_id": "p06",
+    "ratings": {
+      "pressing": 4.3,
+      "verticality": 4.6,
+      "compact_block": 3.7,
+      "flank_overload": 4.7,
+      "transition": 4.4,
+      "execution": 4.7,
+      "discipline": 3.6,
+      "fitness": 4.0
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m01",
+    "player_id": "p07",
+    "ratings": {
+      "pressing": 3.6,
+      "verticality": 3.2,
+      "compact_block": 4.7,
+      "flank_overload": 2.9,
+      "transition": 3.2,
+      "execution": 4.4,
+      "discipline": 4.9,
+      "fitness": 4.4
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m01",
+    "player_id": "p08",
+    "ratings": {
+      "pressing": 3.7,
+      "verticality": 4.0,
+      "compact_block": 4.9,
+      "flank_overload": 3.3,
+      "transition": 3.8,
+      "execution": 4.4,
+      "discipline": 5.0,
+      "fitness": 4.6
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m01",
+    "player_id": "p09",
+    "ratings": {
+      "pressing": 3.8,
+      "verticality": 3.7,
+      "compact_block": 4.7,
+      "flank_overload": 2.8,
+      "transition": 3.2,
+      "execution": 4.0,
+      "discipline": 4.4,
+      "fitness": 5.0
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m01",
+    "player_id": "p12",
+    "ratings": {
+      "pressing": 4.4,
+      "verticality": 4.2,
+      "compact_block": 4.4,
+      "flank_overload": 2.8,
+      "transition": 4.8,
+      "execution": 4.3,
+      "discipline": 4.2,
+      "fitness": 4.7
+    },
+    "overall": 4.4
+  },
+  {
+    "match_id": "m01",
+    "player_id": "p11",
+    "ratings": {
+      "pressing": 4.2,
+      "verticality": 4.4,
+      "compact_block": 3.4,
+      "flank_overload": 4.6,
+      "transition": 4.3,
+      "execution": 4.4,
+      "discipline": 3.8,
+      "fitness": 4.1
+    },
+    "overall": 4.4
+  },
+  {
+    "match_id": "m02",
+    "player_id": "p01",
+    "ratings": {
+      "pressing": 4.2,
+      "verticality": 3.9,
+      "compact_block": 2.7,
+      "flank_overload": 3.5,
+      "transition": 4.9,
+      "execution": 3.9,
+      "discipline": 3.9,
+      "fitness": 3.9
+    },
+    "overall": 4.1
+  },
+  {
+    "match_id": "m02",
+    "player_id": "p02",
+    "ratings": {
+      "pressing": 4.0,
+      "verticality": 4.5,
+      "compact_block": 4.5,
+      "flank_overload": 3.2,
+      "transition": 3.2,
+      "execution": 4.4,
+      "discipline": 4.9,
+      "fitness": 4.5
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m02",
+    "player_id": "p03",
+    "ratings": {
+      "pressing": 3.8,
+      "verticality": 4.1,
+      "compact_block": 2.9,
+      "flank_overload": 4.7,
+      "transition": 3.9,
+      "execution": 4.4,
+      "discipline": 4.0,
+      "fitness": 3.8
+    },
+    "overall": 4.1
+  },
+  {
+    "match_id": "m02",
+    "player_id": "p04",
+    "ratings": {
+      "pressing": 4.7,
+      "verticality": 4.1,
+      "compact_block": 4.0,
+      "flank_overload": 3.7,
+      "transition": 4.0,
+      "execution": 4.1,
+      "discipline": 4.0,
+      "fitness": 4.3
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m02",
+    "player_id": "p05",
+    "ratings": {
+      "pressing": 3.6,
+      "verticality": 3.8,
+      "compact_block": 4.1,
+      "flank_overload": 4.2,
+      "transition": 3.5,
+      "execution": 3.7,
+      "discipline": 3.9,
+      "fitness": 4.2
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m02",
+    "player_id": "p06",
+    "ratings": {
+      "pressing": 4.0,
+      "verticality": 4.7,
+      "compact_block": 3.4,
+      "flank_overload": 4.2,
+      "transition": 4.5,
+      "execution": 4.7,
+      "discipline": 3.2,
+      "fitness": 3.8
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m02",
+    "player_id": "p07",
+    "ratings": {
+      "pressing": 2.9,
+      "verticality": 3.1,
+      "compact_block": 4.6,
+      "flank_overload": 2.5,
+      "transition": 3.0,
+      "execution": 3.8,
+      "discipline": 4.3,
+      "fitness": 4.2
+    },
+    "overall": 3.6
+  },
+  {
+    "match_id": "m02",
+    "player_id": "p08",
+    "ratings": {
+      "pressing": 3.4,
+      "verticality": 3.3,
+      "compact_block": 4.8,
+      "flank_overload": 3.1,
+      "transition": 3.0,
+      "execution": 3.9,
+      "discipline": 5.0,
+      "fitness": 4.3
+    },
+    "overall": 3.9
+  },
+  {
+    "match_id": "m02",
+    "player_id": "p09",
+    "ratings": {
+      "pressing": 3.1,
+      "verticality": 3.2,
+      "compact_block": 4.2,
+      "flank_overload": 2.6,
+      "transition": 2.9,
+      "execution": 3.8,
+      "discipline": 4.0,
+      "fitness": 4.3
+    },
+    "overall": 3.6
+  },
+  {
+    "match_id": "m02",
+    "player_id": "p12",
+    "ratings": {
+      "pressing": 3.5,
+      "verticality": 4.0,
+      "compact_block": 3.8,
+      "flank_overload": 2.7,
+      "transition": 4.4,
+      "execution": 3.7,
+      "discipline": 3.8,
+      "fitness": 4.6
+    },
+    "overall": 3.9
+  },
+  {
+    "match_id": "m02",
+    "player_id": "p11",
+    "ratings": {
+      "pressing": 3.6,
+      "verticality": 3.9,
+      "compact_block": 3.2,
+      "flank_overload": 4.0,
+      "transition": 4.0,
+      "execution": 4.3,
+      "discipline": 3.4,
+      "fitness": 3.6
+    },
+    "overall": 3.9
+  },
+  {
+    "match_id": "m03",
+    "player_id": "p01",
+    "ratings": {
+      "pressing": 4.6,
+      "verticality": 4.5,
+      "compact_block": 3.3,
+      "flank_overload": 3.8,
+      "transition": 5.0,
+      "execution": 4.4,
+      "discipline": 4.8,
+      "fitness": 4.1
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m03",
+    "player_id": "p02",
+    "ratings": {
+      "pressing": 4.1,
+      "verticality": 4.7,
+      "compact_block": 4.7,
+      "flank_overload": 3.2,
+      "transition": 3.6,
+      "execution": 4.6,
+      "discipline": 5.0,
+      "fitness": 4.7
+    },
+    "overall": 4.4
+  },
+  {
+    "match_id": "m03",
+    "player_id": "p03",
+    "ratings": {
+      "pressing": 4.2,
+      "verticality": 4.6,
+      "compact_block": 3.5,
+      "flank_overload": 5.0,
+      "transition": 4.3,
+      "execution": 4.2,
+      "discipline": 4.4,
+      "fitness": 4.5
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m03",
+    "player_id": "p04",
+    "ratings": {
+      "pressing": 5.0,
+      "verticality": 4.9,
+      "compact_block": 4.3,
+      "flank_overload": 3.6,
+      "transition": 4.5,
+      "execution": 4.1,
+      "discipline": 4.3,
+      "fitness": 4.6
+    },
+    "overall": 4.7
+  },
+  {
+    "match_id": "m03",
+    "player_id": "p05",
+    "ratings": {
+      "pressing": 3.8,
+      "verticality": 4.4,
+      "compact_block": 4.2,
+      "flank_overload": 4.7,
+      "transition": 4.1,
+      "execution": 4.1,
+      "discipline": 4.8,
+      "fitness": 4.6
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m03",
+    "player_id": "p06",
+    "ratings": {
+      "pressing": 4.2,
+      "verticality": 4.9,
+      "compact_block": 3.6,
+      "flank_overload": 4.7,
+      "transition": 4.9,
+      "execution": 4.9,
+      "discipline": 3.8,
+      "fitness": 4.3
+    },
+    "overall": 4.6
+  },
+  {
+    "match_id": "m03",
+    "player_id": "p07",
+    "ratings": {
+      "pressing": 3.3,
+      "verticality": 3.4,
+      "compact_block": 4.8,
+      "flank_overload": 3.3,
+      "transition": 3.1,
+      "execution": 4.4,
+      "discipline": 4.6,
+      "fitness": 4.1
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m03",
+    "player_id": "p08",
+    "ratings": {
+      "pressing": 3.9,
+      "verticality": 3.9,
+      "compact_block": 5.0,
+      "flank_overload": 3.1,
+      "transition": 3.8,
+      "execution": 4.2,
+      "discipline": 5.0,
+      "fitness": 4.6
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m03",
+    "player_id": "p09",
+    "ratings": {
+      "pressing": 3.5,
+      "verticality": 3.6,
+      "compact_block": 4.8,
+      "flank_overload": 3.4,
+      "transition": 3.1,
+      "execution": 4.2,
+      "discipline": 4.4,
+      "fitness": 4.8
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m03",
+    "player_id": "p12",
+    "ratings": {
+      "pressing": 4.2,
+      "verticality": 4.2,
+      "compact_block": 4.2,
+      "flank_overload": 3.0,
+      "transition": 4.3,
+      "execution": 4.3,
+      "discipline": 4.6,
+      "fitness": 5.0
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m03",
+    "player_id": "p11",
+    "ratings": {
+      "pressing": 3.9,
+      "verticality": 4.3,
+      "compact_block": 3.2,
+      "flank_overload": 4.6,
+      "transition": 4.5,
+      "execution": 4.7,
+      "discipline": 3.4,
+      "fitness": 3.9
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m04",
+    "player_id": "p01",
+    "ratings": {
+      "pressing": 4.3,
+      "verticality": 4.0,
+      "compact_block": 2.7,
+      "flank_overload": 3.4,
+      "transition": 4.5,
+      "execution": 3.4,
+      "discipline": 4.0,
+      "fitness": 3.5
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m04",
+    "player_id": "p02",
+    "ratings": {
+      "pressing": 3.5,
+      "verticality": 4.4,
+      "compact_block": 3.6,
+      "flank_overload": 2.4,
+      "transition": 2.9,
+      "execution": 4.0,
+      "discipline": 4.3,
+      "fitness": 4.2
+    },
+    "overall": 3.7
+  },
+  {
+    "match_id": "m04",
+    "player_id": "p03",
+    "ratings": {
+      "pressing": 3.7,
+      "verticality": 3.5,
+      "compact_block": 2.9,
+      "flank_overload": 4.3,
+      "transition": 3.6,
+      "execution": 4.1,
+      "discipline": 3.7,
+      "fitness": 3.4
+    },
+    "overall": 3.8
+  },
+  {
+    "match_id": "m04",
+    "player_id": "p04",
+    "ratings": {
+      "pressing": 4.3,
+      "verticality": 3.8,
+      "compact_block": 3.2,
+      "flank_overload": 3.3,
+      "transition": 3.9,
+      "execution": 3.5,
+      "discipline": 3.8,
+      "fitness": 4.2
+    },
+    "overall": 3.9
+  },
+  {
+    "match_id": "m04",
+    "player_id": "p05",
+    "ratings": {
+      "pressing": 3.0,
+      "verticality": 3.2,
+      "compact_block": 3.4,
+      "flank_overload": 4.1,
+      "transition": 3.7,
+      "execution": 3.5,
+      "discipline": 4.1,
+      "fitness": 3.7
+    },
+    "overall": 3.7
+  },
+  {
+    "match_id": "m04",
+    "player_id": "p06",
+    "ratings": {
+      "pressing": 3.2,
+      "verticality": 3.9,
+      "compact_block": 3.0,
+      "flank_overload": 4.4,
+      "transition": 4.1,
+      "execution": 4.4,
+      "discipline": 3.4,
+      "fitness": 3.3
+    },
+    "overall": 3.9
+  },
+  {
+    "match_id": "m04",
+    "player_id": "p07",
+    "ratings": {
+      "pressing": 2.6,
+      "verticality": 2.4,
+      "compact_block": 4.3,
+      "flank_overload": 2.7,
+      "transition": 2.6,
+      "execution": 3.5,
+      "discipline": 3.9,
+      "fitness": 3.9
+    },
+    "overall": 3.3
+  },
+  {
+    "match_id": "m04",
+    "player_id": "p08",
+    "ratings": {
+      "pressing": 3.3,
+      "verticality": 3.4,
+      "compact_block": 4.6,
+      "flank_overload": 2.9,
+      "transition": 2.6,
+      "execution": 3.8,
+      "discipline": 4.4,
+      "fitness": 4.1
+    },
+    "overall": 3.7
+  },
+  {
+    "match_id": "m04",
+    "player_id": "p09",
+    "ratings": {
+      "pressing": 3.0,
+      "verticality": 3.1,
+      "compact_block": 4.3,
+      "flank_overload": 2.3,
+      "transition": 2.8,
+      "execution": 3.2,
+      "discipline": 4.1,
+      "fitness": 4.4
+    },
+    "overall": 3.4
+  },
+  {
+    "match_id": "m04",
+    "player_id": "p12",
+    "ratings": {
+      "pressing": 3.2,
+      "verticality": 3.8,
+      "compact_block": 3.6,
+      "flank_overload": 2.0,
+      "transition": 4.0,
+      "execution": 3.5,
+      "discipline": 3.4,
+      "fitness": 4.0
+    },
+    "overall": 3.5
+  },
+  {
+    "match_id": "m04",
+    "player_id": "p11",
+    "ratings": {
+      "pressing": 3.3,
+      "verticality": 4.1,
+      "compact_block": 2.9,
+      "flank_overload": 3.5,
+      "transition": 3.7,
+      "execution": 3.8,
+      "discipline": 3.1,
+      "fitness": 3.5
+    },
+    "overall": 3.7
+  },
+  {
+    "match_id": "m05",
+    "player_id": "p01",
+    "ratings": {
+      "pressing": 5.0,
+      "verticality": 4.3,
+      "compact_block": 3.6,
+      "flank_overload": 3.6,
+      "transition": 5.0,
+      "execution": 4.2,
+      "discipline": 4.3,
+      "fitness": 4.3
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m05",
+    "player_id": "p02",
+    "ratings": {
+      "pressing": 4.3,
+      "verticality": 4.7,
+      "compact_block": 4.6,
+      "flank_overload": 3.3,
+      "transition": 3.7,
+      "execution": 4.7,
+      "discipline": 5.0,
+      "fitness": 4.9
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m05",
+    "player_id": "p03",
+    "ratings": {
+      "pressing": 4.0,
+      "verticality": 4.6,
+      "compact_block": 3.5,
+      "flank_overload": 5.0,
+      "transition": 4.5,
+      "execution": 4.6,
+      "discipline": 4.0,
+      "fitness": 4.1
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m05",
+    "player_id": "p04",
+    "ratings": {
+      "pressing": 5.0,
+      "verticality": 4.5,
+      "compact_block": 4.0,
+      "flank_overload": 4.0,
+      "transition": 4.6,
+      "execution": 4.2,
+      "discipline": 4.2,
+      "fitness": 4.8
+    },
+    "overall": 4.6
+  },
+  {
+    "match_id": "m05",
+    "player_id": "p05",
+    "ratings": {
+      "pressing": 3.8,
+      "verticality": 4.0,
+      "compact_block": 4.1,
+      "flank_overload": 4.5,
+      "transition": 4.4,
+      "execution": 4.2,
+      "discipline": 4.8,
+      "fitness": 4.4
+    },
+    "overall": 4.4
+  },
+  {
+    "match_id": "m05",
+    "player_id": "p06",
+    "ratings": {
+      "pressing": 4.0,
+      "verticality": 4.8,
+      "compact_block": 3.5,
+      "flank_overload": 4.7,
+      "transition": 4.6,
+      "execution": 4.9,
+      "discipline": 3.9,
+      "fitness": 4.1
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m05",
+    "player_id": "p07",
+    "ratings": {
+      "pressing": 3.5,
+      "verticality": 3.1,
+      "compact_block": 4.8,
+      "flank_overload": 3.4,
+      "transition": 3.5,
+      "execution": 3.9,
+      "discipline": 4.6,
+      "fitness": 4.3
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m05",
+    "player_id": "p08",
+    "ratings": {
+      "pressing": 3.9,
+      "verticality": 3.7,
+      "compact_block": 5.0,
+      "flank_overload": 3.5,
+      "transition": 3.6,
+      "execution": 4.1,
+      "discipline": 4.9,
+      "fitness": 4.2
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m05",
+    "player_id": "p09",
+    "ratings": {
+      "pressing": 3.4,
+      "verticality": 3.5,
+      "compact_block": 5.0,
+      "flank_overload": 2.9,
+      "transition": 3.3,
+      "execution": 4.2,
+      "discipline": 4.3,
+      "fitness": 4.9
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m05",
+    "player_id": "p12",
+    "ratings": {
+      "pressing": 4.1,
+      "verticality": 4.2,
+      "compact_block": 4.4,
+      "flank_overload": 2.5,
+      "transition": 4.7,
+      "execution": 4.5,
+      "discipline": 4.1,
+      "fitness": 4.8
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m05",
+    "player_id": "p11",
+    "ratings": {
+      "pressing": 3.9,
+      "verticality": 4.8,
+      "compact_block": 3.3,
+      "flank_overload": 4.0,
+      "transition": 4.2,
+      "execution": 4.7,
+      "discipline": 3.5,
+      "fitness": 4.3
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m06",
+    "player_id": "p01",
+    "ratings": {
+      "pressing": 5.0,
+      "verticality": 4.8,
+      "compact_block": 3.4,
+      "flank_overload": 4.1,
+      "transition": 5.0,
+      "execution": 4.4,
+      "discipline": 4.7,
+      "fitness": 4.3
+    },
+    "overall": 4.7
+  },
+  {
+    "match_id": "m06",
+    "player_id": "p02",
+    "ratings": {
+      "pressing": 4.4,
+      "verticality": 4.9,
+      "compact_block": 4.8,
+      "flank_overload": 3.5,
+      "transition": 3.8,
+      "execution": 4.5,
+      "discipline": 5.0,
+      "fitness": 4.9
+    },
+    "overall": 4.6
+  },
+  {
+    "match_id": "m06",
+    "player_id": "p03",
+    "ratings": {
+      "pressing": 4.5,
+      "verticality": 4.3,
+      "compact_block": 3.6,
+      "flank_overload": 5.0,
+      "transition": 4.1,
+      "execution": 4.4,
+      "discipline": 4.0,
+      "fitness": 4.2
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m06",
+    "player_id": "p04",
+    "ratings": {
+      "pressing": 5.0,
+      "verticality": 4.4,
+      "compact_block": 4.0,
+      "flank_overload": 3.9,
+      "transition": 4.6,
+      "execution": 4.1,
+      "discipline": 4.3,
+      "fitness": 4.8
+    },
+    "overall": 4.6
+  },
+  {
+    "match_id": "m06",
+    "player_id": "p05",
+    "ratings": {
+      "pressing": 3.8,
+      "verticality": 3.9,
+      "compact_block": 4.3,
+      "flank_overload": 4.8,
+      "transition": 4.2,
+      "execution": 4.2,
+      "discipline": 4.7,
+      "fitness": 4.5
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m06",
+    "player_id": "p06",
+    "ratings": {
+      "pressing": 4.1,
+      "verticality": 4.5,
+      "compact_block": 3.7,
+      "flank_overload": 5.0,
+      "transition": 4.8,
+      "execution": 5.0,
+      "discipline": 3.8,
+      "fitness": 4.3
+    },
+    "overall": 4.6
+  },
+  {
+    "match_id": "m06",
+    "player_id": "p07",
+    "ratings": {
+      "pressing": 3.6,
+      "verticality": 3.4,
+      "compact_block": 4.7,
+      "flank_overload": 3.0,
+      "transition": 3.3,
+      "execution": 3.8,
+      "discipline": 4.7,
+      "fitness": 4.4
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m06",
+    "player_id": "p08",
+    "ratings": {
+      "pressing": 3.8,
+      "verticality": 3.6,
+      "compact_block": 5.0,
+      "flank_overload": 3.1,
+      "transition": 3.6,
+      "execution": 4.0,
+      "discipline": 5.0,
+      "fitness": 4.6
+    },
+    "overall": 4.2
+  },
+  {
+    "match_id": "m06",
+    "player_id": "p09",
+    "ratings": {
+      "pressing": 3.3,
+      "verticality": 3.6,
+      "compact_block": 4.6,
+      "flank_overload": 3.1,
+      "transition": 3.1,
+      "execution": 4.0,
+      "discipline": 4.3,
+      "fitness": 4.7
+    },
+    "overall": 3.9
+  },
+  {
+    "match_id": "m06",
+    "player_id": "p12",
+    "ratings": {
+      "pressing": 4.3,
+      "verticality": 4.2,
+      "compact_block": 4.5,
+      "flank_overload": 3.0,
+      "transition": 4.4,
+      "execution": 4.1,
+      "discipline": 4.0,
+      "fitness": 4.8
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m06",
+    "player_id": "p11",
+    "ratings": {
+      "pressing": 4.5,
+      "verticality": 4.4,
+      "compact_block": 3.4,
+      "flank_overload": 4.5,
+      "transition": 4.4,
+      "execution": 4.7,
+      "discipline": 3.8,
+      "fitness": 3.9
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m07",
+    "player_id": "p01",
+    "ratings": {
+      "pressing": 4.6,
+      "verticality": 4.3,
+      "compact_block": 3.1,
+      "flank_overload": 3.9,
+      "transition": 5.0,
+      "execution": 4.2,
+      "discipline": 4.7,
+      "fitness": 4.5
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m07",
+    "player_id": "p02",
+    "ratings": {
+      "pressing": 4.0,
+      "verticality": 4.9,
+      "compact_block": 4.7,
+      "flank_overload": 3.1,
+      "transition": 4.0,
+      "execution": 4.9,
+      "discipline": 4.9,
+      "fitness": 4.6
+    },
+    "overall": 4.5
+  },
+  {
+    "match_id": "m07",
+    "player_id": "p03",
+    "ratings": {
+      "pressing": 4.3,
+      "verticality": 4.4,
+      "compact_block": 3.8,
+      "flank_overload": 5.0,
+      "transition": 4.5,
+      "execution": 4.3,
+      "discipline": 4.3,
+      "fitness": 4.4
+    },
+    "overall": 4.6
+  },
+  {
+    "match_id": "m07",
+    "player_id": "p04",
+    "ratings": {
+      "pressing": 5.0,
+      "verticality": 4.8,
+      "compact_block": 4.3,
+      "flank_overload": 3.9,
+      "transition": 4.3,
+      "execution": 4.6,
+      "discipline": 4.5,
+      "fitness": 4.7
+    },
+    "overall": 4.7
+  },
+  {
+    "match_id": "m07",
+    "player_id": "p05",
+    "ratings": {
+      "pressing": 3.8,
+      "verticality": 4.1,
+      "compact_block": 4.3,
+      "flank_overload": 4.4,
+      "transition": 4.3,
+      "execution": 4.3,
+      "discipline": 4.3,
+      "fitness": 4.6
+    },
+    "overall": 4.4
+  },
+  {
+    "match_id": "m07",
+    "player_id": "p06",
+    "ratings": {
+      "pressing": 4.3,
+      "verticality": 5.0,
+      "compact_block": 4.0,
+      "flank_overload": 4.8,
+      "transition": 4.8,
+      "execution": 5.0,
+      "discipline": 3.7,
+      "fitness": 4.3
+    },
+    "overall": 4.7
+  },
+  {
+    "match_id": "m07",
+    "player_id": "p07",
+    "ratings": {
+      "pressing": 3.6,
+      "verticality": 3.3,
+      "compact_block": 4.8,
+      "flank_overload": 3.3,
+      "transition": 3.2,
+      "execution": 4.3,
+      "discipline": 5.0,
+      "fitness": 4.1
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m07",
+    "player_id": "p08",
+    "ratings": {
+      "pressing": 4.1,
+      "verticality": 3.7,
+      "compact_block": 5.0,
+      "flank_overload": 3.4,
+      "transition": 3.5,
+      "execution": 4.1,
+      "discipline": 5.0,
+      "fitness": 4.3
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m07",
+    "player_id": "p09",
+    "ratings": {
+      "pressing": 3.4,
+      "verticality": 3.7,
+      "compact_block": 4.7,
+      "flank_overload": 3.4,
+      "transition": 3.5,
+      "execution": 4.0,
+      "discipline": 4.2,
+      "fitness": 5.0
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m07",
+    "player_id": "p12",
+    "ratings": {
+      "pressing": 3.9,
+      "verticality": 4.5,
+      "compact_block": 4.3,
+      "flank_overload": 3.0,
+      "transition": 4.7,
+      "execution": 4.4,
+      "discipline": 4.3,
+      "fitness": 5.0
+    },
+    "overall": 4.4
+  },
+  {
+    "match_id": "m07",
+    "player_id": "p11",
+    "ratings": {
+      "pressing": 3.9,
+      "verticality": 4.4,
+      "compact_block": 3.5,
+      "flank_overload": 4.2,
+      "transition": 4.4,
+      "execution": 4.5,
+      "discipline": 3.6,
+      "fitness": 4.1
+    },
+    "overall": 4.3
+  },
+  {
+    "match_id": "m08",
+    "player_id": "p01",
+    "ratings": {
+      "pressing": 4.6,
+      "verticality": 4.1,
+      "compact_block": 3.1,
+      "flank_overload": 3.3,
+      "transition": 4.6,
+      "execution": 3.8,
+      "discipline": 4.0,
+      "fitness": 3.8
+    },
+    "overall": 4.2
+  },
+  {
+    "match_id": "m08",
+    "player_id": "p02",
+    "ratings": {
+      "pressing": 3.8,
+      "verticality": 4.6,
+      "compact_block": 4.0,
+      "flank_overload": 2.8,
+      "transition": 3.5,
+      "execution": 4.4,
+      "discipline": 5.0,
+      "fitness": 4.5
+    },
+    "overall": 4.2
+  },
+  {
+    "match_id": "m08",
+    "player_id": "p03",
+    "ratings": {
+      "pressing": 3.8,
+      "verticality": 3.7,
+      "compact_block": 3.0,
+      "flank_overload": 4.6,
+      "transition": 3.8,
+      "execution": 3.9,
+      "discipline": 3.8,
+      "fitness": 3.8
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m08",
+    "player_id": "p04",
+    "ratings": {
+      "pressing": 5.0,
+      "verticality": 4.3,
+      "compact_block": 3.9,
+      "flank_overload": 3.3,
+      "transition": 4.4,
+      "execution": 4.0,
+      "discipline": 4.2,
+      "fitness": 4.5
+    },
+    "overall": 4.4
+  },
+  {
+    "match_id": "m08",
+    "player_id": "p05",
+    "ratings": {
+      "pressing": 3.4,
+      "verticality": 3.7,
+      "compact_block": 3.8,
+      "flank_overload": 3.9,
+      "transition": 4.0,
+      "execution": 3.8,
+      "discipline": 4.4,
+      "fitness": 3.9
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m08",
+    "player_id": "p06",
+    "ratings": {
+      "pressing": 3.5,
+      "verticality": 4.6,
+      "compact_block": 3.2,
+      "flank_overload": 4.3,
+      "transition": 4.3,
+      "execution": 4.4,
+      "discipline": 3.8,
+      "fitness": 3.6
+    },
+    "overall": 4.2
+  },
+  {
+    "match_id": "m08",
+    "player_id": "p07",
+    "ratings": {
+      "pressing": 3.3,
+      "verticality": 3.0,
+      "compact_block": 4.7,
+      "flank_overload": 2.6,
+      "transition": 3.0,
+      "execution": 3.8,
+      "discipline": 4.4,
+      "fitness": 4.2
+    },
+    "overall": 3.7
+  },
+  {
+    "match_id": "m08",
+    "player_id": "p08",
+    "ratings": {
+      "pressing": 3.8,
+      "verticality": 3.4,
+      "compact_block": 4.9,
+      "flank_overload": 3.0,
+      "transition": 3.3,
+      "execution": 4.3,
+      "discipline": 4.6,
+      "fitness": 4.0
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m08",
+    "player_id": "p09",
+    "ratings": {
+      "pressing": 3.3,
+      "verticality": 3.0,
+      "compact_block": 4.3,
+      "flank_overload": 2.5,
+      "transition": 2.7,
+      "execution": 3.8,
+      "discipline": 4.2,
+      "fitness": 4.4
+    },
+    "overall": 3.6
+  },
+  {
+    "match_id": "m08",
+    "player_id": "p12",
+    "ratings": {
+      "pressing": 3.6,
+      "verticality": 4.1,
+      "compact_block": 4.1,
+      "flank_overload": 2.5,
+      "transition": 4.3,
+      "execution": 4.2,
+      "discipline": 4.2,
+      "fitness": 4.6
+    },
+    "overall": 4.0
+  },
+  {
+    "match_id": "m08",
+    "player_id": "p11",
+    "ratings": {
+      "pressing": 3.9,
+      "verticality": 4.4,
+      "compact_block": 2.9,
+      "flank_overload": 4.0,
+      "transition": 4.1,
+      "execution": 4.4,
+      "discipline": 3.4,
+      "fitness": 3.5
+    },
+    "overall": 4.0
+  }
+]

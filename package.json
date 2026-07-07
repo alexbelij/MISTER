@@ -31,6 +31,9 @@
     "footage": "node src/analysis/footage.js",
     "ratings": "node src/analysis/player_ratings.js",
     "opponents": "node src/analysis/opponent_tracker.js",
+    "suggestions": "node src/analysis/suggestions.js",
+    "report": "node src/analysis/reports.js --match",
+    "season": "node src/analysis/reports.js --season",
     "ocr": "node src/ocr/notes.js",
     "translate": "node src/translate/translate.js",
     "registry": "node src/model_registry/select.js",
@@ -51,7 +54,8 @@
     "hyperswarm": "latest",
     "hyperblobs": "latest",
     "corestore": "latest",
-    "autobase": "latest"
+    "autobase": "latest",
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
     "electron": "latest"
