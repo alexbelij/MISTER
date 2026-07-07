@@ -1,0 +1,99 @@
+[
+  {
+    "name": "SV Hafen United",
+    "style": "Possession-based 4-2-3-1. Patient build-up, switch play, weak to high press.",
+    "weaknesses": [
+      "GK uncomfortable under pressure",
+      "CBs slow to turn",
+      "Fullbacks push high — channels open",
+      "No plan B vs low block"
+    ],
+    "strengths": [
+      "Midfield control",
+      "Set pieces",
+      "Experienced 6 who shields well"
+    ],
+    "last_match": "2-1 loss to FC Metall Nord (Hinrunde). Conceded from a channel run by Hartmann after pressing their CB into a mistake.",
+    "key_players": [
+      {
+        "name": "Sven Mahler",
+        "pos": "GK",
+        "note": "Hesitant under pressure, tends to play long when pressed — that's where we win the second ball."
+      },
+      {
+        "name": "Robert Fass",
+        "pos": "CB",
+        "note": "Slow to turn. If Hartmann peels into the channel, Fass can't recover."
+      },
+      {
+        "name": "Kai Bohn",
+        "pos": "CM (6)",
+        "note": "Good shield but doesn't like being pressed from behind. Riedel should mark him when we have the ball."
+      }
+    ]
+  },
+  {
+    "name": "TSV Bergland",
+    "style": "Direct 3-5-2. Long balls to twin strikers, wingbacks provide width. Compact mid-block.",
+    "weaknesses": [
+      "Wingbacks caught high — 2v1s available",
+      "3-at-the-back vulnerable to channel runs",
+      "No pressing structure — passive out of possession"
+    ],
+    "strengths": [
+      "Physical twin strikers",
+      "Set piece threat",
+      "Counter-attack from deep"
+    ],
+    "last_match": "0-0 draw. We struggled against their mid-block — couldn't break them down. Need more patience in build-up.",
+    "key_players": [
+      {
+        "name": "Uwe Stahl",
+        "pos": "CB (middle)",
+        "note": "Aggressive stepper — if he steps, Wendt finds the pocket behind him."
+      },
+      {
+        "name": "Mike Dorn",
+        "pos": "WBR",
+        "note": "Gets forward but doesn't track back fast. Krüger pins him, 10 underlaps."
+      },
+      {
+        "name": "Lars Pfeiffer",
+        "pos": "ST",
+        "note": "Big, physical, wins headers. Kross needs to match him physically, Vogt covers."
+      }
+    ]
+  },
+  {
+    "name": "FC Südwest Stern",
+    "style": "Counter-attacking 4-4-2. Deep block, absorb pressure, counter with two fast wingers.",
+    "weaknesses": [
+      "Deep block can be pulled apart by switches",
+      "No pressing at all",
+      "Vulnerable to overloads on both flanks"
+    ],
+    "strengths": [
+      "Two rapid wingers for counters",
+      "Disciplined block",
+      "GK is excellent shot-stopper"
+    ],
+    "last_match": "1-0 win for Stern. We had 70% possession, couldn't score. They countered from a lost transition — Heil was caught high.",
+    "key_players": [
+      {
+        "name": "Tom Engel",
+        "pos": "GK",
+        "note": "Great shot-stopper, weak distribution. Press him and he'll go long — second ball is ours."
+      },
+      {
+        "name": "Jan Köhler",
+        "pos": "RW",
+        "note": "Rapid counter threat. Auer must stay compact, no overlapping. 1v1 only."
+      },
+      {
+        "name": "Max Ritter",
+        "pos": "ST",
+        "note": "Poacher, stays central. Kross marks him tight, Vogt sweeps."
+      }
+    ]
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "name": "mister-mobile",
+  "version": "1.0.0",
+  "type": "app",
+  "entrypoint": "mobile/index.html",
+  "workers": ["mobile/worker.js"],
+  "permissions": {
+    "camera": true,
+    "microphone": true,
+    "storage": true,
+    "network": true
+  },
+  "dependencies": {
+    "@qvac/sdk": "latest",
+    "hyperswarm": "latest",
+    "hyperblobs": "latest",
+    "corestore": "latest"
+  }
+}

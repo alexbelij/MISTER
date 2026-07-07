@@ -1,0 +1,65 @@
+{
+  "name": "mister",
+  "version": "5.0.0",
+  "description": "MISTER — On-device club brain that fine-tunes (LoRA) on your club's data. Tether Developers Cup.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexbelij/MISTER.git"
+  },
+  "homepage": "https://github.com/alexbelij/MISTER#readme",
+  "type": "commonjs",
+  "scripts": {
+    "prepare": "node src/pipeline/prepare_data.js",
+    "augment": "node src/pipeline/augment.js",
+    "finetune": "node src/finetune/finetune.js",
+    "finetune:gate": "node src/finetune/finetune.js --profile gate",
+    "finetune:deep": "node src/finetune/finetune.js --profile deep",
+    "eval": "node src/eval/eval_harness.js",
+    "eval:enhanced": "node src/eval/enhanced_eval.js --llm-judge",
+    "chat": "node src/inference/chat.js",
+    "chat:stream": "node src/inference/chat.js --stream",
+    "multi-agent": "node src/inference/multi_agent.js",
+    "distribute": "node src/pears/distribute.js",
+    "delegate": "node src/pears/delegate.js",
+    "collab": "node src/pears/collab_model.js",
+    "marketplace": "node src/wdk/marketplace.js",
+    "voice:briefing": "node src/voice/briefing.js",
+    "voice:briefing:stream": "node src/voice/briefing.js --stream",
+    "voice:input": "node src/voice/input.js",
+    "voice:input:stream": "node src/voice/input.js --stream",
+    "footage": "node src/analysis/footage.js",
+    "ratings": "node src/analysis/player_ratings.js",
+    "opponents": "node src/analysis/opponent_tracker.js",
+    "ocr": "node src/ocr/notes.js",
+    "translate": "node src/translate/translate.js",
+    "registry": "node src/model_registry/select.js",
+    "gate": "node src/pipeline/prepare_data.js && node src/finetune/finetune.js --profile gate && node src/eval/eval_harness.js",
+    "gate:enhanced": "node src/pipeline/prepare_data.js && node src/pipeline/augment.js && node src/finetune/finetune.js --profile standard && node src/eval/enhanced_eval.js --llm-judge",
+    "ui": "npx electron main.js",
+    "mobile": "pear run .",
+    "start": "npm run prepare && npm run ui",
+    "test": "node tests/run_tests.js",
+    "encrypt": "node -e \"require('./src/security/crypto').encryptClubData(process.argv[1] || prompt('Password: '))\"",
+    "decrypt": "node -e \"require('./src/security/crypto').decryptClubData(process.argv[1] || prompt('Password: '))\"",
+    "export-data": "node -e \"const p = require('./src/security/crypto').exportAllData(); console.log('Exported to:', p)\"",
+    "delete-data": "node -e \"require('./src/security/crypto').deleteAllClubData(); console.log('All data deleted')\""
+  },
+  "dependencies": {
+    "@qvac/sdk": "latest",
+    "@tetherto/wdk": "latest",
+    "hyperswarm": "latest",
+    "hyperblobs": "latest",
+    "corestore": "latest",
+    "autobase": "latest"
+  },
+  "devDependencies": {
+    "electron": "latest"
+  },
+  "keywords": [
+    "qvac", "local-ai", "on-device-ai", "lora", "fine-tuning",
+    "football", "pears", "p2p", "privacy", "wdk", "self-custody",
+    "voice", "vlm", "ocr", "translate", "tactical-analysis",
+    "mobile", "encryption", "gdpr", "edge-ai"
+  ]
+}
