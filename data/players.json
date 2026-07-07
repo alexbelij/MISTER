@@ -1,0 +1,162 @@
+[
+  {
+    "id": "p01",
+    "name": "Jonas Hartmann",
+    "pos": "ST",
+    "number": 9,
+    "age": 24,
+    "foot": "right",
+    "height": 182,
+    "notes": "Channel runs, first touch pressure on GK, pressing trigger"
+  },
+  {
+    "id": "p02",
+    "name": "Lukas Riedel",
+    "pos": "CM",
+    "number": 6,
+    "age": 27,
+    "foot": "right",
+    "height": 178,
+    "notes": "Metronome, always available, forward-thinking. Pressing engine when needed"
+  },
+  {
+    "id": "p03",
+    "name": "Felix Krüger",
+    "pos": "RW",
+    "number": 7,
+    "age": 22,
+    "foot": "left",
+    "height": 175,
+    "notes": "Pins FB, creates 2v1, flank overload primary weapon"
+  },
+  {
+    "id": "p04",
+    "name": "Max Schäfer",
+    "pos": "CM",
+    "number": 8,
+    "age": 25,
+    "foot": "right",
+    "height": 180,
+    "notes": "Pressing engine, box-to-box, drives forward with ball"
+  },
+  {
+    "id": "p05",
+    "name": "Tobias Heil",
+    "pos": "RB",
+    "number": 2,
+    "age": 23,
+    "foot": "right",
+    "height": 176,
+    "notes": "Underlaps in flank overload, compact rest-defence"
+  },
+  {
+    "id": "p06",
+    "name": "Niko Wendt",
+    "pos": "AM",
+    "number": 10,
+    "age": 21,
+    "foot": "right",
+    "height": 172,
+    "notes": "Drifts wide to create 2v1, finds pockets between lines, creative"
+  },
+  {
+    "id": "p07",
+    "name": "Philipp Auer",
+    "pos": "LB",
+    "number": 3,
+    "age": 26,
+    "foot": "left",
+    "height": 174,
+    "notes": "Defensive-minded, good 1v1, shows wingers wide. Stays compact"
+  },
+  {
+    "id": "p08",
+    "name": "Thomas Voss Jr.",
+    "pos": "CB",
+    "number": 4,
+    "age": 28,
+    "foot": "right",
+    "height": 188,
+    "notes": "Leader of back four, organizes compact block, reads channel runs"
+  },
+  {
+    "id": "p09",
+    "name": "Stefan Brandt",
+    "pos": "CB",
+    "number": 5,
+    "age": 25,
+    "foot": "left",
+    "height": 190,
+    "notes": "Aerial duels, covers channel when Voss Jr. steps up"
+  },
+  {
+    "id": "p10",
+    "name": "Andreas Keller",
+    "pos": "CM",
+    "number": 14,
+    "age": 24,
+    "foot": "right",
+    "height": 176,
+    "notes": "Riedel backup — disciplined, stays position, good passer. Sub at 60min"
+  },
+  {
+    "id": "p11",
+    "name": "Marco Reuss",
+    "pos": "LW",
+    "number": 11,
+    "age": 23,
+    "foot": "right",
+    "height": 170,
+    "notes": "Isolation 1v1 weapon, cuts inside, trusts his man"
+  },
+  {
+    "id": "p12",
+    "name": "Klaus Mahler",
+    "pos": "GK",
+    "number": 1,
+    "age": 29,
+    "foot": "right",
+    "height": 191,
+    "notes": "Sweeper-keeper, high line, quick distribution to trigger transitions"
+  },
+  {
+    "id": "p13",
+    "name": "Daniel Faust",
+    "pos": "CM",
+    "number": 16,
+    "age": 20,
+    "foot": "right",
+    "height": 173,
+    "notes": "Academy prospect, energy off the bench, pressing intensity"
+  },
+  {
+    "id": "p14",
+    "name": "Robert Stein",
+    "pos": "CB",
+    "number": 15,
+    "age": 27,
+    "foot": "right",
+    "height": 186,
+    "notes": "Backup CB, physical, good in the air"
+  },
+  {
+    "id": "p15",
+    "name": "Erik Sommer",
+    "pos": "ST",
+    "number": 19,
+    "age": 19,
+    "foot": "right",
+    "height": 179,
+    "notes": "Academy, super-sub, pace in behind, transition threat"
+  },
+  {
+    "id": "p16",
+    "name": "Jan Licht",
+    "pos": "RB",
+    "number": 17,
+    "age": 22,
+    "foot": "right",
+    "height": 174,
+    "notes": "Heil backup, more attacking, less defensive discipline"
+  }
+]
