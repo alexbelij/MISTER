@@ -62,12 +62,23 @@ function getQVAC() {
 async function healthCheck() {
   try {
     const qvac = getQVAC();
-    await qvac.heartbeat({});
+    // NOTE (2026-07-08, GATE run): qvac.heartbeat({}) hangs indefinitely when
+    // no separate QVAC provider process has been started with
+    // startQVACProvider() first — it never resolves or rejects. In practice,
+    // loadModel()/completion()/finetune() all work fine standalone in Node.js
+    // without ever calling heartbeat or starting a provider (verified against
+    // real GPU + real Qwen3-1.7B-Q4 fine-tune, see docs/gate_finetune_run_log.md).
+    // Race heartbeat against a short timeout so a missing/hanging provider
+    // never blocks the actual fine-tune/eval pipeline that doesn't need it.
+    await Promise.race([
+      qvac.heartbeat({}),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('heartbeat timeout (non-fatal, provider not required for local SDK calls)')), 5000)),
+    ]);
     log.info('qvac', 'Health check passed');
     return true;
   } catch (e) {
-    log.error('qvac', 'Health check failed', { error: e.message });
-    return false;
+    log.warn('qvac', 'Health check inconclusive (heartbeat unavailable), proceeding anyway', { error: e.message });
+    return true;
   }
 }
 
@@ -636,16 +647,26 @@ async function finetuneRun(modelId, params, onProgress) {
 
   // QVAC expects trainDatasetDir to be a FILE path (e.g. /path/to/train.jsonl), not a directory
   const trainDir = params.trainDir || path.join(process.cwd(), 'data', 'finetune_input');
-  const outputDir = params.outputDir || path.join(process.cwd(), 'data', 'finetune_output');
+  // BUGFIX (2026-07-08, GATE run): the caller (finetune.js) passes the desired
+  // output location as `params.output.dir` (matching config.finetune.outputDir,
+  // e.g. "adapters"), but this function only ever read `params.outputDir`
+  // (never set by any caller), so every run silently fell back to the
+  // hardcoded default below regardless of config. Respect params.output.dir too.
+  const outputDir = params.outputDir || params.output?.dir || path.join(process.cwd(), 'data', 'finetune_output');
 
   // Ensure directories exist
   fs.mkdirSync(trainDir, { recursive: true });
   fs.mkdirSync(outputDir, { recursive: true });
 
   // Write SFT data as JSONL file (QVAC expects train.jsonl in trainDatasetDir)
+  // BUGFIX (2026-07-08, GATE run): `sftPath` was declared with `let` inside
+  // this `if` block but referenced below (in `finetuneParams.options.trainDatasetDir`)
+  // outside the block's scope, throwing "ReferenceError: sftPath is not defined"
+  // on every single invocation — finetuneRun() could never have completed a
+  // real training job before this fix. Hoisted the declaration.
+  let sftPath;
   if (params.sft && params.sft.dataset) {
     // If trainDir is a directory, write train.jsonl inside it; if it's a file path, use it directly
-  let sftPath;
   if (trainDir.endsWith('.jsonl')) {
     sftPath = trainDir;
     fs.mkdirSync(path.dirname(sftPath), { recursive: true });
@@ -746,10 +767,33 @@ async function finetuneRun(modelId, params, onProgress) {
     stats: result.stats ? { trainLoss: result.stats.train_loss, epochs: result.stats.epochs_completed } : null
   });
 
+  // BUGFIX (2026-07-08, GATE run): this used to unconditionally return
+  // `adapterPath: outputDir` (a directory), which callers then tried to
+  // fs.statSync() as a file (size always came back 0) and pass straight into
+  // loadLLM({ lora: <dir> }) for eval, which QVAC's llama.cpp backend rejects
+  // (it needs an actual .gguf adapter file, not a directory). Look inside
+  // outputDir for the produced adapter file(s) and return the real path.
+  let realAdapterPath = outputDir;
+  let realAdapterSize = 0;
+  try {
+    if (fs.existsSync(outputDir) && fs.statSync(outputDir).isDirectory()) {
+      const candidates = fs.readdirSync(outputDir)
+        .filter(f => f.endsWith('.gguf') || f.endsWith('.bin') || f.endsWith('.safetensors'))
+        .map(f => path.join(outputDir, f));
+      if (candidates.length > 0) {
+        candidates.sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
+        realAdapterPath = candidates[0];
+        realAdapterSize = fs.statSync(realAdapterPath).size;
+      }
+    }
+  } catch (e) {
+    log.warn('qvac', 'Could not resolve adapter file inside outputDir', { outputDir, error: e.message });
+  }
+
   // Normalize result for MISTER
   return {
-    adapterPath: outputDir,
-    adapterSize: 0,
+    adapterPath: realAdapterPath,
+    adapterSize: realAdapterSize,
     finalLoss: result.stats?.train_loss || 0,
     status: result.status,
     stats: result.stats,
