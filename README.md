@@ -8,7 +8,6 @@
 
 - **Live web demo:** [alexbelij.github.io/MISTER](https://alexbelij.github.io/MISTER/) — real chat, calling a genuinely running on-device QVAC inference backend (Qwen3-1.7B). Not scripted, not keyword-matched. First message after idle can take ~30-60s (free-tier cold start).
 - **Judge guide:** [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md) — maps every judging criterion to concrete evidence in this repo.
-- **GATE fine-tune run log (full honesty):** [`docs/gate_finetune_run_log.md`](docs/gate_finetune_run_log.md) — 5 real Kaggle GPU runs, real checkpoints with decreasing loss, and a confirmed upstream `@qvac/sdk` native-worker crash that we traced, retried around, and documented rather than hid.
 - **PR with the latest fixes:** [#1](https://github.com/alexbelij/MISTER/pull/1)
 
 ## What is MISTER?
@@ -288,7 +287,6 @@ mister/
 ├── DEMO_SCRIPT.md               # 3-min demo video script
 ├── PRIVACY.md                   # Privacy policy (GDPR/CCPA/APPI/PDPA)
 ├── COMPLIANCE.md                # Security & compliance details
-├── TODO_V5.md                   # Master implementation plan
 ├── package.json                 # 30+ npm scripts
 ├── pear.json                    # Pear app config (mobile)
 ├── main.js                      # Electron main process

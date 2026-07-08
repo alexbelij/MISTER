@@ -35,7 +35,7 @@ const DATA_DIR = argValue('--data') || config.paths.processed;
 const OUTPUT_DIR = config.finetune.outputDir;
 // RETRY-ON-CRASH (2026-07-08): --retry-on-crash makes finetune() survive the
 // native `@qvac/sdk` worker SIGABRT crash we hit repeatedly on Kaggle P100 GPUs
-// (see docs/gate_finetune_run_log.md). On crash we re-invoke finetuneRun with
+// On crash we re-invoke finetuneRun with
 // `resume: true` (QVAC's operation: 'resume'), which continues from the last
 // checkpoint written to checkpointSaveDir instead of losing all progress and
 // restarting cold. Capped at MAX_RETRIES attempts (first attempt + retries).

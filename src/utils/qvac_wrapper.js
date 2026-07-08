@@ -67,7 +67,7 @@ async function healthCheck() {
     // startQVACProvider() first — it never resolves or rejects. In practice,
     // loadModel()/completion()/finetune() all work fine standalone in Node.js
     // without ever calling heartbeat or starting a provider (verified against
-    // real GPU + real Qwen3-1.7B-Q4 fine-tune, see docs/gate_finetune_run_log.md).
+    // real GPU + real Qwen3-1.7B-Q4 fine-tune).
     // Race heartbeat against a short timeout so a missing/hanging provider
     // never blocks the actual fine-tune/eval pipeline that doesn't need it.
     await Promise.race([
@@ -698,9 +698,8 @@ async function finetuneRun(modelId, params, onProgress) {
     }
   };
 
-  // RETRY/RESUME SUPPORT (2026-07-08, added after Kaggle SIGABRT crashes seen
-  // in the native fine-tune worker even on the lightest `gate` profile — see
-  // docs/gate_finetune_run_log.md). QVAC's `finetune()` supports
+  // RETRY/RESUME SUPPORT (added after intermittent native-worker crashes seen
+  // during testing, even on the lightest `gate` profile). QVAC's `finetune()` supports
   // `operation: 'resume'`, which continues from the latest checkpoint written
   // to `checkpointSaveDir` instead of restarting from scratch. Callers that
   // want to resume after a crashed/aborted run should pass `params.resume: true`

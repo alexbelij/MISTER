@@ -10,7 +10,7 @@
       "expectedTime": "5-10 min"
     },
     "gate_micro": {
-      "description": "Smallest possible GATE run — used to isolate a native fine-tune worker SIGABRT crash seen on Kaggle P100 (see docs/gate_finetune_run_log.md). 1 epoch, 20 pairs, microBatchSize 1, checkpoint every step so a resume can pick up immediately after a crash.",
+      "description": "Smallest possible GATE run — used to isolate a native fine-tune worker crash seen on a cloud GPU during testing. 1 epoch, 20 pairs, microBatchSize 1, checkpoint every step so a resume can pick up immediately after a crash.",
       "epochs": 1,
       "learningRate": 1e-4,
       "causalEpochs": 1,
