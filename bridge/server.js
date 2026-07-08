@@ -110,8 +110,16 @@ app.post('/chat', async (req, res) => {
   }
 
   try {
+    // Qwen3 is a "thinking" model: by default it spends generated tokens on a
+    // <think>...</think> block before the actual answer. With the small
+    // CPU-only token budget below (48), the whole budget can be consumed by
+    // thinking and the stripped answer comes back empty. Qwen3's chat
+    // template recognizes a literal "/no_think" directive to skip the
+    // reasoning block entirely, so the full 48-token budget goes to the
+    // actual answer. See stripThinking() in qvac_wrapper.js for the (now
+    // largely unnecessary but harmless) belt-and-suspenders stripping.
     const history = [
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: `${SYSTEM_PROMPT} /no_think` },
       { role: 'user', content: message },
     ];
 
