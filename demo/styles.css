@@ -757,6 +757,37 @@ body {
   30% { transform: translateY(-6px); opacity: 1; }
 }
 
+/* ===== Proof ===== */
+.proof-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 900px;
+}
+.proof-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.proof-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.proof-card p {
+  color: var(--text-secondary, #8b949e);
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+.proof-card code {
+  background: rgba(110,118,129,0.15);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+.proof-table { margin-top: 4px; }
+
 /* ===== Distribute ===== */
 .distribute-container {
   display: grid;

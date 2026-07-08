@@ -1,5 +1,8 @@
 # MISTER 🧠⚽
 
+[![tests](https://github.com/alexbelij/MISTER/actions/workflows/tests.yml/badge.svg)](https://github.com/alexbelij/MISTER/actions/workflows/tests.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **On-device club brain that fine-tunes (LoRA) on your club's data. Your tactical IP never leaves the machine.**
 
 > Built for [Tether Developers Cup](https://dorahacks.io/hackathon/tether-developers-cup) — QVAC (flagship) + Pears (genuine) + WDK (marketplace).
@@ -211,6 +214,9 @@ Three scoring layers:
 2. **Semantic**: embedding cosine similarity via QVAC `embed()` (not word overlap)
 3. **LLM-as-Judge**: local model rates responses on 5 rubric criteria (1-5)
 
+**Illustrative expected output format** (this is what the harness computes and prints —
+not a completed measured run; see honest status below):
+
 ```
 Metric              BEFORE    AFTER    DELTA
 ─────────────────────────────────────────────
@@ -220,6 +226,16 @@ Style Match (embed) 0.22      0.61     +0.39
 LLM Judge           2.10      4.20     +2.10
 TOTAL               0.17      0.66     +0.49
 ```
+
+**Real status:** across 5 real fine-tune attempts on Kaggle (Tesla P100), the BEFORE
+eval completed successfully every time (real model, real inference) and real
+gradient-descent training started with genuine decreasing loss — but `@qvac/sdk`'s
+native fine-tune worker crashed with `SIGABRT` before writing `adapter_meta.json`,
+so no AFTER eval has been completed yet. This is a confirmed upstream bug
+independent of dataset/batch size — see the "Fine-tune status" section in
+[`JUDGE_GUIDE.md`](JUDGE_GUIDE.md) for the full honest breakdown. The table above
+shows the harness's real, working scoring methodology and output format; the
+numbers are illustrative until an AFTER eval actually completes.
 
 ## QVAC API Integration (40+ functions)
 
