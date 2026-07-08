@@ -115,9 +115,21 @@ app.post('/chat', async (req, res) => {
       { role: 'user', content: message },
     ];
 
+    // NOTE: this Space runs on HF's free "cpu-basic" tier with no real GPU —
+    // QVAC's native worker needs a Vulkan device, so we ship a software
+    // (llvmpipe) Vulkan ICD. Software-rendered inference is far slower than
+    // a real GPU, so we cap tokens well below config.model.maxTokens (512)
+    // to keep a single /chat call inside a reasonable HTTP timeout. Bump
+    // this back up if the Space is ever moved to a GPU tier.
+    const requestedMaxTokens = Math.min(
+      Number(req.body?.maxTokens) || config.model.maxTokens,
+      config.model.maxTokens
+    );
+    const demoMaxTokens = Math.min(requestedMaxTokens, 48);
+
     const t0 = Date.now();
     const answer = await qvac.chat(modelId, history, {
-      maxTokens: config.model.maxTokens,
+      maxTokens: demoMaxTokens,
       temperature: config.model.temperature,
     });
     console.log(`[bridge] /chat answered in ${Date.now() - t0}ms (len=${answer.length})`);
