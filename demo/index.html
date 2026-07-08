@@ -11,7 +11,7 @@
 <!-- Banner -->
 <div id="banner" class="banner">
   <svg class="banner-icon" viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M8 0a8 8 0 100 16A8 8 0 008 0zM6.5 12L3 8.5l1.5-1.5L6.5 9l5-5L13 5.5 6.5 12z"/></svg>
-  <span><strong>Interactive Demo</strong> — simulated UX flow with real project data. The actual app runs on-device via QVAC + Pears.</span>
+  <span><strong>Scripted walkthrough</strong> — the chat below replays 4 pre-written Q&amp;A pairs (real FC Metall Nord tactical data, not live model inference). It is <em>not</em> connected to QVAC in this browser demo. For a live on-device run, use the Electron app (<code>npm start</code>) — see README "Run the real thing".</span>
   <a href="https://github.com/alexbelij/MISTER" target="_blank" rel="noopener" class="banner-link" data-tooltip="View the MISTER source code on GitHub — Electron + QVAC + Pears P2P">
     <svg viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
     GitHub
@@ -98,7 +98,7 @@
           <svg viewBox="0 0 24 24" width="24" height="24" class="title-icon"><path fill="currentColor" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
           Tactical Chat
         </h1>
-        <div class="tab-subtitle" data-tooltip="The LoRA adapter was fine-tuned on FC Metall Nord's match footage and tactical decisions via SFT (Supervised Fine-Tuning).">LoRA fine-tuned · on-device via QVAC</div>
+        <div class="tab-subtitle" data-tooltip="This browser demo replays 4 pre-scripted Q&A pairs from the real SFT dataset. It does not call QVAC or run live inference — see the Electron app for that.">Scripted walkthrough (not live inference) · real Electron app runs QVAC on-device</div>
       </div>
 
       <div class="chat-container">
@@ -108,7 +108,7 @@
               <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
             </div>
             <div class="chat-bubble">
-              <p>Coach, I'm ready. Ask me about game plans, opponent adjustments, or player-specific tactics. I'm running fully on-device — no data leaves your machine.</p>
+              <p>Coach, I'm ready — but note: this browser demo is a <strong>scripted walkthrough</strong>, not a live model. Tap one of the 4 sample questions below (or type keywords like "Hafen", "diamond", "yellow card", "fullback") to see a pre-recorded response from the real fine-tuned SFT dataset. For live on-device inference, run the Electron app.</p>
             </div>
           </div>
         </div>
@@ -133,9 +133,9 @@
         </div>
 
         <div class="chat-input-area">
-          <div class="chat-input-wrapper" data-tooltip="Type a tactical question. Inference runs locally via QVAC — no cloud round-trip.">
-            <input type="text" id="chat-input" class="chat-input" placeholder="Ask about tactics, opponents, player roles..." autocomplete="off">
-            <button id="chat-send" class="chat-send-btn" data-tooltip="Send query to the on-device model">
+          <div class="chat-input-wrapper" data-tooltip="Keyword-matched to one of 4 scripted responses (Hafen/diamond/yellow/fullback). Not live inference in this browser demo.">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Try: Hafen, diamond, yellow card, fullback..." autocomplete="off">
+            <button id="chat-send" class="chat-send-btn" data-tooltip="Match against scripted demo responses"
               <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
           </div>

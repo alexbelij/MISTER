@@ -6,6 +6,7 @@
   },
   "model": {
     "llm": "registry://hf/unsloth/Qwen3-1.7B-GGUF/resolve/d7f544eead698dbd1f15126ef60b45a1e1933222/Qwen3-1.7B-Q4_0.gguf",
+    "llmCatalogName": "QWEN3_1_7B_INST_Q4",
     "vlm": "SmolVLM2-500M",
     "quantization": "Q4_0",
     "maxTokens": 512,
@@ -58,7 +59,12 @@
     "paymasterAddress": "",
     "entryPointAddress": "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
     "marketplaceFee": 0,
-    "currency": "USDt"
+    "currency": "USDt",
+    "rpcUrl": "",
+    "bundlerUrl": "",
+    "paymasterUrl": "",
+    "tokenAddress": "",
+    "chainId": 11155111
   },
   "eval": {
     "holdoutPath": "eval/holdout_set.json",

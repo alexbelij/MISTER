@@ -7,3 +7,6 @@ logs/
 dist/
 build/
 *.gguf
+.wallet.json
+.wallet.seed.enc
+.wallet.local.key

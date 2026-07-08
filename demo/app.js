@@ -1,5 +1,15 @@
 // ===== MISTER — Football Coaching AI Demo =====
-// All data is real project data from FC Metall Nord
+// All static data (players, matches, opponents, chat answers) is real project
+// data from the FC Metall Nord SFT/causal corpus used to fine-tune the model.
+//
+// HONESTY NOTE: this browser demo does NOT call QVAC and does NOT run live
+// inference. The chat below keyword-matches user input against 4 pre-written
+// answers (CHAT_RESPONSES) — it is a scripted walkthrough, not an AI. The
+// typing indicator delay is a UI animation, not real inference latency.
+// Per-match player "ratings" below add a small random jitter purely for
+// visual variety on the radar chart; they are not a computed model output.
+// Live, non-scripted inference happens in the Electron app (`npm start`),
+// which calls the real `@qvac/sdk` — see src/inference/chat.js.
 
 // ===== DATA =====
 const PLAYERS = [
@@ -301,7 +311,7 @@ function initChat() {
       if (matched) {
         renderResponse(CHAT_RESPONSES[matched]);
       } else {
-        addMessage('I can answer questions about game plans, opponent adjustments, player roles, and tactical patterns. Try one of the suggested prompts below, or ask about specific opponents like Hafen United, Bergland, or Stahl Süd.', false);
+        addMessage('This is a scripted walkthrough, not a live model — I only have 4 pre-written answers in this browser demo (keywords: "Hafen"/"game plan", "diamond", "yellow"/"Riedel"/"card", "fullback"/"slow"/"channel"). Tap a suggestion button below, or run the Electron app for real on-device QVAC inference on any question.', false);
       }
     }, 800 + Math.random() * 400);
   };

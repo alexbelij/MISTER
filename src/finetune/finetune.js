@@ -80,7 +80,7 @@ async function main() {
     });
   }
 
-  const catalogInfo = await qvac.getCatalogInfo(MODEL);
+  const catalogInfo = await qvac.getCatalogInfo(config.model.llmCatalogName);
   if (catalogInfo) {
     log.info('finetune', 'Catalog info', { model: MODEL, cacheState: catalogInfo.cacheState });
   }

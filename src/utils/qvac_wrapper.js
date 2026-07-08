@@ -1227,7 +1227,9 @@ async function getLoadedModelInfo(modelId) {
 async function getCatalogInfo(modelName) {
   const qvac = getQVAC();
   try {
-    const info = await qvac.getModelInfo({ modelId: modelName });
+    // Real @qvac/sdk API takes { name }, not { modelId } — the old param name
+    // was silently ignored by the SDK, making this call always fail/return undefined.
+    const info = await qvac.getModelInfo({ name: modelName });
     log.info('qvac', 'Catalog info', { model: modelName, info });
     return info;
   } catch (e) {

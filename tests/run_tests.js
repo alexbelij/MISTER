@@ -391,15 +391,66 @@ test('package.json has all dependencies', () => {
   assert(pkg.dependencies['autobase'], 'Should depend on autobase');
 });
 
-// --- Results ---
-console.log('\n' + '═'.repeat(60));
-console.log(`Results: ${passed} passed, ${failed} failed, ${passed + failed} total`);
-
-if (failures.length > 0) {
-  console.log('\nFailures:');
-  for (const f of failures) {
-    console.log(`  ✗ ${f.name}: ${f.error}`);
+async function testAsync(name, fn) {
+  try {
+    await fn();
+    passed++;
+    console.log(`  ✓ ${name}`);
+  } catch (e) {
+    failed++;
+    failures.push({ name, error: e.message });
+    console.log(`  ✗ ${name}: ${e.message}`);
   }
 }
 
-process.exit(failed > 0 ? 1 : 0);
+// --- Real QVAC SDK Tests (live calls, not structural checks) ---
+// These hit the actual @qvac/sdk against its real catalog/API surface — they
+// fail if the SDK's function signatures change or the network/catalog is
+// unreachable, unlike the structural tests above which only check file/export
+// shape.
+async function runLiveQvacTests() {
+  console.log('\n🔌 Live QVAC SDK calls:');
+  let qvac;
+  try {
+    qvac = require('@qvac/sdk');
+  } catch (e) {
+    console.log(`  ⚠ Skipped — @qvac/sdk not installed (${e.message})`);
+    return;
+  }
+
+  await testAsync('getModelInfo resolves real catalog metadata for the configured LLM', async () => {
+    const { config } = require('../src/utils/config');
+    const info = await qvac.getModelInfo({ name: config.model.llmCatalogName });
+    assert(info && info.registryPath && config.model.llm.endsWith(info.registryPath),
+      'config.model.llm (registry URL) should resolve to this catalog entry\'s registryPath');
+    assert(info.engine === 'llamacpp-completion', 'Expected llamacpp-completion engine for this GGUF model');
+  });
+
+  await testAsync('getModelInfo rejects unknown model names with a real catalog error (not silently undefined)', async () => {
+    let threw = false;
+    try {
+      await qvac.getModelInfo({ name: 'NOT_A_REAL_CATALOG_MODEL_XYZ' });
+    } catch (e) {
+      threw = true;
+      assert(/not found in catalog/i.test(e.message), 'Error should mention catalog lookup failure');
+    }
+    assert(threw, 'Expected getModelInfo to reject for an unknown catalog name');
+  });
+}
+
+// --- Results ---
+(async () => {
+  await runLiveQvacTests();
+
+  console.log('\n' + '═'.repeat(60));
+  console.log(`Results: ${passed} passed, ${failed} failed, ${passed + failed} total`);
+
+  if (failures.length > 0) {
+    console.log('\nFailures:');
+    for (const f of failures) {
+      console.log(`  ✗ ${f.name}: ${f.error}`);
+    }
+  }
+
+  process.exit(failed > 0 ? 1 : 0);
+})();
