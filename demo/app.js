@@ -1,5 +1,24 @@
 // ===== MISTER — Football Coaching AI Demo =====
-// All data is real project data from FC Metall Nord
+// All static data (players, matches, opponents, suggested prompts) is real
+// project data from the FC Metall Nord SFT/causal corpus used to fine-tune
+// the model.
+//
+// HONESTY NOTE: the chat below calls a real hosted backend — a small
+// Express bridge server (bridge/server.js) running on a free Hugging Face
+// Space, which loads the repo's configured Qwen3-1.7B-Q4 model via
+// @qvac/sdk (the same wrapper logic as src/inference/chat.js / the
+// Electron app) and runs genuine completion. It is not keyword-matched or
+// pre-scripted. The bridge runs on free CPU hardware and may be asleep —
+// the "typing" indicator reflects real network + cold-start + inference
+// latency, not a fixed UI animation.
+// Per-match player "ratings" below add a small random jitter purely for
+// visual variety on the radar chart; they are not a computed model output.
+// Fully on-device (no network) inference happens in the Electron app
+// (`npm start`), which calls the same `@qvac/sdk` — see src/inference/chat.js.
+
+// Public URL of the hosted QVAC bridge (Hugging Face Space, Docker SDK).
+// See bridge/server.js and bridge/Dockerfile for the backend implementation.
+const QVAC_BRIDGE_URL = 'https://khrol-mister-qvac-bridge.hf.space';
 
 // ===== DATA =====
 const PLAYERS = [
@@ -254,27 +273,76 @@ function initChat() {
     if (t) t.remove();
   };
 
-  const renderResponse = (response) => {
-    let html = '';
-    response.answer.forEach(block => {
-      if (block.type === 'p') {
-        html += `<p>${block.text}</p>`;
-      } else if (block.type === 'point') {
-        html += `<div class="tactical-point">${ICONS[block.icon] || ''}<span>${block.text}</span></div>`;
+  // Render a plain-text (or lightly formatted) reply from the live backend.
+  const renderReply = (text) => {
+    // Escape HTML, then turn **bold** into <strong> and newlines into <br>/<p>.
+    const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const escaped = escapeHtml(text);
+    const withBold = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    const paragraphs = withBold.split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+    addMessage(paragraphs || `<p>${escaped}</p>`, false, true);
+  };
+
+  // Fetch with a client-side timeout (the Space can be asleep and slow to wake).
+  const fetchWithTimeout = (url, opts, timeoutMs) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    return fetch(url, { ...opts, signal: controller.signal }).finally(() => clearTimeout(timer));
+  };
+
+  // Call the real hosted QVAC bridge (see bridge/server.js). Retries once
+  // if the model is still cold-starting (503 from the backend).
+  const askBackend = async (message) => {
+    const endpoint = QVAC_BRIDGE_URL.replace(/\/$/, '') + '/chat';
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const res = await fetchWithTimeout(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message }),
+        }, 60000);
+        if (res.status === 503 && attempt === 0) {
+          // Model still loading / Space waking up — wait then retry once.
+          await new Promise(r => setTimeout(r, 8000));
+          continue;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.error || `Backend returned ${res.status}`);
+        }
+        return data.reply || '(empty reply from backend)';
+      } catch (e) {
+        if (attempt === 0) {
+          await new Promise(r => setTimeout(r, 4000));
+          continue;
+        }
+        throw e;
       }
-    });
-    addMessage(html, false, true);
+    }
+    throw new Error('Backend did not respond in time');
+  };
+
+  const sendToBackend = async (text) => {
+    addMessage(text, true);
+    addTyping();
+    try {
+      const reply = await askBackend(text);
+      removeTyping();
+      renderReply(reply);
+    } catch (e) {
+      removeTyping();
+      addMessage(
+        `⚠️ Could not reach the live QVAC backend (${e.message || e}). It may be waking up from sleep — ` +
+        `please wait ~30-60s and try again, or check the Space status directly: ${QVAC_BRIDGE_URL}`,
+        false
+      );
+    }
   };
 
   const sendPrompt = (promptKey) => {
     const response = CHAT_RESPONSES[promptKey];
     if (!response) return;
-    addMessage(response.question, true);
-    addTyping();
-    setTimeout(() => {
-      removeTyping();
-      renderResponse(response);
-    }, 800 + Math.random() * 400);
+    sendToBackend(response.question);
   };
 
   // Suggestion buttons
@@ -286,24 +354,8 @@ function initChat() {
   const handleSend = () => {
     const text = inputEl.value.trim();
     if (!text) return;
-    addMessage(text, true);
     inputEl.value = '';
-    addTyping();
-    setTimeout(() => {
-      removeTyping();
-      // Try to match a pre-baked response
-      const lower = text.toLowerCase();
-      let matched = null;
-      if (lower.includes('hafen') || lower.includes('game plan') || lower.includes('gameplan')) matched = 'gameplan';
-      else if (lower.includes('diamond')) matched = 'diamond';
-      else if (lower.includes('yellow') || lower.includes('riedel') || lower.includes('card')) matched = 'yellow';
-      else if (lower.includes('fullback') || lower.includes('slow') || lower.includes('channel')) matched = 'fullback';
-      if (matched) {
-        renderResponse(CHAT_RESPONSES[matched]);
-      } else {
-        addMessage('I can answer questions about game plans, opponent adjustments, player roles, and tactical patterns. Try one of the suggested prompts below, or ask about specific opponents like Hafen United, Bergland, or Stahl Süd.', false);
-      }
-    }, 800 + Math.random() * 400);
+    sendToBackend(text);
   };
 
   sendBtn.addEventListener('click', handleSend);

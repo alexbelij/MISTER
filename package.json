@@ -1,7 +1,7 @@
 {
   "name": "mister",
   "version": "5.0.0",
-  "description": "MISTER — On-device club brain that fine-tunes (LoRA) on your club's data. Tether Developers Cup.",
+  "description": "MISTER \u2014 On-device club brain that fine-tunes (LoRA) on your club's data. Tether Developers Cup.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -14,6 +14,7 @@
     "augment": "node src/pipeline/augment.js",
     "finetune": "node src/finetune/finetune.js",
     "finetune:gate": "node src/finetune/finetune.js --profile gate",
+    "finetune:gate_micro": "node src/finetune/finetune.js --profile gate_micro --retry-on-crash",
     "finetune:deep": "node src/finetune/finetune.js --profile deep",
     "eval": "node src/eval/eval_harness.js",
     "eval:enhanced": "node src/eval/enhanced_eval.js --llm-judge",
@@ -50,20 +51,38 @@
   },
   "dependencies": {
     "@qvac/sdk": "latest",
-    "@tetherto/wdk": "latest",
+    "@tetherto/wdk": "1.0.0-beta.13",
     "hyperswarm": "latest",
     "hyperblobs": "latest",
     "corestore": "latest",
     "autobase": "latest",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "@tetherto/wdk-wallet-evm": "^1.0.0-beta.15",
+    "@tetherto/wdk-wallet-evm-erc-4337": "latest"
   },
   "devDependencies": {
     "electron": "latest"
   },
   "keywords": [
-    "qvac", "local-ai", "on-device-ai", "lora", "fine-tuning",
-    "football", "pears", "p2p", "privacy", "wdk", "self-custody",
-    "voice", "vlm", "ocr", "translate", "tactical-analysis",
-    "mobile", "encryption", "gdpr", "edge-ai"
+    "qvac",
+    "local-ai",
+    "on-device-ai",
+    "lora",
+    "fine-tuning",
+    "football",
+    "pears",
+    "p2p",
+    "privacy",
+    "wdk",
+    "self-custody",
+    "voice",
+    "vlm",
+    "ocr",
+    "translate",
+    "tactical-analysis",
+    "mobile",
+    "encryption",
+    "gdpr",
+    "edge-ai"
   ]
 }

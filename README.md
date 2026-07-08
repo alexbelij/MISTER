@@ -4,6 +4,12 @@
 
 > Built for [Tether Developers Cup](https://dorahacks.io/hackathon/tether-developers-cup) — QVAC (flagship) + Pears (genuine) + WDK (marketplace).
 
+## 🔗 For judges — try it live
+
+- **Live web demo:** [alexbelij.github.io/MISTER](https://alexbelij.github.io/MISTER/) — real chat, calling a genuinely running on-device QVAC inference backend (Qwen3-1.7B). Not scripted, not keyword-matched. First message after idle can take ~30-60s (free-tier cold start).
+- **Judge guide:** [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md) — maps every judging criterion to concrete evidence in this repo.
+- **PR with the latest fixes:** [#1](https://github.com/alexbelij/MISTER/pull/1)
+
 ## What is MISTER?
 
 MISTER is a private coaching assistant that **learns your club's game model** — tactical philosophy, terminology, player profiles, match notes — by fine-tuning a small LLM directly on your device. No cloud, no API keys, your IP never leaves the machine.
@@ -281,7 +287,6 @@ mister/
 ├── DEMO_SCRIPT.md               # 3-min demo video script
 ├── PRIVACY.md                   # Privacy policy (GDPR/CCPA/APPI/PDPA)
 ├── COMPLIANCE.md                # Security & compliance details
-├── TODO_V5.md                   # Master implementation plan
 ├── package.json                 # 30+ npm scripts
 ├── pear.json                    # Pear app config (mobile)
 ├── main.js                      # Electron main process

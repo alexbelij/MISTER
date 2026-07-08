@@ -1,33 +1,124 @@
 /**
  * MISTER — Adapter Marketplace (WDK)
- * 
- * Sell club-specific adapters for gasless USDt via WDK.
- * Coaches can buy adapters from other clubs, tactical consultants can sell
- * their expertise as fine-tuned adapters.
- * 
- * Uses WDK for self-custody wallet, gasless USDt transfers (ERC-4337 paymaster),
- * and smart contract escrow for adapter delivery.
- * 
+ *
+ * Sell club-specific adapters for USDt via WDK (self-custody wallet).
+ *
+ * HONEST STATUS (read this before demoing to judges):
+ *   - Wallet creation/derivation below uses the REAL `@tetherto/wdk` +
+ *     `@tetherto/wdk-wallet-evm(-erc-4337)` API (`new WDK(seed)`,
+ *     `registerWallet()`, `getAccount()`, `getTokenBalance()`, `transfer()`).
+ *     There is no more calling `WDK.createWallet(...)` / `WDK.transfer(...)`
+ *     which never existed on the real SDK and always fell into a catch block.
+ *   - Address derivation and balance reads work with just an RPC URL
+ *     (`MISTER_WDK__RPCURL`) — no funds or bundler needed to prove this part.
+ *   - A LIVE on-chain transfer (`--buy`) additionally needs a funded testnet
+ *     account and, for the "gasless" claim, a real ERC-4337 bundler +
+ *     paymaster endpoint (`MISTER_WDK__BUNDLERURL`, `MISTER_WDK__PAYMASTERURL`).
+ *     Without those set, `--buy` fails loudly with an actionable error instead
+ *     of silently faking a "payment sent" message — do NOT claim a live
+ *     gasless transfer in the demo unless these are configured and funded.
+ *
  * Usage:
- *   node src/wdk/marketplace.js --list                    List available adapters
- *   node src/wdk/marketplace.js --sell --adapter adapters/adapter.gguf --price 50
- *   node src/wdk/marketplace.js --buy --listing <id>      Buy an adapter
- *   node src/wdk/marketplace.js --wallet                  Show wallet balance
- *   node src/wdk/marketplace.js --setup                   Initialize wallet
+ *   node src/wdk/marketplace.js --list
+ *   node src/wdk/marketplace.js --sell --adapter=adapters/adapter.gguf --price=50
+ *   node src/wdk/marketplace.js --buy --listing=<id>
+ *   node src/wdk/marketplace.js --wallet
+ *   node src/wdk/marketplace.js --setup
  */
 
 const fs = require('fs');
 const path = require('path');
 const { config } = require('../utils/config');
 const log = require('../utils/logger');
+const crypto = require('../security/crypto');
 const { ensureDir, writeJSON, readJSON, fileExists, generateId, hashString, fileSizeFormatted } = require('../utils/helpers');
 
 const MARKETPLACE_DIR = path.join(process.cwd(), 'marketplace');
 const LISTINGS_FILE = path.join(MARKETPLACE_DIR, 'listings.json');
 const WALLET_FILE = path.join(process.cwd(), '.wallet.json');
+const WALLET_SEED_FILE = path.join(process.cwd(), '.wallet.seed.enc');
+const WALLET_PASS_FILE = path.join(process.cwd(), '.wallet.local.key');
+
+// ---------------------------------------------------------------------------
+// Real WDK wiring (no more calls to nonexistent WDK.createWallet/transfer/getBalance)
+// ---------------------------------------------------------------------------
+
+function loadWdkModules() {
+  const WDK = require('@tetherto/wdk').default;
+  let WalletManagerEvm;
+  let WalletManagerEvmErc4337 = null;
+  try {
+    WalletManagerEvm = require('@tetherto/wdk-wallet-evm').default;
+  } catch (e) {
+    throw new Error(
+      '@tetherto/wdk-wallet-evm not installed. Run: npm install @tetherto/wdk @tetherto/wdk-wallet-evm'
+    );
+  }
+  try {
+    WalletManagerEvmErc4337 = require('@tetherto/wdk-wallet-evm-erc-4337').default;
+  } catch (e) {
+    // Optional — only needed for gasless (sponsored) transfers.
+  }
+  return { WDK, WalletManagerEvm, WalletManagerEvmErc4337 };
+}
+
+function wdkNetworkConfig() {
+  return {
+    rpcUrl: process.env.MISTER_WDK__RPCURL || config.wdk.rpcUrl || '',
+    bundlerUrl: process.env.MISTER_WDK__BUNDLERURL || config.wdk.bundlerUrl || '',
+    paymasterUrl: process.env.MISTER_WDK__PAYMASTERURL || config.wdk.paymasterUrl || '',
+    tokenAddress: process.env.MISTER_WDK__TOKENADDRESS || config.wdk.tokenAddress || '',
+    chainId: config.wdk.chainId || 11155111, // sepolia
+  };
+}
+
+function getOrCreateLocalPassphrase() {
+  // Demo-grade local secret to encrypt the seed at rest with the project's own
+  // AES-256-GCM helper. This is NOT a substitute for a real hardware/OS keystore —
+  // fine for a hackathon demo wallet holding testnet funds only.
+  if (fileExists(WALLET_PASS_FILE)) {
+    return fs.readFileSync(WALLET_PASS_FILE, 'utf-8').trim();
+  }
+  const pass = crypto.generateToken(32);
+  fs.writeFileSync(WALLET_PASS_FILE, pass, { mode: 0o600 });
+  return pass;
+}
+
+function loadOrCreateSeed(WDK) {
+  const pass = getOrCreateLocalPassphrase();
+  if (fileExists(WALLET_SEED_FILE)) {
+    const encB64 = fs.readFileSync(WALLET_SEED_FILE, 'utf-8');
+    return crypto.decryptString(encB64, pass);
+  }
+  const seed = WDK.getRandomSeedPhrase(12);
+  const encB64 = crypto.encryptString(seed, pass);
+  fs.writeFileSync(WALLET_SEED_FILE, encB64, { mode: 0o600 });
+  return seed;
+}
+
+async function buildAccount() {
+  const { WDK, WalletManagerEvm, WalletManagerEvmErc4337 } = loadWdkModules();
+  const net = wdkNetworkConfig();
+  const seed = loadOrCreateSeed(WDK);
+
+  const wdk = new WDK(seed);
+
+  const useErc4337 = Boolean(net.bundlerUrl && WalletManagerEvmErc4337);
+  const walletConfig = {
+    provider: net.rpcUrl || undefined,
+    chainId: net.chainId,
+    ...(useErc4337 ? { bundlerUrl: net.bundlerUrl, paymasterUrl: net.paymasterUrl || undefined } : {}),
+  };
+
+  wdk.registerWallet('ethereum', useErc4337 ? WalletManagerEvmErc4337 : WalletManagerEvm, walletConfig);
+  const account = await wdk.getAccount('ethereum', 0);
+  return { wdk, account, net, gasless: useErc4337 && Boolean(net.paymasterUrl) };
+}
+
+// ---------------------------------------------------------------------------
 
 async function main() {
-  const action = process.argv.find(a => a.startsWith('--'))?.replace('--', '');
+  const action = process.argv.find(a => a.startsWith('--'))?.replace('--', '').split('=')[0];
 
   switch (action) {
     case 'setup':
@@ -56,74 +147,67 @@ async function main() {
 // --- Wallet Setup ---
 
 async function setupWallet() {
-  let WDK;
+  let account, net, gasless;
   try {
-    WDK = require('@tetherto/wdk');
+    ({ account, net, gasless } = await buildAccount());
   } catch (e) {
-    log.error('wdk', '@tetherto/wdk not found', { hint: 'npm install @tetherto/wdk' });
-    log.info('wdk', 'Creating local wallet configuration...');
-    
-    // Fallback: create a placeholder wallet config
-    const walletConfig = {
-      id: generateId('wallet'),
-      network: config.wdk.network,
-      createdAt: new Date().toISOString(),
-      note: 'WDK SDK not installed. Run npm install @tetherto/wdk for real self-custody wallet functionality.',
-    };
-    writeJSON(WALLET_FILE, walletConfig);
-    console.log('⚠ WDK not installed. Placeholder wallet created.');
-    console.log('  Install WDK: npm install @tetherto/wdk');
-    console.log('  Then run: node src/wdk/marketplace.js --setup');
-    return;
+    log.error('wdk', 'Failed to initialize WDK wallet', { error: e.message });
+    console.log(`✗ Could not initialize wallet: ${e.message}`);
+    process.exit(1);
   }
 
-  log.info('wdk', 'Initializing WDK wallet');
-
-  // Create self-custody wallet
-  const wallet = await WDK.createWallet({
-    network: config.wdk.network,
-    chains: ['evm'],
-  });
+  const address = await account.getAddress();
 
   const walletData = {
-    id: wallet.id,
-    address: wallet.address,
-    network: config.wdk.network,
+    address,
+    network: net.chainId,
+    provider: net.rpcUrl ? 'configured' : 'not configured (address derivation only, no live reads)',
+    gaslessTransfersConfigured: gasless,
     createdAt: new Date().toISOString(),
   };
-
   writeJSON(WALLET_FILE, walletData);
 
-  log.info('wdk', 'Wallet created', { address: wallet.address });
-  console.log(`✓ Wallet created: ${wallet.address}`);
-  console.log(`  Network: ${config.wdk.network}`);
-  console.log(`  Fund with testnet USDt to start trading adapters.`);
+  log.info('wdk', 'Wallet ready', { address });
+  console.log(`✓ Self-custody wallet ready (real @tetherto/wdk derivation): ${address}`);
+  console.log(`  Chain ID: ${net.chainId}`);
+  if (!net.rpcUrl) {
+    console.log('  ⚠ No RPC configured (MISTER_WDK__RPCURL) — balance/transfer calls will fail until set.');
+  }
+  if (!gasless) {
+    console.log('  ⚠ Gasless ERC-4337 transfers not configured (need MISTER_WDK__BUNDLERURL + MISTER_WDK__PAYMASTERURL).');
+  }
 }
 
 // --- Show Wallet ---
 
 async function showWallet() {
-  if (!fileExists(WALLET_FILE)) {
-    console.log('No wallet found. Run --setup first.');
+  let account, net;
+  try {
+    ({ account, net } = await buildAccount());
+  } catch (e) {
+    console.log(`No wallet available: ${e.message}. Run --setup first.`);
     return;
   }
 
-  const wallet = readJSON(WALLET_FILE);
-  console.log(`\nWallet: ${wallet.address}`);
-  console.log(`Network: ${wallet.network}`);
+  const address = await account.getAddress();
+  console.log(`\nWallet: ${address}`);
+  console.log(`Chain ID: ${net.chainId}`);
 
-  let WDK;
+  if (!net.rpcUrl) {
+    console.log('USDt Balance: [no RPC configured — set MISTER_WDK__RPCURL to read real on-chain balance]');
+    return;
+  }
+  if (!net.tokenAddress) {
+    console.log('USDt Balance: [no token contract configured — set MISTER_WDK__TOKENADDRESS]');
+    return;
+  }
+
   try {
-    WDK = require('@tetherto/wdk');
-    const balance = await WDK.getBalance({
-      address: wallet.address,
-      network: wallet.network,
-      tokens: ['USDt'],
-    });
-    console.log(`USDt Balance: ${balance.USDt || '0'}`);
-    log.metric('wdk', 'usdt_balance', balance.USDt || 0);
+    const balance = await account.getTokenBalance(net.tokenAddress);
+    console.log(`USDt Balance (raw units): ${balance.toString()}`);
+    log.metric('wdk', 'usdt_balance_raw', balance.toString());
   } catch (e) {
-    console.log(`USDt Balance: [WDK not connected]`);
+    console.log(`USDt Balance: [read failed: ${e.message}]`);
   }
 }
 
@@ -145,11 +229,15 @@ async function sellAdapter() {
     process.exit(1);
   }
 
-  // Load adapter metadata
   let adapterMeta = {};
   const metaPath = path.join(path.dirname(adapterPath), 'adapter_meta.json');
   if (fileExists(metaPath)) {
     adapterMeta = readJSON(metaPath);
+  }
+
+  let sellerAddress = 'unknown';
+  if (fileExists(WALLET_FILE)) {
+    sellerAddress = readJSON(WALLET_FILE).address;
   }
 
   const listing = {
@@ -161,7 +249,7 @@ async function sellAdapter() {
     adapterHash: hashString(fs.readFileSync(adapterPath).toString('base64').substring(0, 1000)),
     price,
     currency: config.wdk.currency,
-    sellerWallet: fileExists(WALLET_FILE) ? readJSON(WALLET_FILE).address : 'unknown',
+    sellerWallet: sellerAddress,
     model: adapterMeta.model || config.model.llm,
     club: adapterMeta.club || 'unknown',
     version: adapterMeta.version || '1.0.0',
@@ -169,7 +257,6 @@ async function sellAdapter() {
     status: 'active',
   };
 
-  // Add to listings
   ensureDir(MARKETPLACE_DIR);
   let listings = [];
   if (fileExists(LISTINGS_FILE)) {
@@ -194,7 +281,7 @@ async function buyAdapter() {
     || process.argv.find(a => a.startsWith('--buy='))?.split('=')[1];
 
   if (!listingId) {
-    log.error('wdk', 'Listing ID required. Use --listing <id>');
+    log.error('wdk', 'Listing ID required. Use --listing=<id>');
     process.exit(1);
   }
 
@@ -211,51 +298,52 @@ async function buyAdapter() {
     process.exit(1);
   }
 
-  if (!fileExists(WALLET_FILE)) {
-    console.log('No wallet found. Run --setup first.');
-    return;
+  let account, net, gasless;
+  try {
+    ({ account, net, gasless } = await buildAccount());
+  } catch (e) {
+    console.log(`No wallet available: ${e.message}. Run --setup first.`);
+    process.exit(1);
   }
 
-  const wallet = readJSON(WALLET_FILE);
+  if (!net.rpcUrl || !net.tokenAddress) {
+    console.log('✗ Cannot execute a live transfer: missing MISTER_WDK__RPCURL / MISTER_WDK__TOKENADDRESS.');
+    console.log('  This is a real limitation, not a bug — configure a testnet RPC + funded');
+    console.log('  account (+ bundler/paymaster for gasless) before demoing a live purchase.');
+    process.exit(1);
+  }
 
-  log.info('wdk', 'Purchasing adapter', { listing: listingId, price: listing.price });
+  log.info('wdk', 'Purchasing adapter', { listing: listingId, price: listing.price, gasless });
 
-  let WDK;
   try {
-    WDK = require('@tetherto/wdk');
-
-    // Gasless USDt transfer via ERC-4337
-    const tx = await WDK.transfer({
-      from: wallet.address,
+    const tx = await account.transfer({
       to: listing.sellerWallet,
       amount: listing.price,
-      token: 'USDt',
-      network: config.wdk.network,
-      gasless: true, // Paymaster pays gas in USDt
+      token: net.tokenAddress,
     });
 
     log.info('wdk', 'Payment sent', { txHash: tx.hash });
     console.log(`✓ Payment sent: ${tx.hash}`);
     console.log(`  Amount: ${listing.price} USDt`);
     console.log(`  To: ${listing.sellerWallet}`);
+    console.log(`  Gasless (sponsored via paymaster): ${gasless ? 'yes' : 'no'}`);
+
+    listing.status = 'sold';
+    listing.soldAt = new Date().toISOString();
+    listing.buyerWallet = await account.getAddress();
+    listing.txHash = tx.hash;
+    writeJSON(LISTINGS_FILE, listings);
+
+    console.log(`\n✓ Adapter purchased!`);
+    console.log(`  The adapter will be delivered via Pears P2P.`);
+    console.log(`  Run: node src/pears/distribute.js --receive --topic <seller-topic>`);
   } catch (e) {
-    log.warn('wdk', 'WDK transfer failed — SDK not installed or not connected', { error: e.message, hint: 'npm install @tetherto/wdk' });
-    console.log(`⚠ WDK SDK not connected. To enable real gasless USDt transfers:`);
-    console.log(`   npm install @tetherto/wdk`);
-    console.log(`   Then run: npm run marketplace -- --setup`);
-    console.log(`  Amount: ${listing.price} USDt`);
-    console.log(`  To: ${listing.sellerWallet}`);
+    // Real failure surfaced honestly — no fake "payment sent" and no listing mutation.
+    log.error('wdk', 'Transfer failed', { error: e.message });
+    console.log(`✗ Transfer failed: ${e.message}`);
+    console.log('  Common causes: unfunded account, missing bundler/paymaster config, wrong token address.');
+    process.exit(1);
   }
-
-  // Mark listing as sold
-  listing.status = 'sold';
-  listing.soldAt = new Date().toISOString();
-  listing.buyerWallet = wallet.address;
-  writeJSON(LISTINGS_FILE, listings);
-
-  console.log(`\n✓ Adapter purchased!`);
-  console.log(`  The adapter will be delivered via Pears P2P.`);
-  console.log(`  Run: node src/pears/distribute.js --receive --topic <seller-topic>`);
 }
 
 // --- List Adapters ---
@@ -297,7 +385,7 @@ async function deliverAdapter() {
   const listingId = process.argv.find(a => a.startsWith('--listing='))?.split('=')[1];
 
   if (!listingId || !fileExists(LISTINGS_FILE)) {
-    console.log('Usage: --deliver --listing <id>');
+    console.log('Usage: --deliver --listing=<id>');
     return;
   }
 
@@ -313,9 +401,8 @@ async function deliverAdapter() {
   console.log(`  Adapter: ${listing.adapterPath}`);
   console.log(`  Buyer: ${listing.buyerWallet}`);
 
-  // Start Pears distribution
   const { spawn } = require('child_process');
-  const proc = spawn('node', [
+  spawn('node', [
     'src/pears/distribute.js',
     `--adapter=${listing.adapterPath}`
   ], { cwd: process.cwd(), stdio: 'inherit' });
@@ -325,16 +412,20 @@ function printUsage() {
   console.log('MISTER — Adapter Marketplace (WDK)');
   console.log('');
   console.log('Usage:');
-  console.log('  --setup                              Initialize self-custody wallet');
-  console.log('  --wallet                             Show wallet balance');
-  console.log('  --sell --adapter <path> --price 50   List adapter for sale');
-  console.log('     --title "Tactical Adapter" --desc "4-3-3 pressing system"');
-  console.log('  --list                               Browse available adapters');
-  console.log('  --buy --listing <id>                 Buy an adapter (gasless USDt)');
-  console.log('  --deliver --listing <id>             Deliver sold adapter via P2P');
+  console.log('  --setup                               Derive self-custody wallet (real WDK API)');
+  console.log('  --wallet                              Show address + on-chain USDt balance');
+  console.log('  --sell --adapter=<path> --price=50    List adapter for sale');
+  console.log('     --title="Tactical Adapter" --desc="4-3-3 pressing system"');
+  console.log('  --list                                 Browse available adapters');
+  console.log('  --buy --listing=<id>                  Buy an adapter (real on-chain USDt transfer)');
+  console.log('  --deliver --listing=<id>               Deliver sold adapter via P2P');
+  console.log('');
+  console.log('Env config: MISTER_WDK__RPCURL, MISTER_WDK__TOKENADDRESS,');
+  console.log('            MISTER_WDK__BUNDLERURL, MISTER_WDK__PAYMASTERURL (for gasless)');
 }
 
 main().catch(err => {
   log.error('wdk', 'Marketplace error', { error: err.message });
+  console.log(`✗ ${err.message}`);
   process.exit(1);
 });

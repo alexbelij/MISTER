@@ -11,7 +11,7 @@
 <!-- Banner -->
 <div id="banner" class="banner">
   <svg class="banner-icon" viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M8 0a8 8 0 100 16A8 8 0 008 0zM6.5 12L3 8.5l1.5-1.5L6.5 9l5-5L13 5.5 6.5 12z"/></svg>
-  <span><strong>Interactive Demo</strong> — simulated UX flow with real project data. The actual app runs on-device via QVAC + Pears.</span>
+  <span><strong>Live backend</strong> — the chat below calls a real hosted QVAC inference server (Qwen3-1.7B-Q4, running on a free Hugging Face Space) via HTTP. It is genuine model inference, not scripted/keyword-matched text. The Space runs on free CPU hardware and may be asleep — the first message can take up to ~30-60s to wake it and load the model. For a fully on-device run (no network), use the Electron app (<code>npm start</code>) — see README "Run the real thing".</span>
   <a href="https://github.com/alexbelij/MISTER" target="_blank" rel="noopener" class="banner-link" data-tooltip="View the MISTER source code on GitHub — Electron + QVAC + Pears P2P">
     <svg viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
     GitHub
@@ -98,7 +98,7 @@
           <svg viewBox="0 0 24 24" width="24" height="24" class="title-icon"><path fill="currentColor" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
           Tactical Chat
         </h1>
-        <div class="tab-subtitle" data-tooltip="The LoRA adapter was fine-tuned on FC Metall Nord's match footage and tactical decisions via SFT (Supervised Fine-Tuning).">LoRA fine-tuned · on-device via QVAC</div>
+        <div class="tab-subtitle" data-tooltip="This browser demo calls a real hosted QVAC inference backend (Qwen3-1.7B-Q4) over HTTP. Same model config as the Electron app, but served from a free Hugging Face Space instead of running fully on-device.">Live QVAC backend (hosted) · real Electron app runs the same model fully on-device</div>
       </div>
 
       <div class="chat-container">
@@ -108,41 +108,41 @@
               <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
             </div>
             <div class="chat-bubble">
-              <p>Coach, I'm ready. Ask me about game plans, opponent adjustments, or player-specific tactics. I'm running fully on-device — no data leaves your machine.</p>
+              <p>Coach, I'm ready — this chat calls a <strong>real hosted QVAC backend</strong> (Qwen3-1.7B-Q4) running on a free Hugging Face Space. Ask anything about the tactics below, or tap a suggestion. First reply may take up to a minute if the Space was asleep. For fully on-device inference with no network dependency, run the Electron app.</p>
             </div>
           </div>
         </div>
 
         <div class="chat-suggestions">
-          <button class="chat-suggestion-btn" data-prompt="gameplan" data-tooltip="Pre-baked tactical response from the SFT dataset">
+          <button class="chat-suggestion-btn" data-prompt="gameplan" data-tooltip="Sends this question to the live QVAC backend">
             <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M3 13h2v8H3v-8zm4-6h2v14H7V7zm4 3h2v11h-2V10zm4-7h2v18h-2V3zm4 4h2v14h-2V7z"/></svg>
             Game plan vs Hafen United
           </button>
-          <button class="chat-suggestion-btn" data-prompt="diamond" data-tooltip="Pre-baked tactical response from the SFT dataset">
+          <button class="chat-suggestion-btn" data-prompt="diamond" data-tooltip="Sends this question to the live QVAC backend">
             <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M12 2L2 12l10 10 10-10L12 2z"/></svg>
             Counter diamond midfield
           </button>
-          <button class="chat-suggestion-btn" data-prompt="yellow" data-tooltip="Pre-baked tactical response from the SFT dataset">
+          <button class="chat-suggestion-btn" data-prompt="yellow" data-tooltip="Sends this question to the live QVAC backend">
             <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
             Riedel yellow card
           </button>
-          <button class="chat-suggestion-btn" data-prompt="fullback" data-tooltip="Pre-baked tactical response from the SFT dataset">
+          <button class="chat-suggestion-btn" data-prompt="fullback" data-tooltip="Sends this question to the live QVAC backend">
             <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M12 4l-8 8 8 8 8-8-8-8z"/></svg>
             Exploit slow fullback
           </button>
         </div>
 
         <div class="chat-input-area">
-          <div class="chat-input-wrapper" data-tooltip="Type a tactical question. Inference runs locally via QVAC — no cloud round-trip.">
-            <input type="text" id="chat-input" class="chat-input" placeholder="Ask about tactics, opponents, player roles..." autocomplete="off">
-            <button id="chat-send" class="chat-send-btn" data-tooltip="Send query to the on-device model">
+          <div class="chat-input-wrapper" data-tooltip="Sent to a real hosted QVAC inference backend (Qwen3-1.7B-Q4) — any question is answered live, not keyword-matched.">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Ask any tactical question..." autocomplete="off">
+            <button id="chat-send" class="chat-send-btn" data-tooltip="Send to the live QVAC backend"
               <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
           </div>
           <div class="chat-meta">
-            <span class="chat-pipeline-indicator" data-tooltip="Pipeline: Input → QVAC inference (LoRA adapter) → Response. ~0.4s on-device.">
+            <span class="chat-pipeline-indicator" data-tooltip="Pipeline: Input → hosted QVAC bridge (Hugging Face Space) → Qwen3-1.7B-Q4 inference → Response.">
               <svg viewBox="0 0 24 24" width="12" height="12"><path fill="currentColor" d="M13 3l3.29 3.29-7.58 7.58 1.42 1.42 7.58-7.58L21 11V3z"/></svg>
-              on-device pipeline
+              live QVAC backend
             </span>
           </div>
         </div>
