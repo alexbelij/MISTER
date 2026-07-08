@@ -15,19 +15,35 @@
 > recording, since the first chat message wakes a sleeping free-tier HF
 > Space and can take 30-60s (see 0:35-0:55 below — plan around this, don't
 > let it kill your take).
+>
+> **Why no "unplug the wifi" offline proof in this version:** this scoped
+> script only shows the browser demo, which is intentionally *cloud-hosted*
+> (a Hugging Face Space) for judge accessibility — it needs a network
+> connection to work. Killing the network here would break the demo, not
+> prove the on-device claim. The actual on-device path is the Electron
+> desktop app / Pear mobile app, which this script deliberately does not
+> show live because neither has been run on real hardware yet (see above).
+> If there's time before recording to do a quick smoke-test of the desktop
+> app, a genuine offline/airplane-mode clip can be added as a bonus B-roll
+> segment — but don't force it live into this script under time pressure.
 
 ---
 
-## TIMELINE (total ≈ 175s)
+## TIMELINE (total ≈ 177s)
 
-### 0:00–0:12 | Hook (12s)
-**[Screen: alexbelij.github.io/MISTER/ loading, Chat tab, dark UI]**
-> "This is MISTER — an on-device club brain for football coaches. It fine-tunes
-> a small LLM on your club's tactical data via QVAC, so the model literally
-> speaks in your club's voice. No cloud required for the real thing — what
-> you're seeing now is a live hosted version for browser access."
+### 0:00–0:15 | Hook (15s)
+**[Screen: brief black frame or a close-up of a notebook/phone, then cut to
+alexbelij.github.io/MISTER/ loading, Chat tab, dark UI]**
+> "A coach loses his tactics notebook the night before a match. Every
+> set-piece, every player note — gone."
+**[Beat — one second — then the MISTER chat UI finishes loading]**
+> "MISTER is a club brain that fine-tunes on your own data and runs
+> on-device — no cloud, no API keys, your tactical IP never leaves the
+> machine. What you're about to see now is a browser-hosted version for
+> easy judge access; the real product runs this same inference fully
+> offline, on a laptop."
 
-### 0:12–0:35 | Live chat = real inference (23s)
+### 0:15–0:38 | Live chat = real inference (23s)
 **[Screen: type a tactical question in Chat tab, e.g. "How should we press
 their back three?", hit send]**
 > "This chat isn't scripted or keyword-matched — it's calling a real QVAC
@@ -37,7 +53,7 @@ their back three?", hit send]**
 wakes the free-tier instance — usually 30 to 60 seconds."]**
 **[Once reply streams in, briefly highlight the tokens appearing live.]**
 
-### 0:35–0:55 | Analytics — real match data (20s)
+### 0:38–0:58 | Analytics — real match data (20s)
 **[Click Analytics tab. Show Match Timeline + Player Ratings table +
 Pressing chart]**
 > "Behind the chat is a real analytics layer: 8 real matches, 16 players,
@@ -45,20 +61,20 @@ Pressing chart]**
 > transition speed, flank overloads — all computed client-side from the
 > club's match data, not fabricated placeholder numbers."
 
-### 0:55–1:15 | Match History → Report navigation (20s)
+### 0:58–1:18 | Match History → Report navigation (20s)
 **[Scroll to Match Timeline, click on one match row]**
 > "Clicking a match jumps straight into its full tactical report —"
 **[Screen auto-switches to Reports tab, shows the selected match's report:
 xG, possession, pressing success, notes]**
 > "— generated from the same tactical event data the model was trained on."
 
-### 1:15–1:30 | Suggestions tab (15s)
+### 1:18–1:33 | Suggestions tab (15s)
 **[Click Suggestions tab]**
 > "MISTER also surfaces auto-generated tactical recommendations, each backed
 > by evidence from real match patterns — this is the model reasoning over
 > the club's own history, not generic football advice."
 
-### 1:30–1:50 | Distribute — real P2P + real QR (20s)
+### 1:33–1:53 | Distribute — real P2P + real QR (20s)
 **[Click Distribute tab. Show QR code + Pears topic key + connected peers]**
 > "Game plans distribute peer-to-peer via Pears — no cloud server. This QR
 > code is real and scannable, encoding the actual P2P topic key any coach's
@@ -67,7 +83,7 @@ xG, possession, pressing success, notes]**
 real payload — only do this if you've tested it works with your phone's
 default camera app beforehand.]**
 
-### 1:50–2:20 | Honest fine-tune story — the Proof tab (30s)
+### 1:53–2:23 | Honest fine-tune story — the Proof tab (30s)
 **[Click the new Proof tab]**
 > "Here's the part we want to be completely transparent about. We ran the
 > real on-device LoRA fine-tune five times against a real cloud GPU on
@@ -82,19 +98,17 @@ default camera app beforehand.]**
 > than hide it. We chose not to publish a fake completed result just to
 > look finished."
 
-### 2:20–2:40 | Proof it's not vaporware — tests + CI (20s)
+### 2:23–2:40 | Proof it's not vaporware — tests + CI (17s)
 **[Screen: GitHub repo, green Actions checkmark / README badge, or terminal
 `npm test` output]**
-> "37 out of 37 tests pass, verified automatically by CI on every commit.
-> Zero fake API calls, zero silent error-swallowing — audited across the
-> full codebase and full git history."
+> "37 out of 37 tests pass, verified by CI on every commit. Zero fake API
+> calls, zero silent error-swallowing — audited across the full codebase."
 
-### 2:40–3:00 | Close (20s)
+### 2:40–2:57 | Close (17s)
 **[Screen: back to Chat tab or GitHub repo homepage]**
-> "MISTER: a real, on-device, QVAC-native coaching assistant — honest about
-> what works today, and about the one upstream bug blocking full LoRA
-> completion. Full code, full run logs, and full disclosure are all in the
-> repo. Thanks for watching."
+> "MISTER: real, on-device, QVAC-native — honest about what works today,
+> and about the one upstream bug blocking full LoRA completion. Full code
+> and full run logs are in the repo. Thanks for watching."
 
 ---
 
@@ -107,4 +121,4 @@ default camera app beforehand.]**
 - [ ] If you want to show the QR scan live, test decoding it with your own
       phone's camera app once beforehand — don't discover live on camera
       whether it works.
-- [ ] Keep total under 3:00 — this script targets ~2:55 with buffer.
+- [ ] Keep total under 3:00 — this script targets ~2:57 with a small buffer.
