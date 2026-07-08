@@ -698,6 +698,17 @@ async function finetuneRun(modelId, params, onProgress) {
     }
   };
 
+  // RETRY/RESUME SUPPORT (2026-07-08, added after Kaggle SIGABRT crashes seen
+  // in the native fine-tune worker even on the lightest `gate` profile — see
+  // docs/gate_finetune_run_log.md). QVAC's `finetune()` supports
+  // `operation: 'resume'`, which continues from the latest checkpoint written
+  // to `checkpointSaveDir` instead of restarting from scratch. Callers that
+  // want to resume after a crashed/aborted run should pass `params.resume: true`
+  // (finetune.js's retry wrapper does this automatically).
+  if (params.resume) {
+    finetuneParams.operation = 'resume';
+  }
+
   // Map training config to QVAC options
   const opts = finetuneParams.options;
   if (params.sft) {

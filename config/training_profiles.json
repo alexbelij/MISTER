@@ -9,6 +9,18 @@
       "maxSFTPairs": 50,
       "expectedTime": "5-10 min"
     },
+    "gate_micro": {
+      "description": "Smallest possible GATE run — used to isolate a native fine-tune worker SIGABRT crash seen on Kaggle P100 (see docs/gate_finetune_run_log.md). 1 epoch, 20 pairs, microBatchSize 1, checkpoint every step so a resume can pick up immediately after a crash.",
+      "epochs": 1,
+      "learningRate": 1e-4,
+      "causalEpochs": 1,
+      "useAugmentation": false,
+      "maxSFTPairs": 20,
+      "batchSize": 1,
+      "microBatchSize": 1,
+      "checkpointEveryNEpochs": 1,
+      "expectedTime": "2-5 min"
+    },
     "standard": {
       "description": "Standard training — balanced speed and quality (3 epochs)",
       "epochs": 3,

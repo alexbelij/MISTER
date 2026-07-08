@@ -33,6 +33,18 @@ const EPOCHS = parseInt(argValue('--epochs') || '0') || config.finetune.defaultE
 const PROFILE = argValue('--profile') || 'standard';
 const DATA_DIR = argValue('--data') || config.paths.processed;
 const OUTPUT_DIR = config.finetune.outputDir;
+// RETRY-ON-CRASH (2026-07-08): --retry-on-crash makes finetune() survive the
+// native `@qvac/sdk` worker SIGABRT crash we hit repeatedly on Kaggle P100 GPUs
+// (see docs/gate_finetune_run_log.md). On crash we re-invoke finetuneRun with
+// `resume: true` (QVAC's operation: 'resume'), which continues from the last
+// checkpoint written to checkpointSaveDir instead of losing all progress and
+// restarting cold. Capped at MAX_RETRIES attempts (first attempt + retries).
+const RETRY_ON_CRASH = process.argv.includes('--retry-on-crash');
+const MAX_RETRIES = parseInt(argValue('--max-retries') || '4');
+function isWorkerCrash(err) {
+  const msg = (err && (err.message || err.toString())) || '';
+  return /WORKER_CRASHED|SIGABRT|Bare worker exited/i.test(msg);
+}
 
 async function main() {
   const t = timer();
@@ -136,7 +148,7 @@ async function main() {
     epochs: trainingConfig.epochs,
   });
 
-  const result = await qvac.finetuneRun(modelId, finetuneParams, (progress) => {
+  const onProgress = (progress) => {
     const { epoch, step, totalSteps, loss, percent } = progress;
     if (step !== undefined && (step % 10 === 0 || step === totalSteps)) {
       log.info('finetune', 'Progress', {
@@ -145,7 +157,38 @@ async function main() {
         percent: percent ? percent.toFixed(1) + '%' : 'N/A',
       });
     }
-  });
+  };
+
+  let result;
+  let attempt = 0;
+  let resume = false;
+  while (true) {
+    attempt += 1;
+    try {
+      result = await qvac.finetuneRun(modelId, { ...finetuneParams, resume }, onProgress);
+      if (attempt > 1) {
+        log.info('finetune', 'Recovered after native worker crash', { attempt, resumed: resume });
+      }
+      break;
+    } catch (err) {
+      const crashed = isWorkerCrash(err);
+      log.error('finetune', 'finetuneRun attempt failed', {
+        attempt, crashed, error: err.message,
+      });
+      if (!RETRY_ON_CRASH || !crashed || attempt > MAX_RETRIES) {
+        throw err;
+      }
+      // If a checkpoint dir already has content, resume from it next attempt;
+      // otherwise restart cold (nothing to resume from yet).
+      const ckptDir = path.join(OUTPUT_DIR, 'checkpoints');
+      resume = fileExists(ckptDir) && fs.readdirSync(ckptDir).length > 0;
+      const backoffMs = 3000 * attempt;
+      log.warn('finetune', 'Retrying after native worker crash', {
+        nextAttempt: attempt + 1, resume, backoffMs,
+      });
+      await new Promise(r => setTimeout(r, backoffMs));
+    }
+  }
 
   // --- Result ---
   const adapterPath = result.adapterPath || result.path || path.join(OUTPUT_DIR, 'adapter.gguf');
