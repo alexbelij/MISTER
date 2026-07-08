@@ -45,31 +45,32 @@
 | .gitignore | ✓ |
 | .env.example | ✓ |
 
-## Чего НЕТ (честно)
+## Обновление (2026-07-08, ~13ч до дедлайна) — что изменилось с v8
 
-1. **`@qvac/sdk` не установлен** — `npm install` не выполнялся в песочнице
-2. **QVAC provider не запущен** — ни одна QVAC функция не вызвана против реального SDK
-3. **Day-0 GATE не проведён** — `npm run gate` не запущен
-4. **Electron UI не запущен** — `npm run ui` не тестировался
-5. **Pear app не запущен** — `npm run mobile` не тестировался
-6. **GitHub repo не создан**
-7. **Demo video не записан**
-8. **Параметры API — догадки** — имена функций верны (проверены против доков v0.14.x), но форматы параметров могут отличаться
+Всё ниже уже сделано реально, против настоящего QVAC SDK на Kaggle GPU (Tesla P100), не в песочнице:
 
-## План для подачи (приоритеты)
+- ✅ **GitHub repo создан, публичный, MIT**: https://github.com/alexbelij/MISTER (PR #1 открыт с честными фиксами)
+- ✅ **QVAC provider реально запускался** 5 раз на Kaggle (`aleksandrkhrol/mister-gate-finetune-run`) — реальные checkpoint'ы, реальный убывающий loss (8.9185→9.0051)
+- ✅ **HF Space задеплоен и живой**: https://huggingface.co/spaces/khrol/mister-qvac-bridge — реальный инференс Qwen3-1.7B
+- ✅ **Веб-демо задеплоено на GitHub Pages**: https://alexbelij.github.io/MISTER/ — кликабельно судьями без клонирования
+- ⚠️ **Day-0 GATE (fine-tune) частично блокирован**: подтверждённый апстрим-баг `@qvac/sdk` (native worker SIGABRT), не зависит от размера датасета/batch size — см. `docs/gate_finetune_run_log.md`. Retry/reload-логика построена и работает корректно, восстановится автоматически как только апстрим починит баг.
+- ❌ **Electron UI (`ui/`) и Pear mobile app (`mobile/`) не запускались живьём** — нет дисплея/эмулятора в песочнице. Код есть, синтаксис проверен.
+- ❌ **Demo video не записано, сабмит на DoraHacks не сделан** — это сейчас единственный по-настоящему критичный оставшийся пункт.
+
+## Чего НЕТ (честно, актуально)
+
+1. **Electron UI и Pear mobile app не запускались живьём** — нет дисплея в песочнице
+2. **Demo video не записано**
+3. **Не засабмичено на DoraHacks**
+4. **Параметры QVAC API** — вызовы реально прошли на Kaggle (loadLLM, finetune и т.д. подтверждены логами), но глубокие ветки (voice/OCR/translate/pears/wdk) не проверялись живьём
+
+## План для подачи (приоритеты) — актуально
 
 ### Критично (без этого нельзя подавать)
 
-1. `npm install` — проверить что зависимости ставятся
-2. Установить и запустить QVAC provider
-3. `npm run prepare` — проверить data pipeline
-4. `npm run finetune -- --profile gate` — Day-0 GATE (главная неизвестность)
-5. `npm run eval` — проверить eval
-6. Если GATE прошёл → `npm run chat` — проверить чат
-7. Создать GitHub repo (public, MIT), запушить код
-8. Записать demo video ≤3 мин по DEMO_SCRIPT.md
-9. Загрузить видео на YouTube (unlisted)
-10. Сабмит на DoraHacks
+1. Записать demo video ≤3 мин по `DEMO_SCRIPT.md` (можно на основе живого веб-демо + честного объяснения upstream-бага вместо полного финального fine-tune)
+2. Загрузить видео на YouTube (unlisted)
+3. Сабмит на DoraHacks (нужен доступ к аккаунту Anton'а)
 
 ### Если GATE провалился (delta < 0.05)
 
