@@ -269,12 +269,21 @@ async function chat(modelId, history, opts = {}) {
   const params = {
     modelId: modelId,
     history: history,
+    stream: true,  // stream is required by QVAC SDK
   };
   
-  if (opts.maxTokens) params.maxTokens = opts.maxTokens;
-  if (opts.temperature !== undefined) params.temperature = opts.temperature;
+  // generationParams is the correct nesting for temp/predict/etc
+  const genParams = {};
+  if (opts.maxTokens) genParams.predict = opts.maxTokens;
+  if (opts.temperature !== undefined) genParams.temp = opts.temperature;
+  if (opts.topP !== undefined) genParams.top_p = opts.topP;
+  if (opts.topK !== undefined) genParams.top_k = opts.topK;
+  if (opts.seed !== undefined) genParams.seed = opts.seed;
+  if (Object.keys(genParams).length > 0) params.generationParams = genParams;
+  
   if (opts.tools) params.tools = opts.tools;
-  if (opts.captureThinking) params.captureThinking = opts.captureThinking;
+  // Remove thinking tokens from output by default (Qwen3 produces <think> blocks)
+  params.remove_thinking_from_context = opts.captureThinking === true ? false : true;
   
   log.debug('qvac', 'Completion request', { 
     modelId, 
@@ -296,12 +305,13 @@ async function chat(modelId, history, opts = {}) {
     // Also get final for any remaining data
     if (run.final) {
       const final = await run.final;
-      const finalText = final.content || final.text || '';
+      const finalText = final.contentText || final.content || final.text || '';
       // Use final if we didn't get content via events
       if (!fullText && finalText) {
         return finalText;
       }
     }
+    fullText = stripThinking(fullText);
     log.debug('qvac', 'Completion (streamed)', { length: fullText.length });
     return fullText;
   }
@@ -309,9 +319,10 @@ async function chat(modelId, history, opts = {}) {
   // Non-streaming: wait for final
   if (run.final) {
     const result = await run.final;
-    const text = result.content || result.text || '';
-    log.debug('qvac', 'Completion (final)', { length: text.length });
-    return text;
+    const text = result.contentText || result.content || result.text || '';
+    const cleanText = stripThinking(text);
+    log.debug('qvac', 'Completion (final)', { length: cleanText.length });
+    return cleanText;
   }
   
   // Legacy: some SDKs may return text directly
@@ -323,6 +334,21 @@ async function chat(modelId, history, opts = {}) {
   
   log.warn('qvac', 'Completion returned unexpected shape', { keys: Object.keys(run) });
   return '';
+}
+
+/**
+ * Strip thinking blocks from model output.
+ * Qwen3 produces  thinking...  blocks that should not be shown to users.
+ */
+function stripThinking(text) {
+  if (!text) return text;
+  // Remove  ...  blocks
+  text = text.replace(/<think>[\s\S]*?<\/think>/g, '');
+  // Remove leading  if present (unclosed thinking at start)
+  text = text.replace(/^<think>[\s\S]*$/m, '');
+  // Also remove  prefix if model outputs it without tags
+  if (text.startsWith('')) text = text.substring(7).trim();
+  return text.trim();
 }
 
 /**
@@ -366,10 +392,13 @@ async function describeImage(vlmModelId, imageBuffer, prompt, opts = {}) {
   const params = {
     modelId: vlmModelId,
     history: history,
+    stream: true,
   };
   
-  if (opts.maxTokens) params.maxTokens = opts.maxTokens;
-  if (opts.temperature !== undefined) params.temperature = opts.temperature;
+  const genParams = {};
+  if (opts.maxTokens) genParams.predict = opts.maxTokens;
+  if (opts.temperature !== undefined) genParams.temp = opts.temperature;
+  if (Object.keys(genParams).length > 0) params.generationParams = genParams;
   
   log.info('qvac', 'VLM describeImage', { promptLength: prompt.length, imageSize: imageBuffer.length });
   
@@ -377,7 +406,7 @@ async function describeImage(vlmModelId, imageBuffer, prompt, opts = {}) {
   
   if (run.final) {
     const result = await run.final;
-    const text = result.content || result.text || '';
+    const text = result.contentText || result.content || result.text || '';
     log.info('qvac', 'VLM response', { length: text.length });
     return text;
   }
@@ -598,35 +627,134 @@ async function ragReindex(workspace) {
  */
 async function finetuneRun(modelId, params, onProgress) {
   const qvac = getQVAC();
-  
+  const fs = require('fs');
+  const path = require('path');
+
+  // QVAC finetune API expects:
+  // { modelId, options: { trainDatasetDir, outputParametersDir, numberOfEpochs, ... } }
+  // We need to write SFT data to a directory in the format QVAC expects.
+
+  // QVAC expects trainDatasetDir to be a FILE path (e.g. /path/to/train.jsonl), not a directory
+  const trainDir = params.trainDir || path.join(process.cwd(), 'data', 'finetune_input');
+  const outputDir = params.outputDir || path.join(process.cwd(), 'data', 'finetune_output');
+
+  // Ensure directories exist
+  fs.mkdirSync(trainDir, { recursive: true });
+  fs.mkdirSync(outputDir, { recursive: true });
+
+  // Write SFT data as JSONL file (QVAC expects train.jsonl in trainDatasetDir)
+  if (params.sft && params.sft.dataset) {
+    // If trainDir is a directory, write train.jsonl inside it; if it's a file path, use it directly
+  let sftPath;
+  if (trainDir.endsWith('.jsonl')) {
+    sftPath = trainDir;
+    fs.mkdirSync(path.dirname(sftPath), { recursive: true });
+  } else {
+    sftPath = path.join(trainDir, 'train.jsonl');
+  }
+    const lines = params.sft.dataset.map(item => {
+      // QVAC expects { messages: [{ role, content }] } format
+      if (item.messages) return JSON.stringify(item);
+      // Convert { prompt, completion } to { messages: [...] }
+      return JSON.stringify({
+        messages: [
+          { role: 'user', content: item.prompt || item.instruction || '' },
+          { role: 'assistant', content: item.completion || item.output || item.response || '' }
+        ]
+      });
+    });
+    fs.writeFileSync(sftPath, lines.join('\n'));
+    log.info('qvac', 'Wrote SFT training data', { path: sftPath, pairs: lines.length });
+  }
+
+  // Build QVAC finetune params
   const finetuneParams = {
-    model: modelId,
-    ...params,
+    modelId: modelId,
+    options: {
+      trainDatasetDir: sftPath,  // QVAC expects a file path, not directory
+      outputParametersDir: outputDir,
+      validation: { type: 'none' },
+    }
   };
-  
-  log.info('qvac', 'Starting fine-tune', { modelId, sftPairs: params.sft?.dataset?.length });
-  
-  // Overload 1: returns FinetuneHandle
+
+  // Map training config to QVAC options
+  const opts = finetuneParams.options;
+  if (params.sft) {
+    if (params.sft.epochs) opts.numberOfEpochs = params.sft.epochs;
+    if (params.sft.learningRate) opts.learningRate = params.sft.learningRate;
+    if (params.sft.assistantLossOnly !== undefined) opts.assistantLossOnly = params.sft.assistantLossOnly;
+    if (params.sft.loraModules) {
+      // Convert array to comma-separated string if needed
+      let modules = params.sft.loraModules;
+      if (Array.isArray(modules)) {
+        // Map common short names to QVAC's expected module names
+        const moduleMap = {
+          'q_proj': 'attn_q', 'k_proj': 'attn_k', 'v_proj': 'attn_v', 'o_proj': 'attn_o',
+          'gate_proj': 'ffn_gate', 'up_proj': 'ffn_up', 'down_proj': 'ffn_down'
+        };
+        modules = modules.map(m => moduleMap[m] || m).join(',');
+      }
+      opts.loraModules = modules;
+    }
+  }
+  if (params.loraRank) opts.loraRank = params.loraRank;
+  if (params.loraAlpha) opts.loraAlpha = params.loraAlpha;
+  if (params.contextLength) opts.contextLength = params.contextLength;
+  if (params.batchSize) opts.batchSize = params.batchSize;
+  if (params.microBatchSize) opts.microBatchSize = params.microBatchSize;
+  if (params.checkpoints && params.checkpoints.enabled) {
+    fs.mkdirSync(params.checkpoints.dir, { recursive: true });
+    opts.checkpointSaveDir = params.checkpoints.dir;
+    if (params.checkpoints.everyNEpochs) opts.checkpointSaveSteps = params.checkpoints.everyNEpochs;
+  }
+
+  log.info('qvac', 'Starting fine-tune', {
+    modelId,
+    trainDir,
+    outputDir,
+    epochs: opts.numberOfEpochs,
+    sftPairs: params.sft?.dataset?.length
+  });
+
+  // finetune() returns FinetuneHandle with progressStream + result
   const handle = qvac.finetune(finetuneParams);
-  
+
   // Stream progress
   if (handle.progressStream && onProgress) {
     for await (const progress of handle.progressStream) {
-      onProgress(progress);
+      // Normalize progress fields
+      onProgress({
+        epoch: progress.current_epoch,
+        step: progress.current_batch,
+        totalSteps: progress.total_batches,
+        loss: progress.loss,
+        percent: progress.total_batches > 0 ? (progress.current_batch / progress.total_batches) * 100 : 0,
+        elapsed: progress.elapsed_ms,
+        eta: progress.eta_ms,
+        raw: progress,
+      });
     }
   }
-  
+
   // Wait for result
-  const result = handle.result 
+  const result = handle.result
     ? (handle.result instanceof Promise ? await handle.result : handle.result)
     : handle;
-  
-  log.info('qvac', 'Fine-tune complete', { 
-    adapterPath: result.adapterPath || result.path,
-    finalLoss: result.finalLoss || result.loss 
+
+  log.info('qvac', 'Fine-tune complete', {
+    status: result.status,
+    stats: result.stats ? { trainLoss: result.stats.train_loss, epochs: result.stats.epochs_completed } : null
   });
-  
-  return result;
+
+  // Normalize result for MISTER
+  return {
+    adapterPath: outputDir,
+    adapterSize: 0,
+    finalLoss: result.stats?.train_loss || 0,
+    status: result.status,
+    stats: result.stats,
+    raw: result,
+  };
 }
 
 /**
@@ -717,7 +845,7 @@ async function tts(ttsModelId, text, opts = {}) {
   log.info('qvac', 'TTS request', { textLength: text.length });
   
   const params = {
-    model: ttsModelId,
+    modelId: ttsModelId,
     text: text,
   };
   
@@ -752,7 +880,7 @@ async function ttsStream(ttsModelId, text, onChunk, opts = {}) {
   log.info('qvac', 'TTS stream request', { textLength: text.length });
   
   const params = {
-    model: ttsModelId,
+    modelId: ttsModelId,
     text: text,
     stream: true,
   };
@@ -849,7 +977,7 @@ async function stt(whisperModelId, audioBuffer, opts = {}) {
   log.info('qvac', 'STT request', { audioSize: audioBuffer.length });
   
   const params = {
-    model: whisperModelId,
+    modelId: whisperModelId,
     audio: audioBuffer,
   };
   
@@ -878,7 +1006,7 @@ async function sttStream(whisperModelId, onText, opts = {}) {
   log.info('qvac', 'STT stream starting');
   
   const params = {
-    model: whisperModelId,
+    modelId: whisperModelId,
   };
   
   if (opts.language) params.language = opts.language;
@@ -925,13 +1053,12 @@ async function translateText(nmtModelId, text, targetLang, opts = {}) {
   log.info('qvac', 'Translate request', { textLength: text.length, targetLang });
   
   const params = {
-    model: nmtModelId,
+    modelId: nmtModelId,
     text: text,
-    targetLang: targetLang,
+    to: targetLang,
   };
   
-  if (opts.sourceLang) params.sourceLang = opts.sourceLang;
-  else params.sourceLang = 'auto';
+  if (opts.sourceLang) params.from = opts.sourceLang;
   
   const result = await qvac.translate(params);
   
@@ -958,13 +1085,12 @@ async function translateStream(nmtModelId, text, targetLang, onToken, opts = {})
   log.info('qvac', 'Translate stream', { textLength: text.length, targetLang });
   
   const params = {
-    model: nmtModelId,
+    modelId: nmtModelId,
     text: text,
-    targetLang: targetLang,
+    to: targetLang,
   };
   
-  if (opts.sourceLang) params.sourceLang = opts.sourceLang;
-  else params.sourceLang = 'auto';
+  if (opts.sourceLang) params.from = opts.sourceLang;
   
   const result = await qvac.translate(params);
   
@@ -1010,7 +1136,7 @@ async function ocrImage(modelId, imageBuffer, opts = {}) {
   log.info('qvac', 'OCR request', { imageSize: imageBuffer.length });
   
   const params = {
-    model: modelId,
+    modelId: modelId,
     image: imageBuffer,
   };
   
@@ -1051,7 +1177,7 @@ async function upscaleImage(diffusionModelId, imageBuffer, scale = 2) {
   log.info('qvac', 'Upscale request', { imageSize: imageBuffer.length, scale });
   
   const result = await qvac.upscale({
-    model: diffusionModelId,
+    modelId: diffusionModelId,
     image: imageBuffer,
     scale: scale,
   });
@@ -1101,7 +1227,7 @@ async function getLoadedModelInfo(modelId) {
 async function getCatalogInfo(modelName) {
   const qvac = getQVAC();
   try {
-    const info = await qvac.getModelInfo({ model: modelName });
+    const info = await qvac.getModelInfo({ modelId: modelName });
     log.info('qvac', 'Catalog info', { model: modelName, info });
     return info;
   } catch (e) {
