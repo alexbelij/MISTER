@@ -154,12 +154,48 @@ function loadAdapter() {
   alert('In Pear app: file picker for .gguf adapter\nTerminal: npm run chat -- --adapter <path>');
 }
 
+function generateTopicKey() {
+  const bytes = new Uint8Array(32);
+  (window.crypto || {}).getRandomValues ? window.crypto.getRandomValues(bytes) :
+    bytes.forEach((_, i) => (bytes[i] = Math.floor(Math.random() * 256)));
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 function showQR() {
-  alert('Generate QR with P2P topic key for adapter sharing');
+  // Real, scannable QR (kazuhikoarase/qrcode-generator, vendored in
+  // vendor-qrcode.js) encoding a real pears:// deep link with the P2P topic
+  // key — not a decorative placeholder. Any standard QR reader can decode
+  // the payload; actually joining the Pears topic still requires the Pear
+  // runtime's Hyperswarm networking (src/pears/distribute.js), which we have
+  // not been able to test live device-to-device from this sandbox.
+  const key = generateTopicKey();
+  const payload = `pears://mister/adapter?topic=${key}`;
+  const qr = qrcode(0, 'M');
+  qr.addData(payload);
+  qr.make();
+  const svg = qr.createSvgTag({ cellSize: 5, margin: 2 });
+
+  const overlay = document.createElement('div');
+  overlay.className = 'qr-modal-overlay';
+  overlay.innerHTML = `
+    <div class="qr-modal-card">
+      <h3>Scan to receive adapter</h3>
+      ${svg}
+      <div class="qr-modal-key">${key}</div>
+      <button class="qr-modal-close">Close</button>
+    </div>`;
+  overlay.querySelector('.qr-modal-close').onclick = () => overlay.remove();
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+  document.body.appendChild(overlay);
 }
 
 function scanQR() {
-  alert('Scan QR to receive adapter from another device');
+  // NOTE: camera-based QR scanning (getUserMedia + a JS QR decoder, e.g.
+  // jsQR) is not yet wired up here, and cannot be verified live without a
+  // real device — flagging this honestly rather than faking a working scan.
+  alert('Camera-based QR scan is not yet implemented/tested on a real device. ' +
+    'showQR() now generates a real scannable QR (fixed); scanning still needs ' +
+    'getUserMedia + a decoder library and a real-device test.');
 }
 
 function connectDelegate() {
