@@ -81,17 +81,33 @@ async function main() {
     process.exit(1);
   }
 
-  const sftData = fs.readFileSync(sftTrainPath, 'utf-8').trim().split('\n').filter(l => l.trim()).map(JSON.parse);
+  let sftData = fs.readFileSync(sftTrainPath, 'utf-8').trim().split('\n').filter(l => l.trim()).map(JSON.parse);
   log.info('finetune', 'SFT pairs loaded', { count: sftData.length });
+
+  // BUGFIX (2026-07-08, gate_micro run): every training profile in
+  // config/training_profiles.json defines `maxSFTPairs` (e.g. gate_micro=20),
+  // but this script never actually applied it — the full dataset on disk was
+  // always used regardless of profile, so `gate_micro` trained on the same
+  // 93 pairs as `gate`/`standard` and gave the native worker crash no fewer
+  // reps to survive. Slice here so the profile's dataset-size knob actually works.
+  if (trainingConfig.maxSFTPairs && sftData.length > trainingConfig.maxSFTPairs) {
+    log.info('finetune', 'Truncating SFT pairs to profile maxSFTPairs', {
+      before: sftData.length, after: trainingConfig.maxSFTPairs,
+    });
+    sftData = sftData.slice(0, trainingConfig.maxSFTPairs);
+  }
 
   let causalData = [];
   if (fileExists(causalPath)) {
     causalData = fs.readFileSync(causalPath, 'utf-8').trim().split('\n').filter(l => l.trim()).map(JSON.parse);
     log.info('finetune', 'Causal corpus loaded', { count: causalData.length });
+    if (trainingConfig.maxSFTPairs && causalData.length > trainingConfig.maxSFTPairs) {
+      causalData = causalData.slice(0, trainingConfig.maxSFTPairs);
+    }
   }
 
   // --- Load model using wrapper ---
-  const modelId = await qvac.loadLLM(MODEL, {
+  let modelId = await qvac.loadLLM(MODEL, {
     quantization: config.model.quantization,
     ctxSize: 2048,
   });
@@ -129,6 +145,12 @@ async function main() {
       learningRate: trainingConfig.causalLearningRate || 5e-5,
     },
     evalSplit: trainingConfig.evalSplit,
+    // BUGFIX (2026-07-08, gate_micro run): qvac_wrapper.finetuneRun() reads
+    // params.batchSize/params.microBatchSize top-level, but this object never
+    // set them, so profile-level batchSize/microBatchSize (e.g. gate_micro's
+    // batchSize:1) were silently dropped and had zero effect on the actual run.
+    batchSize: trainingConfig.batchSize,
+    microBatchSize: trainingConfig.microBatchSize,
     checkpoints: {
       enabled: true,
       dir: path.join(OUTPUT_DIR, 'checkpoints'),
@@ -171,9 +193,16 @@ async function main() {
       }
       break;
     } catch (err) {
-      const crashed = isWorkerCrash(err);
+      // A native worker SIGABRT kills the entire bare RPC worker process, which
+      // also invalidates any modelId that was loaded against it (the registry
+      // dies with the worker) — a plain retry with the same modelId fails with
+      // MODEL_NOT_FOUND (confirmed on Kaggle kernel v4, 2026-07-08). We detect
+      // that as its own recoverable case and reload the model fresh before
+      // the next finetuneRun attempt.
+      const modelLost = /MODEL_NOT_FOUND|not found/i.test(err.message || '');
+      const crashed = isWorkerCrash(err) || modelLost;
       log.error('finetune', 'finetuneRun attempt failed', {
-        attempt, crashed, error: err.message,
+        attempt, crashed, modelLost, error: err.message,
       });
       if (!RETRY_ON_CRASH || !crashed || attempt > MAX_RETRIES) {
         throw err;
@@ -187,6 +216,18 @@ async function main() {
         nextAttempt: attempt + 1, resume, backoffMs,
       });
       await new Promise(r => setTimeout(r, backoffMs));
+      // Reload the model to get a fresh modelId bound to a live worker before
+      // the next attempt — the crashed worker's modelId is no longer valid.
+      try {
+        modelId = await qvac.loadLLM(MODEL, {
+          quantization: config.model.quantization,
+          ctxSize: 2048,
+        });
+        log.info('finetune', 'Reloaded model after crash', { modelId });
+      } catch (reloadErr) {
+        log.error('finetune', 'Model reload after crash failed', { error: reloadErr.message });
+        throw err;
+      }
     }
   }
 
