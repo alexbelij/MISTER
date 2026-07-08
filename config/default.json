@@ -5,7 +5,7 @@
     "env": "development"
   },
   "model": {
-    "llm": "Qwen3-1.7B",
+    "llm": "registry://hf/unsloth/Qwen3-1.7B-GGUF/resolve/d7f544eead698dbd1f15126ef60b45a1e1933222/Qwen3-1.7B-Q4_0.gguf",
     "vlm": "SmolVLM2-500M",
     "quantization": "Q4_0",
     "maxTokens": 512,
@@ -15,9 +15,17 @@
   "finetune": {
     "defaultEpochs": 3,
     "gateEpochs": 2,
-    "learningRate": 1e-4,
-    "causalLearningRate": 5e-5,
-    "loraModules": ["q_proj", "k_proj", "v_proj", "o_proj"],
+    "learningRate": 0.0001,
+    "causalLearningRate": 5e-05,
+    "loraModules": [
+      "attn_q",
+      "attn_k",
+      "attn_v",
+      "attn_o",
+      "ffn_gate",
+      "ffn_up",
+      "ffn_down"
+    ],
     "assistantLossOnly": true,
     "evalSplit": 0.1,
     "checkpointEveryNEpochs": 1,
