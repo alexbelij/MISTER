@@ -10,3 +10,4 @@ build/
 .wallet.json
 .wallet.seed.enc
 .wallet.local.key
+data/processed/
