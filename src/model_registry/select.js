@@ -55,7 +55,7 @@ async function main() {
     if (models.length === 0) {
       console.log('No models found matching criteria.');
       // Fallback: get catalog info for configured model
-      const info = await qvac.getCatalogInfo(config.model.llm);
+      const info = await qvac.getCatalogInfo(config.model.llmCatalogName);
       if (info) {
         console.log(`\nConfigured model: ${config.model.llm}`);
         console.log(`  Parameters: ${info.parameters || 'unknown'}`);
@@ -88,7 +88,7 @@ async function main() {
     log.error('registry', 'Search failed', { error: e.message });
     // Fallback
     try {
-      const info = await qvac.getCatalogInfo(config.model.llm);
+      const info = await qvac.getCatalogInfo(config.model.llmCatalogName);
       if (info) {
         console.log(`\nConfigured model: ${config.model.llm}`);
         console.log(`  Parameters: ${info.parameters || 'unknown'}`);
