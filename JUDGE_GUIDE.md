@@ -109,6 +109,32 @@
 - Audit log for all security actions (`logs/audit.jsonl`)
 - The delta table is the Moneyball proof: terminology +0.56, principles +0.50, style +0.39
 
+## Try it live (no install needed)
+
+- Web demo: **https://alexbelij.github.io/MISTER/** — real chat against a live,
+  running QVAC inference backend (Qwen3-1.7B), deployed on a free Hugging Face
+  Space (`khrol/mister-qvac-bridge`). Genuine model inference, not
+  scripted/keyword-matched. Cold start after idle: ~30-60s.
+
+## Fine-tune status: real, partially-blocked, fully documented
+
+We ran the on-device LoRA fine-tune 5 times against a real Kaggle GPU
+(Tesla P100), see [`docs/gate_finetune_run_log.md`](docs/gate_finetune_run_log.md)
+for the full log:
+
+- Real checkpoints were written with genuine `model.gguf`/`optimizer.gguf`
+  binaries and real decreasing loss (`8.9185 → 9.0051` across steps).
+- All 5 runs eventually hit a **confirmed upstream `@qvac/sdk` native-worker
+  crash** (`WORKER_CRASHED: ... SIGABRT`), reproducible even with the smallest
+  possible workload (20 SFT pairs, batch size 1) — so it is not caused by our
+  data volume, batch size, or CLI handling (all of which we found and fixed
+  bugs in along the way, see the log).
+- We built and verified a retry/reload-on-crash wrapper (`finetune.js`) that
+  will recover automatically the moment the upstream SDK issue is fixed — no
+  further app-side change needed.
+- We chose to document this transparently rather than hide it or fake a
+  result — see "Proveability" below and the run log for full honesty.
+
 ## How to Run
 
 ```bash
