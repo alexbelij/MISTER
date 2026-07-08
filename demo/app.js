@@ -181,19 +181,22 @@ function positionTooltip(e) {
 }
 
 // ===== TAB SWITCHING =====
-function initTabs() {
-  const switchTab = (tabName) => {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(t => t.classList.remove('active'));
-    const tab = document.getElementById('tab-' + tabName);
-    if (tab) tab.classList.add('active');
-    document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(t => t.classList.add('active'));
-    closeSidebar();
-    // Scroll to top
-    document.querySelector('.main-content').scrollTop = 0;
-    window.scrollTo(0, 0);
-  };
+// Exposed on window so other sections (e.g. Match History -> Match Report)
+// can navigate tabs programmatically, not just via the sidebar/bottom nav.
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(t => t.classList.remove('active'));
+  const tab = document.getElementById('tab-' + tabName);
+  if (tab) tab.classList.add('active');
+  document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(t => t.classList.add('active'));
+  closeSidebar();
+  // Scroll to top
+  document.querySelector('.main-content').scrollTop = 0;
+  window.scrollTo(0, 0);
+}
+window.switchTab = switchTab;
 
+function initTabs() {
   document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
@@ -369,7 +372,7 @@ function renderMatchTimeline() {
   const container = document.getElementById('match-timeline');
   if (!container) return;
   container.innerHTML = MATCHES.map(m => `
-    <div class="match-row result-${m.result.toLowerCase()}" data-tooltip="${m.date} vs ${m.opponent} (${m.venue}) — ${m.result} ${m.gf}-${m.ga}. xG: ${m.xg_f}-${m.xg_a}. Press: ${m.press}%. Transition: ${m.trans}s. Flank overloads: ${m.flank}.">
+    <div class="match-row result-${m.result.toLowerCase()}" data-match-id="${m.id}" data-tooltip="${m.date} vs ${m.opponent} (${m.venue}) — ${m.result} ${m.gf}-${m.ga}. xG: ${m.xg_f}-${m.xg_a}. Press: ${m.press}%. Transition: ${m.trans}s. Flank overloads: ${m.flank}. Click to open the full match report.">
       <div class="match-date">${m.date.slice(5)}</div>
       <div class="match-vs">
         <div class="match-opponent">${m.opponent}</div>
@@ -383,6 +386,19 @@ function renderMatchTimeline() {
       <div class="match-score">${m.gf}-${m.ga}</div>
     </div>
   `).join('');
+
+  container.querySelectorAll('.match-row').forEach((row) => {
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', () => {
+      const matchId = row.dataset.matchId;
+      switchTab('reports');
+      const select = document.getElementById('report-match-select');
+      if (select) {
+        select.value = matchId;
+        select.dispatchEvent(new Event('change'));
+      }
+    });
+  });
 }
 
 function renderPlayerRatings() {
@@ -716,53 +732,16 @@ function renderQRCode(key) {
   const container = document.getElementById('qr-code');
   if (!container) return;
 
-  // Generate a stylized QR code pattern from the key
-  const size = 21; // QR-like grid
-  const cellSize = 8;
-  const totalSize = size * cellSize;
-  const seed = key.split('').reduce((s, c) => s + c.charCodeAt(0), 0);
-
-  // Pseudo-random based on key
-  let rng = seed;
-  const random = () => {
-    rng = (rng * 1103515245 + 12345) & 0x7fffffff;
-    return rng / 0x7fffffff;
-  };
-
-  let cells = '';
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      // Finder patterns (corners)
-      const isFinder = (x < 7 && y < 7) || (x >= size - 7 && y < 7) || (x < 7 && y >= size - 7);
-      if (isFinder) {
-        const fx = x < 7 ? x : x - (size - 7);
-        const fy = y < 7 ? y : y - (size - 7);
-        const isOuter = fx === 0 || fx === 6 || fy === 0 || fy === 6;
-        const isInner = fx >= 2 && fx <= 4 && fy >= 2 && fy <= 4;
-        if (isOuter || isInner) {
-          cells += `<rect x="${x*cellSize}" y="${y*cellSize}" width="${cellSize}" height="${cellSize}" fill="#0d1117"/>`;
-        }
-        continue;
-      }
-      // Data cells
-      if (random() > 0.5) {
-        cells += `<rect x="${x*cellSize}" y="${y*cellSize}" width="${cellSize}" height="${cellSize}" fill="#0d1117"/>`;
-      }
-    }
-  }
-
-  // Timing patterns
-  for (let i = 8; i < size - 8; i++) {
-    if (i % 2 === 0) {
-      cells += `<rect x="${i*cellSize}" y="${6*cellSize}" width="${cellSize}" height="${cellSize}" fill="#0d1117"/>`;
-      cells += `<rect x="${6*cellSize}" y="${i*cellSize}" width="${cellSize}" height="${cellSize}" fill="#0d1117"/>`;
-    }
-  }
-
-  container.innerHTML = `<svg width="${totalSize}" height="${totalSize}" viewBox="0 0 ${totalSize} ${totalSize}" xmlns="http://www.w3.org/2000/svg">
-    <rect width="${totalSize}" height="${totalSize}" fill="#fff"/>
-    ${cells}
-  </svg>`;
+  // Real, scannable QR code (kazuhikoarase/qrcode-generator, vendored in
+  // vendor-qrcode.js — MIT). Encodes a real pears:// deep link carrying the
+  // topic key, so any standard QR reader decodes real, meaningful content
+  // (previously this rendered a decorative fake pattern that encoded nothing
+  // and could not be scanned by any app — fixed 2026-07-08).
+  const payload = `pears://mister/adapter?topic=${key}`;
+  const qr = qrcode(0, 'M'); // type 0 = auto-detect smallest version, M = ~15% error correction
+  qr.addData(payload);
+  qr.make();
+  container.innerHTML = qr.createSvgTag({ cellSize: 6, margin: 2 });
 }
 
 function renderPeers() {
