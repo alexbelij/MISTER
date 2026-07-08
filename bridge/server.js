@@ -38,6 +38,43 @@ app.use((req, res, next) => {
   next();
 });
 
+// ---- Simple in-memory per-IP rate limit for /chat ----
+// This Space runs on a free single-instance CPU tier with no real GPU — a
+// handful of concurrent inference calls can exhaust the shared token budget
+// and starve real judges during the review window. No extra dependency:
+// fixed-window counter per IP, reset every WINDOW_MS.
+const RATE_LIMIT_WINDOW_MS = 10_000; // 10s window
+const RATE_LIMIT_MAX_REQUESTS = 3; // max 3 /chat calls per IP per window
+const rateLimitBuckets = new Map(); // ip -> { count, windowStart }
+
+function rateLimit(req, res, next) {
+  const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  let bucket = rateLimitBuckets.get(ip);
+  if (!bucket || now - bucket.windowStart > RATE_LIMIT_WINDOW_MS) {
+    bucket = { count: 0, windowStart: now };
+    rateLimitBuckets.set(ip, bucket);
+  }
+  bucket.count += 1;
+  if (bucket.count > RATE_LIMIT_MAX_REQUESTS) {
+    const retryAfterMs = RATE_LIMIT_WINDOW_MS - (now - bucket.windowStart);
+    res.setHeader('Retry-After', Math.ceil(retryAfterMs / 1000));
+    return res.status(429).json({
+      error: `Rate limit exceeded — max ${RATE_LIMIT_MAX_REQUESTS} requests per ${RATE_LIMIT_WINDOW_MS / 1000}s per IP. Retry shortly.`,
+    });
+  }
+  next();
+}
+
+// Periodically evict stale buckets so memory doesn't grow unbounded on a
+// long-running free-tier instance.
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, bucket] of rateLimitBuckets) {
+    if (now - bucket.windowStart > RATE_LIMIT_WINDOW_MS * 10) rateLimitBuckets.delete(ip);
+  }
+}, 60_000).unref();
+
 // ---- Model state ----
 let modelId = null;
 let modelReady = false;
@@ -96,7 +133,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.post('/chat', async (req, res) => {
+app.post('/chat', rateLimit, async (req, res) => {
   const { message } = req.body || {};
   if (!message || typeof message !== 'string' || !message.trim()) {
     return res.status(400).json({ error: 'Body must be JSON: { "message": "<string>" }' });

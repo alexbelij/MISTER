@@ -99,15 +99,20 @@
 
 **Evidence:**
 - `eval/holdout_set.json` — 15 questions NOT in training data
-- `src/eval/enhanced_eval.js` — 3-layer scoring:
+- `src/eval/enhanced_eval.js` — 3-layer scoring, real and working end-to-end:
   1. Lexical: 29 club terms + 8 principles
   2. Semantic: embedding cosine similarity via QVAC `embed()` (not word overlap)
   3. LLM-as-Judge: 5 rubric criteria scored by local model
-- `eval/results/` — BEFORE/AFTER comparison with delta table
+- `npm run eval` writes BEFORE/AFTER results with a delta table to `eval/results/`
+  when it completes — the table format/methodology in README is real, but no run
+  has produced a completed AFTER-side result yet (see "Fine-tune status" above:
+  upstream `@qvac/sdk` crash blocks the AFTER pass). We chose to state this plainly
+  rather than publish placeholder numbers as if they were a measured result.
+- Real proof that exists today: confirmed BEFORE eval runs (real model, real
+  inference) + 3 real checkpoints with genuine decreasing loss from Kaggle runs
 - Training logs with loss curves (`logs/`)
 - Checkpoints (pause/resume supported)
 - Audit log for all security actions (`logs/audit.jsonl`)
-- The delta table is the Moneyball proof: terminology +0.56, principles +0.50, style +0.39
 
 ## Try it live (no install needed)
 
