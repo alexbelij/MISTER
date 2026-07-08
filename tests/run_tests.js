@@ -320,9 +320,18 @@ test('crypto module encrypts and decrypts correctly', () => {
 
 test('crypto rejects wrong password', () => {
   const crypto = require('../src/security/crypto');
+  const log = require('../src/utils/logger');
   const encrypted = crypto.encryptData('secret data', 'correct-password');
   assert(crypto.verifyPassword(encrypted, 'correct-password'), 'Correct password should verify');
-  assert(!crypto.verifyPassword(encrypted, 'wrong-password'), 'Wrong password should not verify');
+  // verifyPassword() internally logs a real ERROR on decrypt failure (correct behavior
+  // in production). Here the failure is *expected* (deliberately wrong password), so
+  // briefly raise the log level to avoid printing a scary but harmless ERROR line in
+  // otherwise-green test output. Production error logging on real decrypt failures is
+  // untouched.
+  log.setLevel('metric');
+  const rejected = !crypto.verifyPassword(encrypted, 'wrong-password');
+  log.setLevel('info');
+  assert(rejected, 'Wrong password should not verify');
 });
 
 test('crypto hashData is consistent', () => {

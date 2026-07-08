@@ -3,7 +3,7 @@
 [![tests](https://github.com/alexbelij/MISTER/actions/workflows/tests.yml/badge.svg)](https://github.com/alexbelij/MISTER/actions/workflows/tests.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**On-device club brain that fine-tunes (LoRA) on your club's data. Your tactical IP never leaves the machine.**
+**MISTER is a private, on-device coaching brain: fine-tune a small LLM on your own club's tactics, offline, and it starts speaking in your club's voice.**
 
 > Built for [Tether Developers Cup](https://dorahacks.io/hackathon/tether-developers-cup) — QVAC (flagship) + Pears (genuine) + WDK (marketplace).
 
@@ -12,6 +12,15 @@
 - **Live web demo:** [alexbelij.github.io/MISTER](https://alexbelij.github.io/MISTER/) — real chat, calling a genuinely running on-device QVAC inference backend (Qwen3-1.7B). Not scripted, not keyword-matched. First message after idle can take ~30-60s (free-tier cold start).
 - **Judge guide:** [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md) — maps every judging criterion to concrete evidence in this repo.
 - **PR with the latest fixes:** [#1](https://github.com/alexbelij/MISTER/pull/1)
+
+### ⚠️ Known limitations (honest, as of submission)
+
+- **GATE fine-tune (AFTER eval) is blocked by an upstream `@qvac/sdk` bug** — the native LoRA worker crashes with `SIGABRT` before writing the adapter, confirmed independent of dataset/batch size and reported upstream. Retry/resume logic is in place and will recover automatically once the SDK is fixed. Real BEFORE-eval and real decreasing-loss training logs from actual Kaggle runs are in the [Proof tab](https://alexbelij.github.io/MISTER/) / `JUDGE_GUIDE.md`.
+- **Electron desktop app and Pear mobile app are code/syntax-verified but not yet run live on real hardware** — the live demo above is the browser-hosted path; desktop/mobile live testing is planned before the final-build round.
+- **WDK adapter marketplace is post-MVP only** — not claimed as a working primary-track feature (see `JUDGE_GUIDE.md`).
+- **Automated tests (37/37) are structural** (files exist, export the right functions, correct API names) — they do not call the real `@qvac/sdk` natively, since that needs the actual GPU/model runtime. Real, non-mocked evidence instead comes from the Kaggle run logs referenced above.
+
+Full detail on every point above: [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md).
 
 ## What is MISTER?
 
@@ -276,7 +285,12 @@ All API calls go through `src/utils/qvac_wrapper.js` — a single source of trut
 ## Tech Stack
 
 - **QVAC SDK** (`@qvac/sdk`) — 40+ API functions via `qvac_wrapper.js`
-- **Pears** (Hyperswarm, Hyperblobs, Corestore, Autobase) — P2P distribution, collaborative game model, inference delegation
+- **Pears** (Hyperswarm, Hyperblobs, Corestore, Autobase) — P2P distribution, collaborative game model, inference delegation. Real usage, e.g. `src/pears/delegate.js`:
+  ```js
+  const swarm = new Hyperswarm();
+  swarm.join(topic, { client: false, server: true }); // laptop advertises itself
+  swarm.on('connection', (socket) => { /* stream inference to phone */ });
+  ```
 - **WDK** (`@tetherto/wdk`) — self-custody wallet, gasless USDt, adapter marketplace
 - **Model**: Qwen3 1.7B (LLM), SmolVLM2 500M (VLM)
 - **Desktop UI**: Electron + React
