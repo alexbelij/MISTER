@@ -14,6 +14,7 @@
     "augment": "node src/pipeline/augment.js",
     "finetune": "node src/finetune/finetune.js",
     "finetune:gate": "node src/finetune/finetune.js --profile gate",
+    "finetune:gate_micro": "node src/finetune/finetune.js --profile gate_micro --retry-on-crash",
     "finetune:deep": "node src/finetune/finetune.js --profile deep",
     "eval": "node src/eval/eval_harness.js",
     "eval:enhanced": "node src/eval/enhanced_eval.js --llm-judge",
