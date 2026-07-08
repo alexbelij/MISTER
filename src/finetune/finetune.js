@@ -14,10 +14,24 @@ const log = require('../utils/logger');
 const qvac = require('../utils/qvac_wrapper');
 const { ensureDir, readJSON, fileExists, writeJSON, generateId, timer } = require('../utils/helpers');
 
-const MODEL = process.argv.find(a => a.startsWith('--model='))?.split('=')[1] || config.model.llm;
-const EPOCHS = parseInt(process.argv.find(a => a.startsWith('--epochs='))?.split('=')[1] || '0') || config.finetune.defaultEpochs;
-const PROFILE = process.argv.find(a => a.startsWith('--profile='))?.split('=')[1] || 'standard';
-const DATA_DIR = process.argv.find(a => a.startsWith('--data='))?.split('=')[1] || config.paths.processed;
+// Supports both `--flag=value` and `--flag value` forms (npm run scripts in this repo use the
+// space-separated form, e.g. `--profile gate`, which the old `--flag=` startsWith check silently
+// ignored — it always fell through to the 'standard' default regardless of which npm script
+// (finetune:gate / finetune:deep) was invoked. Fixed 2026-07-08 after a Kaggle GATE run silently
+// trained with the heavier 'standard' profile instead of the intended 'gate' profile.
+function argValue(flag) {
+  const argv = process.argv;
+  const eq = argv.find(a => a.startsWith(`${flag}=`));
+  if (eq) return eq.split('=').slice(1).join('=');
+  const idx = argv.indexOf(flag);
+  if (idx !== -1 && idx + 1 < argv.length) return argv[idx + 1];
+  return undefined;
+}
+
+const MODEL = argValue('--model') || config.model.llm;
+const EPOCHS = parseInt(argValue('--epochs') || '0') || config.finetune.defaultEpochs;
+const PROFILE = argValue('--profile') || 'standard';
+const DATA_DIR = argValue('--data') || config.paths.processed;
 const OUTPUT_DIR = config.finetune.outputDir;
 
 async function main() {
