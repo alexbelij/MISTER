@@ -69,14 +69,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MISTER">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="preload" href="styles.css?v=24" as="style">
+<link rel="preload" href="styles.css?v=25" as="style">
 <link rel="preload" href="app.js" as="script">
 <link rel="preload" href="vendor-qrcode.js" as="script">
+<link rel="preload" href="ui-notify.js" as="script">
 <link rel="preconnect" href="https://alexbelij-mister-qvac-inference.hf.space" crossorigin>
 <link rel="dns-prefetch" href="https://alexbelij-mister-qvac-inference.hf.space">
-<link rel="stylesheet" href="styles.css?v=24">
+<link rel="stylesheet" href="styles.css?v=25">
 <script>document.documentElement.classList.add('js');</script>
 <script src="vendor-qrcode.js" defer></script>
+<script src="ui-notify.js?v=25" defer></script>
 </head>
 <body>
 
@@ -688,13 +690,55 @@
 <!-- Tooltip -->
 <div id="tooltip" class="tooltip"></div>
 
-<script src="app.js?v=24"></script>
+<script src="app.js?v=25"></script>
 <script>
 // Register PWA service worker (progressive enhancement — silent-fail on unsupported browsers)
+// Also surfaces an update prompt via the UI toast system when a new version is available.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch((err) => {
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+      if (!reg) return;
+      const notify = (worker) => {
+        try {
+          if (!window.UI) return;
+          window.UI.toast({
+            variant: 'info',
+            title: 'Update available',
+            body: 'A new version of the demo is ready.',
+            duration: 0,
+            actions: [
+              { label: 'Reload', primary: true, onClick: () => {
+                  try { worker.postMessage({ type: 'SKIP_WAITING' }); } catch (_) {}
+                  setTimeout(() => location.reload(), 200);
+              } },
+              { label: 'Later' }
+            ]
+          });
+        } catch (_) { /* never break the app on a toast failure */ }
+      };
+      if (reg.waiting) notify(reg.waiting);
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        if (!nw) return;
+        nw.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) notify(nw);
+        });
+      });
+    }).catch((err) => {
       console.warn('[pwa] service worker registration failed:', err);
+    });
+
+    // Online/offline toasts (silent on first load — only on state change)
+    let wasOnline = navigator.onLine;
+    window.addEventListener('offline', () => {
+      if (!wasOnline) return;
+      wasOnline = false;
+      try { window.UI && window.UI.warn('You are offline', 'The chat needs internet, but the rest of the demo still works.', { duration: 6000 }); } catch (_) {}
+    });
+    window.addEventListener('online', () => {
+      if (wasOnline) return;
+      wasOnline = true;
+      try { window.UI && window.UI.success('Back online', 'Everything is reconnected.', { duration: 3500 }); } catch (_) {}
     });
   });
 }
