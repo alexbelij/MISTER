@@ -620,15 +620,27 @@ function renderPlayerCards(filter = 'all') {
     </button>`;
   }).join('');
 
-  // Wire card clicks — use one delegated listener on the grid so we don't
-  // accumulate per-card listeners on every re-render (filter chips re-render
-  // the whole grid). Bind exactly once via a flag on the container.
+  // Wire card clicks — belt-and-braces: one delegated listener on the grid
+  // AND a direct listener on each card. Delegation alone was reported as
+  // unreliable on some browsers/devices; per-card listeners are cheap since
+  // the grid holds only ~16 items and we re-attach on every render.
+  const openFromCard = (card) => {
+    if (!card) return;
+    const idx = Number(card.dataset.playerIndex);
+    if (!Number.isNaN(idx) && PLAYERS[idx]) openPlayerModal(PLAYERS[idx]);
+  };
+  grid.querySelectorAll('.player-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openFromCard(card);
+    });
+  });
   if (!grid.dataset.clickBound) {
     grid.addEventListener('click', (e) => {
       const card = e.target.closest('.player-card');
       if (!card || !grid.contains(card)) return;
-      const idx = Number(card.dataset.playerIndex);
-      if (!Number.isNaN(idx) && PLAYERS[idx]) openPlayerModal(PLAYERS[idx]);
+      openFromCard(card);
     });
     grid.dataset.clickBound = '1';
   }
