@@ -56,7 +56,7 @@ function applyEnvOverrides(cfg) {
     const finalKey = configPath[configPath.length - 1];
     // Try to parse as JSON, fallback to string
     try {
-      target[finalKey] = JSON.parse(value);
+      try { target[finalKey] = JSON.parse(value); } catch { target[finalKey] = value; }
     } catch {
       target[finalKey] = value;
     }
@@ -82,7 +82,7 @@ function applyCLIOverrides(cfg) {
       target = target[keys[i]];
     }
     try {
-      target[keys[keys.length - 1]] = JSON.parse(value);
+      try { target[keys[keys.length - 1]] = JSON.parse(value); } catch { target[keys[keys.length - 1]] = value; }
     } catch {
       target[keys[keys.length - 1]] = value;
     }

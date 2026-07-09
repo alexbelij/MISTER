@@ -83,7 +83,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MISTER">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="preload" href="styles.css?v=34" as="style">
+<link rel="preload" href="styles.css?v=35" as="style">
 <link rel="preload" href="app.js" as="script">
 <link rel="preload" href="vendor-qrcode.js" as="script">
 <link rel="preload" href="ui-notify.js" as="script">
@@ -95,16 +95,16 @@
 <link rel="preload" href="export-report.js" as="script">
 <link rel="preconnect" href="https://alexbelij-mister-qvac-inference.hf.space" crossorigin>
 <link rel="dns-prefetch" href="https://alexbelij-mister-qvac-inference.hf.space">
-<link rel="stylesheet" href="styles.css?v=34">
+<link rel="stylesheet" href="styles.css?v=35">
 <script>document.documentElement.classList.add('js');</script>
 <script src="vendor-qrcode.js" defer></script>
-<script src="ui-notify.js?v=34" defer></script>
-<script src="site-tour.js?v=34" defer></script>
-<script src="theme-toggle.js?v=34" defer></script>
-<script src="keyboard-shortcuts.js?v=34" defer></script>
-<script src="export-report.js?v=34" defer></script>
-<script src="team-switcher.js?v=34" defer></script>
-<script src="chat-signing.js?v=34" defer></script>
+<script src="ui-notify.js?v=35" defer></script>
+<script src="site-tour.js?v=35" defer></script>
+<script src="theme-toggle.js?v=35" defer></script>
+<script src="keyboard-shortcuts.js?v=35" defer></script>
+<script src="export-report.js?v=35" defer></script>
+<script src="team-switcher.js?v=35" defer></script>
+<script src="chat-signing.js?v=35" defer></script>
 </head>
 <body>
 
@@ -195,6 +195,10 @@
       <a class="nav-item" data-tab="distribute" data-tooltip="Distribute game plans to coaches/players via Pears P2P sync. No cloud server required.">
         <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
         <span>Distribute</span>
+      </a>
+      <a class="nav-item" data-tab="marketplace" data-tooltip="Buy and sell LoRA adapters for USDt via WDK. Self-custody wallet, gasless ERC-4337 transactions.">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+        <span>Marketplace</span>
       </a>
       <a class="nav-item" data-tab="proof" data-tooltip="Real, verifiable evidence of on-device fine-tuning: actual Kaggle run logs, real loss values, real checkpoints. No fabricated numbers.">
         <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
@@ -575,6 +579,82 @@
       </div>
     </section>
 
+    <!-- Tab: Marketplace (WDK) -->
+    <section id="tab-marketplace" class="tab-content">
+      <div class="tab-header">
+        <h2 class="tab-title">Adapter Marketplace</h2>
+        <p class="tab-subtitle">Buy and sell LoRA adapters with gasless USDt via WDK (ERC-4337)</p>
+      </div>
+
+      <!-- Wallet info -->
+      <div class="marketplace-wallet" id="marketplace-wallet">
+        <div class="marketplace-wallet-header">
+          <span class="marketplace-wallet-icon">💳</span>
+          <div>
+            <div class="marketplace-wallet-label">Self-Custody Wallet</div>
+            <div class="marketplace-wallet-addr" id="mp-wallet-addr">Not connected</div>
+          </div>
+          <div class="marketplace-wallet-balance" id="mp-wallet-balance">— USDt</div>
+        </div>
+      </div>
+
+      <!-- Listings grid -->
+      <div class="marketplace-grid" id="marketplace-grid">
+        <!-- Sample listings (populated by JS or static demo data) -->
+        <div class="marketplace-card">
+          <div class="marketplace-card-badge">QVAC</div>
+          <h3 class="marketplace-card-title">4-3-3 Pressing Adapter</h3>
+          <p class="marketplace-card-desc">LoRA fine-tuned on 200+ pressing trigger scenarios. Optimized for high-line teams.</p>
+          <div class="marketplace-card-meta">
+            <span>by FC Metall Nord</span>
+            <span>2.4 MB</span>
+          </div>
+          <div class="marketplace-card-footer">
+            <span class="marketplace-price">50 USDt</span>
+            <button class="marketplace-buy-btn" data-listing="press-433">Buy</button>
+          </div>
+        </div>
+        <div class="marketplace-card">
+          <div class="marketplace-card-badge">QVAC</div>
+          <h3 class="marketplace-card-title">Counter-Attack Analyzer</h3>
+          <p class="marketplace-card-desc">Trained on transition data — identifies counter-attack patterns and defensive weak points.</p>
+          <div class="marketplace-card-meta">
+            <span>by SC Eichenwald</span>
+            <span>1.8 MB</span>
+          </div>
+          <div class="marketplace-card-footer">
+            <span class="marketplace-price">35 USDt</span>
+            <button class="marketplace-buy-btn" data-listing="counter-analyzer">Buy</button>
+          </div>
+        </div>
+        <div class="marketplace-card">
+          <div class="marketplace-card-badge">QVAC</div>
+          <h3 class="marketplace-card-title">Set-Piece Specialist</h3>
+          <p class="marketplace-card-desc">Fine-tuned on 150+ set-piece routines with defensive marking patterns and near-post runs.</p>
+          <div class="marketplace-card-meta">
+            <span>by SV Hafen United</span>
+            <span>3.1 MB</span>
+          </div>
+          <div class="marketplace-card-footer">
+            <span class="marketplace-price">45 USDt</span>
+            <button class="marketplace-buy-btn" data-listing="setpiece">Buy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="marketplace-sell-section">
+        <h3>Sell Your Adapter</h3>
+        <p>List your club's LoRA adapter on the marketplace. Revenue: 90% to you, 10% to club treasury.</p>
+        <button class="marketplace-sell-btn" id="mp-sell-btn">+ List Adapter</button>
+      </div>
+
+      <div class="marketplace-honest-note">
+        <strong>⚠️ Honest status:</strong> Wallet creation and balance reads use the real <code>@tetherto/wdk</code> SDK.
+        Gasless transfers require a funded Sepolia testnet account + ERC-4337 bundler/paymaster.
+        <a href="https://github.com/alexbelij/MISTER/blob/main/src/wdk/marketplace.js#L1-L30" target="_blank">See code →</a>
+      </div>
+    </section>
+
     <!-- Tab: Proof -->
     <section id="tab-proof" class="tab-content">
       <div class="tab-header">
@@ -742,7 +822,7 @@
 <!-- Tooltip -->
 <div id="tooltip" class="tooltip"></div>
 
-<script src="app.js?v=34"></script>
+<script src="app.js?v=35"></script>
 <script>
 // Register PWA service worker (progressive enhancement — silent-fail on unsupported browsers)
 // Also surfaces an update prompt via the UI toast system when a new version is available.

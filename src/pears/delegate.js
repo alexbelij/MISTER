@@ -57,7 +57,8 @@ async function runServer(Hyperswarm, adapter) {
 
     socket.on('data', async (data) => {
       try {
-        const request = JSON.parse(data.toString());
+        let request;
+        try { request = JSON.parse(data.toString()); } catch { log.warn('delegate', 'Malformed request from peer'); return; }
         log.info('delegate', 'Request', { promptLength: request.prompt?.length });
 
         // Use wrapper: chat() with correct completion API
@@ -107,7 +108,8 @@ async function runClient(Hyperswarm, topicKey) {
 
     socket.on('data', (data) => {
       try {
-        const response = JSON.parse(data.toString());
+        let response;
+        try { response = JSON.parse(data.toString()); } catch { log.warn('delegate', 'Malformed response from server'); return; }
         if (response.error) console.error(`\nError: ${response.error}\n`);
         else {
           console.log(`\n${response.text}\n`);

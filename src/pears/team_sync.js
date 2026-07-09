@@ -59,7 +59,7 @@ function saveManifest(manifest) {
 function loadManifest(teamId) {
   const p = path.join(teamDir(teamId), 'manifest.json');
   if (!fs.existsSync(p)) return null;
-  return JSON.parse(fs.readFileSync(p, 'utf-8'));
+  try { return JSON.parse(fs.readFileSync(p, 'utf-8')); } catch (e) { return null; }
 }
 
 /**

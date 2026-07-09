@@ -81,7 +81,8 @@ async function main() {
     process.exit(1);
   }
 
-  let sftData = fs.readFileSync(sftTrainPath, 'utf-8').trim().split('\n').filter(l => l.trim()).map(JSON.parse);
+  let sftData;
+  try { sftData = fs.readFileSync(sftTrainPath, 'utf-8').trim().split('\n').filter(l => l.trim()).map(JSON.parse); } catch (e) { log.error('finetune', 'Failed to parse SFT data', { path: sftTrainPath, err: e.message }); process.exit(1); }
   log.info('finetune', 'SFT pairs loaded', { count: sftData.length });
 
   // BUGFIX (2026-07-08, gate_micro run): every training profile in
@@ -99,7 +100,7 @@ async function main() {
 
   let causalData = [];
   if (fileExists(causalPath)) {
-    causalData = fs.readFileSync(causalPath, 'utf-8').trim().split('\n').filter(l => l.trim()).map(JSON.parse);
+    try { causalData = fs.readFileSync(causalPath, 'utf-8').trim().split('\n').filter(l => l.trim()).map(JSON.parse); } catch (e) { log.error('finetune', 'Failed to parse causal data', { path: causalPath, err: e.message }); process.exit(1); }
     log.info('finetune', 'Causal corpus loaded', { count: causalData.length });
     if (trainingConfig.maxSFTPairs && causalData.length > trainingConfig.maxSFTPairs) {
       causalData = causalData.slice(0, trainingConfig.maxSFTPairs);

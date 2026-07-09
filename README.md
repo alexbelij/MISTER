@@ -212,6 +212,18 @@ Full CLI (voice briefing, footage analysis, translation, marketplace, GDPR expor
 
 We publish evals, checkpoints, training logs and the append-only Pears hypercore snapshot next to the code. Every number on the page is either measured on hardware or explicitly marked as a target.
 
+### Verifiable evidence — one-click
+
+| Evidence | Link | Stack |
+|---|---|---|
+| Live demo (real QVAC inference) | [alexbelij.github.io/MISTER](https://alexbelij.github.io/MISTER/) | QVAC |
+| 5 Kaggle training runs | [Proof tab](https://alexbelij.github.io/MISTER/#proof) | QVAC |
+| CI tests (37/37) | [![tests](https://github.com/alexbelij/MISTER/actions/workflows/tests.yml/badge.svg)](https://github.com/alexbelij/MISTER/actions/workflows/tests.yml) | All |
+| WDK wallet creation (real SDK) | [`src/wdk/marketplace.js`](src/wdk/marketplace.js) | WDK |
+| Autobase multi-writer (real) | [`src/pears/collab_model.js`](src/pears/collab_model.js) | Pears |
+| Ed25519 signed P2P adapters | [`src/pears/distribute.js`](src/pears/distribute.js) | Pears+Identity |
+| Hypercore snapshot + verifier | [`demo/` proof section](https://alexbelij.github.io/MISTER/#proof) | Pears |
+
 ### What we’ve measured, on real hardware
 
 > [!TIP]

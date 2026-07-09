@@ -66,7 +66,8 @@ function nodeLoad() {
   if (!fs.existsSync(dir)) return null;
   const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
   if (files.length === 0) return null;
-  const raw = JSON.parse(fs.readFileSync(path.join(dir, files[0]), 'utf-8'));
+  let raw;
+  try { raw = JSON.parse(fs.readFileSync(path.join(dir, files[0]), 'utf-8')); } catch (e) { throw new Error(`Corrupted keypair file: ${e.message}`); }
   return raw;
 }
 
