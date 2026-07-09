@@ -2397,3 +2397,83 @@ html.js .initial-skeleton { display: flex; }
   border-top: 5px solid #58a6ff;
   opacity: 1;
 }
+
+/* --- Kaggle stats card --- */
+.kaggle-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 14px 0 8px;
+}
+.kaggle-chip {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  padding: 10px 12px;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.kaggle-chip:hover { border-color: #30363d; transform: translateY(-1px); }
+.kaggle-chip-label {
+  font-size: 10px;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+  font-family: ui-monospace, monospace;
+}
+.kaggle-chip-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #e6edf3;
+  font-variant-numeric: tabular-nums;
+}
+.kaggle-skeleton {
+  display: flex;
+  gap: 8px;
+  padding: 6px 0;
+}
+.kaggle-skeleton .skel-chip {
+  height: 42px;
+  flex: 1;
+  min-width: 100px;
+  background: linear-gradient(90deg, #161b22 25%, #21262d 50%, #161b22 75%);
+  background-size: 200% 100%;
+  border-radius: 8px;
+  animation: skel-shine 1.4s ease-in-out infinite;
+}
+@keyframes skel-shine { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+.kaggle-empty { color: #8b949e; font-size: 13px; padding: 8px 0; }
+
+/* --- Kaggle runs table --- */
+.kaggle-runs-table {
+  margin-top: 12px;
+}
+.kaggle-runs {
+  font-size: 12.5px;
+}
+.kaggle-runs td, .kaggle-runs th {
+  padding: 8px 10px;
+}
+.kaggle-td-id {
+  font-family: ui-monospace, monospace;
+  font-weight: 700;
+  color: #58a6ff;
+}
+.kaggle-outcome {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.3px;
+}
+.kaggle-outcome-crash    { background: rgba(248,81,73,0.15);  color: #f85149; border: 1px solid rgba(248,81,73,0.3); }
+.kaggle-outcome-partial  { background: rgba(210,153,34,0.15); color: #d29922; border: 1px solid rgba(210,153,34,0.3); }
+.kaggle-outcome-neutral  { background: rgba(139,148,158,0.15); color: #8b949e; border: 1px solid rgba(139,148,158,0.3); }
+
+@media (max-width: 640px) {
+  .kaggle-stats { grid-template-columns: repeat(2, 1fr); }
+  .kaggle-runs { font-size: 11.5px; }
+  .kaggle-runs td, .kaggle-runs th { padding: 6px 6px; }
+}
