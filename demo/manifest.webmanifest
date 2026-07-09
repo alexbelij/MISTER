@@ -1,0 +1,60 @@
+{
+  "name": "MISTER — Football Coaching AI",
+  "short_name": "MISTER",
+  "description": "On-device LoRA fine-tuning for football clubs. Real QVAC inference, real fine-tune runs, honest proof.",
+  "id": "/MISTER/",
+  "start_url": "/MISTER/",
+  "scope": "/MISTER/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0d1117",
+  "background_color": "#0d1117",
+  "categories": ["sports", "productivity", "utilities"],
+  "lang": "en",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Chat with MISTER",
+      "short_name": "Chat",
+      "url": "/MISTER/#chat",
+      "description": "Ask a tactical question"
+    },
+    {
+      "name": "See the proof",
+      "short_name": "Proof",
+      "url": "/MISTER/#proof",
+      "description": "Verify hypercore + training runs"
+    },
+    {
+      "name": "Season analytics",
+      "short_name": "Analytics",
+      "url": "/MISTER/#analytics",
+      "description": "Match history and squad ratings"
+    }
+  ]
+}
