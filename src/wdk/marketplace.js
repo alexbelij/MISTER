@@ -246,7 +246,7 @@ async function sellAdapter() {
     description,
     adapterPath,
     adapterSize: fileSizeFormatted(adapterPath),
-    adapterHash: hashString(fs.readFileSync(adapterPath).toString('base64').substring(0, 1000)),
+    adapterHash: require('crypto').createHash('sha256').update(fs.readFileSync(adapterPath)).digest('hex'),
     price,
     currency: config.wdk.currency,
     sellerWallet: sellerAddress,

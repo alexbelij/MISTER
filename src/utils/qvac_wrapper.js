@@ -78,6 +78,8 @@ async function healthCheck() {
     return true;
   } catch (e) {
     log.warn('qvac', 'Health check inconclusive (heartbeat unavailable), proceeding anyway', { error: e.message });
+    // Return true: standalone SDK calls work without a separate provider process.
+    // Callers that gate on healthCheck() will still proceed — by design.
     return true;
   }
 }

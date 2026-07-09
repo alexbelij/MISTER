@@ -50,6 +50,87 @@
   color-scheme: light;
 }
 
+/* ─── Light theme overrides for hardcoded dark values ─── */
+
+/* Banner (top notification bar) */
+:root[data-theme="light"] .banner {
+  background: linear-gradient(90deg, #f0f3f6, #f6f8fa);
+}
+
+/* Tooltip */
+:root[data-theme="light"] .tooltip {
+  background: var(--card-bg);
+  box-shadow: var(--shadow-md);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+/* Toasts */
+:root[data-theme="light"] .ui-toast {
+  background: var(--card-bg);
+  border-color: var(--border);
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
+}
+:root[data-theme="light"] .ui-toast__body,
+:root[data-theme="light"] .ui-toast__title { color: var(--text); }
+:root[data-theme="light"] .ui-toast__msg { color: var(--text-muted); }
+:root[data-theme="light"] .ui-toast__close { color: var(--text-muted); }
+:root[data-theme="light"] .ui-toast__close:hover { color: var(--text); }
+:root[data-theme="light"] .ui-toast__action:hover { color: var(--bg); }
+:root[data-theme="light"] .ui-toast__action--primary { color: #fff; }
+
+/* Dialog */
+:root[data-theme="light"] .ui-dialog {
+  background: var(--card-bg);
+  border-color: var(--border);
+  box-shadow: var(--shadow-lg);
+}
+:root[data-theme="light"] .ui-dialog__head { border-bottom-color: var(--border); }
+:root[data-theme="light"] .ui-dialog__title { color: var(--text); }
+:root[data-theme="light"] .ui-dialog__close { color: var(--text-muted); }
+:root[data-theme="light"] .ui-dialog__close:hover { color: var(--text); }
+:root[data-theme="light"] .ui-dialog__body { color: var(--text); }
+:root[data-theme="light"] .ui-dialog__foot { border-top-color: var(--border); background: var(--sidebar-bg); }
+:root[data-theme="light"] .ui-dialog-backdrop { background: rgba(31, 35, 40, 0.4); }
+
+/* Noscript */
+:root[data-theme="light"] .noscript-notice { background: var(--bg); }
+:root[data-theme="light"] .noscript-inner {
+  background: var(--card-bg);
+  border-color: var(--border);
+  color: var(--text-muted);
+  box-shadow: var(--shadow-lg);
+}
+:root[data-theme="light"] .noscript-inner strong { color: var(--text); }
+
+/* Initial skeleton */
+:root[data-theme="light"] .initial-skeleton { background: var(--bg); }
+:root[data-theme="light"] .skeleton-sidebar { border-right-color: var(--border); }
+:root[data-theme="light"] .skel {
+  background: linear-gradient(90deg, var(--sidebar-bg) 25%, var(--card-hover) 50%, var(--sidebar-bg) 75%);
+  background-size: 200% 100%;
+}
+
+/* Player modal */
+:root[data-theme="light"] .player-modal-close:hover { background: rgba(0,0,0,0.06); }
+:root[data-theme="light"] .player-modal-body { box-shadow: var(--shadow-lg); }
+:root[data-theme="light"] .player-modal-backdrop { background: rgba(0, 0, 0, 0.3); }
+
+/* Hero section */
+:root[data-theme="light"] .hero {
+  background: linear-gradient(180deg, #f0f3f6 0%, var(--bg) 100%);
+}
+:root[data-theme="light"] .hero-dismiss:hover { background: rgba(0,0,0,0.06); }
+
+/* Topbar breadcrumb */
+:root[data-theme="light"] .topbar-breadcrumb {
+  background: linear-gradient(90deg, var(--sidebar-bg), var(--bg));
+}
+
+/* Sidebar status indicators — softer contrast */
+:root[data-theme="light"] .sidebar { color: var(--text); }
+
 /* Respect reduced-motion — disables all transitions/animations globally */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

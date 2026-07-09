@@ -72,7 +72,9 @@ function applyCLIOverrides(cfg) {
   const result = { ...cfg };
   for (const arg of process.argv.slice(2)) {
     if (!arg.startsWith('--config.')) continue;
-    const [_, key, value] = arg.match(/^--config\.(\S+)=(.+)$/);
+    const m = arg.match(/^--config\.(\S+)=(.+)$/);
+    if (!m) continue;
+    const [, key, value] = m;
     const keys = key.split('.');
     let target = result;
     for (let i = 0; i < keys.length - 1; i++) {

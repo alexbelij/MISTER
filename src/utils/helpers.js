@@ -10,9 +10,11 @@ const path = require('path');
 // --- Text Processing ---
 
 function chunkText(text, maxLen = 384, overlap = 64) {
+  if (overlap >= maxLen) overlap = 0; // guard against infinite loop
   const words = text.split(/\s+/);
   const chunks = [];
-  for (let i = 0; i < words.length; i += maxLen - overlap) {
+  const step = Math.max(1, maxLen - overlap);
+  for (let i = 0; i < words.length; i += step) {
     chunks.push(words.slice(i, i + maxLen).join(' '));
     if (i + maxLen >= words.length) break;
   }

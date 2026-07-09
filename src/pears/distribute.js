@@ -120,7 +120,6 @@ async function main() {
     const blobId = await blobs.put(adapterData);
     
     // Create topic from adapter hash
-    const crypto = require('crypto');
     const hash = crypto.createHash('sha256').update(adapterData).digest();
     const topic = hash.slice(0, 32);
     
