@@ -733,11 +733,14 @@ function renderQRCode(key) {
   if (!container) return;
 
   // Real, scannable QR code (kazuhikoarase/qrcode-generator, vendored in
-  // vendor-qrcode.js — MIT). Encodes a real pears:// deep link carrying the
-  // topic key, so any standard QR reader decodes real, meaningful content
-  // (previously this rendered a decorative fake pattern that encoded nothing
-  // and could not be scanned by any app — fixed 2026-07-08).
-  const payload = `pears://mister/adapter?topic=${key}`;
+  // vendor-qrcode.js — MIT). Encodes an HTTPS handoff URL carrying the P2P
+  // topic key in the fragment, so any standard smartphone camera can open
+  // it directly. The handoff page detects the MISTER app and either deep-
+  // links into it (pears://) or shows a copy-to-clipboard fallback with
+  // install instructions. This works with every stock camera app; a raw
+  // pears:// payload would require the app already installed and a
+  // registered URL scheme, which stock cameras do not honour.
+  const payload = `https://alexbelij.github.io/MISTER/handoff.html#pears=${key}`;
   const qr = qrcode(0, 'M'); // type 0 = auto-detect smallest version, M = ~15% error correction
   qr.addData(payload);
   qr.make();

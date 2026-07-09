@@ -163,13 +163,15 @@ function generateTopicKey() {
 
 function showQR() {
   // Real, scannable QR (kazuhikoarase/qrcode-generator, vendored in
-  // vendor-qrcode.js) encoding a real pears:// deep link with the P2P topic
-  // key — not a decorative placeholder. Any standard QR reader can decode
-  // the payload; actually joining the Pears topic still requires the Pear
-  // runtime's Hyperswarm networking (src/pears/distribute.js), which we have
-  // not been able to test live device-to-device from this sandbox.
+  // vendor-qrcode.js) encoding an HTTPS handoff URL that carries the P2P
+  // topic key in the fragment. Every stock smartphone camera opens HTTPS
+  // URLs; the handoff page deep-links into the MISTER app when installed
+  // or shows a copy-topic fallback otherwise. Actually joining the Pears
+  // topic still requires the Pear runtime's Hyperswarm networking
+  // (src/pears/distribute.js), which we have not been able to test live
+  // device-to-device from this sandbox.
   const key = generateTopicKey();
-  const payload = `pears://mister/adapter?topic=${key}`;
+  const payload = `https://alexbelij.github.io/MISTER/handoff.html#pears=${key}`;
   const qr = qrcode(0, 'M');
   qr.addData(payload);
   qr.make();
