@@ -529,7 +529,7 @@ function initChat() {
     } catch (e) {
       msg.remove();
       addMessage(
-        `⚠️ Could not reach the live QVAC backend (${e.message || e}). It may be waking up from sleep — ` +
+        `[!] Could not reach the live QVAC backend (${e.message || e}). It may be waking up from sleep — ` +
         `please wait ~30-60s and try again, or check the Space status directly: ${QVAC_BRIDGE_URL}`,
         false
       );
@@ -551,19 +551,19 @@ function initChat() {
   // Sends same query twice: vanilla (no adapter) and fine-tuned (with adapter).
   // Shows both responses side-by-side so the user sees the value of LoRA.
   const sendCompare = async (text) => {
-    addMessage(text + '  ⚡ Compare mode', true);
+    addMessage(text + '  Compare mode', true);
     addTyping();
     const endpoint = QVAC_BRIDGE_URL.replace(/\/$/, '');
     const vanilla = fetchWithTimeout(endpoint + '/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: text, vanilla: true }),
-    }, 60000).then(r => r.json()).then(d => d.reply || '(no reply)').catch(e => '⚠️ ' + e.message);
+    }, 60000).then(r => r.json()).then(d => d.reply || '(no reply)').catch(e => '[!] ' + e.message);
     const tuned = fetchWithTimeout(endpoint + '/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: text }),
-    }, 60000).then(r => r.json()).then(d => d.reply || '(no reply)').catch(e => '⚠️ ' + e.message);
+    }, 60000).then(r => r.json()).then(d => d.reply || '(no reply)').catch(e => '[!] ' + e.message);
 
     const [vanillaReply, tunedReply] = await Promise.all([vanilla, tuned]);
     removeTyping();
@@ -572,11 +572,11 @@ function initChat() {
     const html = `
       <div class="compare-split">
         <div class="compare-col compare-vanilla">
-          <div class="compare-label">🔴 Vanilla Qwen3</div>
+          <div class="compare-label"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f85149;vertical-align:middle;margin-right:4px"></span> Vanilla Qwen3</div>
           <div class="compare-text">${escapeHtml(vanillaReply)}</div>
         </div>
         <div class="compare-col compare-tuned">
-          <div class="compare-label">🟢 MISTER (LoRA fine-tuned)</div>
+          <div class="compare-label"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#3fb950;vertical-align:middle;margin-right:4px"></span> MISTER (LoRA fine-tuned)</div>
           <div class="compare-text">${escapeHtml(tunedReply)}</div>
         </div>
       </div>`;
@@ -587,7 +587,7 @@ function initChat() {
   const compareBtn = document.createElement('button');
   compareBtn.className = 'chat-compare-btn';
   compareBtn.title = 'Compare: vanilla vs fine-tuned';
-  compareBtn.textContent = '⚡';
+  compareBtn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>';
   sendBtn.parentNode.insertBefore(compareBtn, sendBtn);
 
   // Send button

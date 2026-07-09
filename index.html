@@ -223,7 +223,7 @@
         </div>
       </div>
       <div class="config-selector" data-tooltip="Config Profile (src/utils/config.js): switch between deployment profiles — default (balanced), low-resource (smaller model, less RAM), gpu-server (full precision, batch inference).">
-        <label class="config-label">⚙️ Profile</label>
+        <label class="config-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px"><path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg> Profile</label>
         <select class="config-dropdown" data-tooltip="Deployment profile: affects model precision, batch size, and memory usage.">
           <option value="default">Default</option>
           <option value="low-resource">Low Resource</option>
@@ -231,7 +231,7 @@
         </select>
       </div>
       <div class="role-selector" data-tooltip="Switch role to see how different team members experience the app. Tabs are hidden based on team_manifest scopes.">
-        <label class="role-label">👤 Role: <span id="role-badge">head coach</span></label>
+        <label class="role-label"><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Role: <span id="role-badge">head coach</span></label>
         <select id="role-select" onchange="window.setRole(this.value)" class="role-dropdown">
           <option value="head_coach">Head Coach</option>
           <option value="assistant_coach">Assistant Coach</option>
@@ -389,7 +389,7 @@
               <span id="routing-agent">tactics</span> agent
             </span>
             <span class="chat-e2e-indicator" data-tooltip="End-to-end encryption (src/security/crypto.js): all chat data is encrypted at rest with AES-256-GCM derived from your Ed25519 identity key. No plaintext leaves the device.">
-              🔒 E2E
+              <svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:-1px"><path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg> E2E
             </span>
           </div>
         </div>
@@ -707,7 +707,7 @@
           <div class="delegate-status">
             <div class="delegate-row"><span class="delegate-label">Mode</span><span class="delegate-value">Local (on-device)</span></div>
             <div class="delegate-row"><span class="delegate-label">Relay peer</span><span class="delegate-value delegate-peer">—</span></div>
-            <div class="delegate-row"><span class="delegate-label">Encryption</span><span class="delegate-value">🔒 AES-256-GCM</span></div>
+            <div class="delegate-row"><span class="delegate-label">Encryption</span><span class="delegate-value"><svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:-1px"><path fill="currentColor" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg> AES-256-GCM</span></div>
           </div>
           <button class="btn-secondary delegate-toggle" data-tooltip="Switch between local inference and delegated (relay to a GPU peer via WebSocket)." onclick="this.textContent = this.textContent.includes('Enable') ? 'Disable Delegation' : 'Enable Delegation'">Enable Delegation</button>
         </div>
@@ -719,7 +719,7 @@
             <div class="crypto-row"><span class="crypto-label">Cipher</span><span class="crypto-value">AES-256-GCM</span></div>
             <div class="crypto-row"><span class="crypto-label">Key derivation</span><span class="crypto-value">HKDF (Ed25519)</span></div>
             <div class="crypto-row"><span class="crypto-label">Salt rotation</span><span class="crypto-value">per session</span></div>
-            <div class="crypto-row"><span class="crypto-label">File encryption</span><span class="crypto-value">✅ encryptFile()</span></div>
+            <div class="crypto-row"><span class="crypto-label">File encryption</span><span class="crypto-value"><svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:-1px"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> encryptFile()</span></div>
           </div>
         </div>
       </div>
@@ -735,7 +735,7 @@
       <!-- Wallet info -->
       <div class="marketplace-wallet" id="marketplace-wallet">
         <div class="marketplace-wallet-header">
-          <span class="marketplace-wallet-icon">💳</span>
+          <span class="marketplace-wallet-icon"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M21 18v1c0 1.1-.9 2-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14c1.1 0 2 .9 2 2v1h-9a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></span>
           <div>
             <div class="marketplace-wallet-label">Self-Custody Wallet</div>
             <div class="marketplace-wallet-addr" id="mp-wallet-addr">Not connected</div>
@@ -795,7 +795,7 @@
       </div>
 
       <div class="marketplace-honest-note">
-        <strong>⚠️ Honest status:</strong> Wallet creation and balance reads use the real <code>@tetherto/wdk</code> SDK.
+        <strong><svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px"><path fill="currentColor" d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg> Honest status:</strong> Wallet creation and balance reads use the real <code>@tetherto/wdk</code> SDK.
         Gasless transfers require a funded Sepolia testnet account + ERC-4337 bundler/paymaster.
         <a href="https://github.com/alexbelij/MISTER/blob/main/src/wdk/marketplace.js#L1-L30" target="_blank">See code →</a>
       </div>
@@ -867,13 +867,13 @@
         <div class="proof-card pipeline-card" data-tooltip="Data Pipeline: raw match data → prepare_data.js (chunk, clean, format SFT pairs) → augment.js (paraphrase prompts, generate terminology explanations via LLM) → finetune.js (LoRA training). All on-device.">
           <h3>Data Pipeline <span class="data-badge data-badge--real" data-tooltip="Real pipeline: prepare_data.js → augment.js → finetune.js, all runnable on-device.">on-device</span></h3>
           <div class="pipeline-flow">
-            <div class="pipeline-step"><span class="pipeline-icon">📄</span><span class="pipeline-name">prepare_data.js</span><span class="pipeline-desc">chunk → clean → SFT pairs</span></div>
+            <div class="pipeline-step"><span class="pipeline-icon"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zM13 9V3.5L18.5 9H13z"/></svg></span><span class="pipeline-name">prepare_data.js</span><span class="pipeline-desc">chunk → clean → SFT pairs</span></div>
             <div class="pipeline-arrow">→</div>
-            <div class="pipeline-step"><span class="pipeline-icon">🔄</span><span class="pipeline-name">augment.js</span><span class="pipeline-desc">paraphrase + terminology</span></div>
+            <div class="pipeline-step"><span class="pipeline-icon"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8A5.87 5.87 0 0 1 6 12c0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/></svg></span><span class="pipeline-name">augment.js</span><span class="pipeline-desc">paraphrase + terminology</span></div>
             <div class="pipeline-arrow">→</div>
-            <div class="pipeline-step"><span class="pipeline-icon">⚡</span><span class="pipeline-name">finetune.js</span><span class="pipeline-desc">LoRA gradient descent</span></div>
+            <div class="pipeline-step"><span class="pipeline-icon"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M7 2v11h3v9l7-12h-4l4-8z"/></svg></span><span class="pipeline-name">finetune.js</span><span class="pipeline-desc">LoRA gradient descent</span></div>
             <div class="pipeline-arrow">→</div>
-            <div class="pipeline-step"><span class="pipeline-icon">📊</span><span class="pipeline-name">eval_harness.js</span><span class="pipeline-desc">lexical + cosine + LLM judge</span></div>
+            <div class="pipeline-step"><span class="pipeline-icon"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg></span><span class="pipeline-name">eval_harness.js</span><span class="pipeline-desc">lexical + cosine + LLM judge</span></div>
           </div>
         </div>
 
@@ -884,9 +884,9 @@
           <table class="data-table eval-table">
             <thead><tr><th>Method</th><th>Source</th><th>Status</th></tr></thead>
             <tbody>
-              <tr><td>Lexical (keyword overlap)</td><td>eval_harness.js</td><td>✅ Ready</td></tr>
-              <tr><td>Cosine similarity (embeddings)</td><td>enhanced_eval.js</td><td>✅ Ready</td></tr>
-              <tr><td>LLM-as-judge</td><td>enhanced_eval.js</td><td>✅ Ready</td></tr>
+              <tr><td>Lexical (keyword overlap)</td><td>eval_harness.js</td><td><svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:-1px"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Ready</td></tr>
+              <tr><td>Cosine similarity (embeddings)</td><td>enhanced_eval.js</td><td><svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:-1px"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Ready</td></tr>
+              <tr><td>LLM-as-judge</td><td>enhanced_eval.js</td><td><svg viewBox="0 0 24 24" width="12" height="12" style="vertical-align:-1px"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Ready</td></tr>
             </tbody>
           </table>
           </div>

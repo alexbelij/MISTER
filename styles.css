@@ -66,19 +66,7 @@
 }
 
 /* Toasts */
-:root[data-theme="light"] .ui-toast {
-  background: var(--card-bg);
-  border-color: var(--border);
-  box-shadow: var(--shadow-lg);
-  color: var(--text);
-}
-:root[data-theme="light"] .ui-toast__body,
-:root[data-theme="light"] .ui-toast__title { color: var(--text); }
-:root[data-theme="light"] .ui-toast__msg { color: var(--text-muted); }
-:root[data-theme="light"] .ui-toast__close { color: var(--text-muted); }
-:root[data-theme="light"] .ui-toast__close:hover { color: var(--text); }
-:root[data-theme="light"] .ui-toast__action:hover { color: var(--bg); }
-:root[data-theme="light"] .ui-toast__action--primary { color: #fff; }
+/* Toast light overrides moved to comprehensive block below */
 
 /* Dialog */
 :root[data-theme="light"] .ui-dialog {
@@ -128,8 +116,215 @@
   background: linear-gradient(90deg, var(--sidebar-bg), var(--bg));
 }
 
-/* Sidebar status indicators — softer contrast */
+/* ── Comprehensive light theme overrides ── */
 :root[data-theme="light"] .sidebar { color: var(--text); }
+
+/* Sidebar nav items */
+:root[data-theme="light"] .nav-item:hover { background: rgba(0,0,0,0.06); }
+:root[data-theme="light"] .nav-item.active { background: rgba(26,127,55,0.1); }
+:root[data-theme="light"] .club-card { background: rgba(0,0,0,0.02); }
+
+/* Toast / "Update available" popup */
+:root[data-theme="light"] .ui-toast { background: #fff; border-color: var(--border); box-shadow: 0 8px 24px rgba(31,35,40,0.12); }
+:root[data-theme="light"] .ui-toast__body,
+:root[data-theme="light"] .ui-toast__title { color: var(--text); }
+:root[data-theme="light"] .ui-toast__msg { color: var(--text-muted); }
+:root[data-theme="light"] .ui-toast__close { color: var(--text-muted); }
+:root[data-theme="light"] .ui-toast__action { color: var(--blue); border-color: var(--border); }
+:root[data-theme="light"] .ui-toast__action:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+:root[data-theme="light"] .ui-toast__action--primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+:root[data-theme="light"] .ui-toast__action--primary:hover { filter: brightness(1.1); }
+:root[data-theme="light"] .ui-toast__close:hover { color: var(--text); }
+
+/* Data tables — text must be dark */
+:root[data-theme="light"] .data-table td { color: var(--text); }
+:root[data-theme="light"] .data-table tbody tr:hover { background: rgba(0,0,0,0.03); }
+:root[data-theme="light"] .rating-high { color: var(--green); }
+:root[data-theme="light"] .rating-mid { color: var(--yellow); }
+:root[data-theme="light"] .rating-low { color: var(--red); }
+
+/* Card text and backgrounds */
+:root[data-theme="light"] .card { color: var(--text); }
+:root[data-theme="light"] .card-header h2 { color: var(--text); }
+:root[data-theme="light"] .proof-card { color: var(--text); }
+:root[data-theme="light"] .proof-card h3 { color: var(--text); }
+:root[data-theme="light"] .proof-card-hint { color: var(--text-muted); }
+
+/* Match timeline */
+:root[data-theme="light"] .match-row { color: var(--text); }
+:root[data-theme="light"] .match-row:hover { background: rgba(0,0,0,0.03); }
+
+/* Chat bubbles */
+:root[data-theme="light"] .chat-bubble { color: var(--text); }
+:root[data-theme="light"] .chat-msg.assistant .chat-bubble { background: rgba(0,0,0,0.04); color: var(--text); }
+:root[data-theme="light"] .chat-msg.user .chat-bubble { background: var(--green); color: #fff; }
+
+/* Player cards */
+:root[data-theme="light"] .player-card { color: var(--text); }
+:root[data-theme="light"] .player-card:hover { background: rgba(0,0,0,0.04); }
+
+/* Suggestions */
+:root[data-theme="light"] .suggestion-card { color: var(--text); }
+
+/* Pipeline steps */
+:root[data-theme="light"] .pipeline-name { color: var(--green); }
+
+/* E2E badge, routing indicator */
+:root[data-theme="light"] .chat-routing-indicator { color: var(--text-muted); }
+:root[data-theme="light"] .chat-e2e-indicator { color: var(--green); }
+
+/* Marketplace light */
+:root[data-theme="light"] .marketplace-wallet { background: rgba(0,0,0,0.02); }
+:root[data-theme="light"] .marketplace-sell-section { background: rgba(0,0,0,0.01); }
+:root[data-theme="light"] .marketplace-honest-note code { background: rgba(0,0,0,0.06); }
+
+/* Distribute cards */
+:root[data-theme="light"] .distribute-card,
+:root[data-theme="light"] .collab-card { color: var(--text); }
+
+/* Compare panel */
+:root[data-theme="light"] .compare-label { color: var(--text); }
+:root[data-theme="light"] .compare-text { color: var(--text); }
+
+/* Delegate, crypto, sync */
+:root[data-theme="light"] .delegate-label,
+:root[data-theme="light"] .crypto-label,
+:root[data-theme="light"] .sync-time { color: var(--text-muted); }
+:root[data-theme="light"] .delegate-value,
+:root[data-theme="light"] .crypto-value { color: var(--text); }
+:root[data-theme="light"] .sync-item { color: var(--text); }
+
+/* OCR/Footage cards */
+:root[data-theme="light"] .ocr-drop-zone,
+:root[data-theme="light"] .footage-upload { border-color: var(--border); color: var(--text-muted); }
+:root[data-theme="light"] .ocr-result { background: rgba(0,0,0,0.03); }
+:root[data-theme="light"] .ocr-text { color: var(--text); }
+
+/* All selectboxes/dropdowns unified */
+:root[data-theme="light"] select,
+:root[data-theme="light"] .role-dropdown,
+:root[data-theme="light"] .config-dropdown,
+:root[data-theme="light"] .chat-lang-select {
+  background: #fff; color: var(--text); border: 1px solid var(--border);
+  border-radius: 6px; appearance: auto;
+}
+:root[data-theme="light"] select:hover,
+:root[data-theme="light"] .role-dropdown:hover,
+:root[data-theme="light"] .config-dropdown:hover { border-color: var(--border-strong); }
+
+/* Role/config selectors */
+:root[data-theme="light"] .role-selector,
+:root[data-theme="light"] .config-selector { background: rgba(0,0,0,0.03); }
+
+/* Tooltips in light */
+:root[data-theme="light"] [data-tooltip]:hover::after { color: #fff; }
+
+/* Generic rgba(255,255,255,...) backgrounds become rgba(0,0,0,...) */
+:root[data-theme="light"] .voice-btn:hover { background: rgba(26,127,55,0.08); }
+
+/* Kbd help modal */
+:root[data-theme="light"] .kbd-help-content { background: #fff; color: var(--text); }
+
+/* Scrollbar */
+:root[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }
+:root[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+
+/* Catch-all: any element with rgba(255,255,255,…) background needs inversion */
+:root[data-theme="light"] .player-card,
+:root[data-theme="light"] .opponent-card,
+:root[data-theme="light"] .suggestion-card,
+:root[data-theme="light"] .season-metric,
+:root[data-theme="light"] .loss-scrubber-bar,
+:root[data-theme="light"] .hypercore-card,
+:root[data-theme="light"] .chart-bar-inner,
+:root[data-theme="light"] .player-modal-close:hover,
+:root[data-theme="light"] .bottom-nav .nav-item:hover,
+:root[data-theme="light"] .match-row:hover,
+:root[data-theme="light"] .player-modal-stat,
+:root[data-theme="light"] .proof-card { background: rgba(0,0,0,0.03); }
+
+:root[data-theme="light"] .player-card:hover,
+:root[data-theme="light"] .opponent-card:hover,
+:root[data-theme="light"] .suggestion-card:hover,
+:root[data-theme="light"] .hypercore-card:hover { background: rgba(0,0,0,0.06); }
+
+/* Hardcoded dark text colors → dark theme vars */
+:root[data-theme="light"] .season-metric-label { color: var(--text-muted); }
+:root[data-theme="light"] .season-metric-value { color: var(--text); }
+:root[data-theme="light"] .player-card-name { color: var(--text); }
+:root[data-theme="light"] .player-card-pos { color: var(--text-muted); }
+:root[data-theme="light"] .opponent-name { color: var(--text); }
+:root[data-theme="light"] .opponent-formation { color: var(--text-muted); }
+:root[data-theme="light"] .suggestion-title { color: var(--text); }
+:root[data-theme="light"] .suggestion-detail { color: var(--text-muted); }
+:root[data-theme="light"] .match-opponent { color: var(--text); }
+:root[data-theme="light"] .match-result { color: var(--text); }
+:root[data-theme="light"] .match-stat { color: var(--text-muted); }
+:root[data-theme="light"] .hypercore-meta-item { color: var(--text-muted); }
+:root[data-theme="light"] .hypercore-type { color: var(--text-muted); }
+:root[data-theme="light"] .chart-label { color: var(--text-muted); }
+:root[data-theme="light"] .loss-value { color: var(--text); }
+:root[data-theme="light"] .kaggle-chip-label { color: var(--text-muted); }
+:root[data-theme="light"] .data-badge { color: var(--green); }
+:root[data-theme="light"] .data-badge--honest { color: var(--yellow); }
+:root[data-theme="light"] .proof-card h3 { color: var(--text); }
+
+/* Player modal */
+:root[data-theme="light"] .player-modal-body { background: #fff; color: var(--text); }
+:root[data-theme="light"] .player-modal-name { color: var(--text); }
+:root[data-theme="light"] .player-modal-pos { color: var(--text-muted); }
+:root[data-theme="light"] .player-modal-stat-label { color: var(--text-muted); }
+:root[data-theme="light"] .player-modal-stat-value { color: var(--text); }
+:root[data-theme="light"] .player-modal-stat { background: rgba(0,0,0,0.03); border-color: var(--border); }
+
+/* Chat input */
+:root[data-theme="light"] .chat-input-wrap { background: #fff; border-color: var(--border); }
+:root[data-theme="light"] .chat-input { color: var(--text); }
+:root[data-theme="light"] .chat-send-btn { color: var(--green); }
+
+/* Sidebar footer, club card */
+:root[data-theme="light"] .sidebar-footer { border-top-color: var(--border); }
+:root[data-theme="light"] .club-info { color: var(--text); }
+:root[data-theme="light"] .club-stat { color: var(--text-muted); }
+
+/* UI Dialog (modals) */
+:root[data-theme="light"] .ui-dialog__panel { background: #fff; border-color: var(--border); box-shadow: 0 8px 24px rgba(31,35,40,0.15); }
+:root[data-theme="light"] .ui-dialog__head { border-bottom-color: var(--border); }
+:root[data-theme="light"] .ui-dialog__title { color: var(--text); }
+:root[data-theme="light"] .ui-dialog__close { color: var(--text-muted); }
+:root[data-theme="light"] .ui-dialog__close:hover { color: var(--text); }
+:root[data-theme="light"] .ui-dialog__body { color: var(--text); }
+:root[data-theme="light"] .ui-dialog__footer { border-top-color: var(--border); }
+:root[data-theme="light"] .ui-dialog__btn { background: #fff; color: var(--text); border-color: var(--border); }
+:root[data-theme="light"] .ui-dialog__btn:hover { background: var(--card-hover); }
+:root[data-theme="light"] .ui-dialog__btn--primary { background: var(--green); color: #fff; border-color: var(--green); }
+:root[data-theme="light"] .ui-dialog__btn--primary:hover { filter: brightness(1.1); }
+
+/* Kbd shortcuts help */
+:root[data-theme="light"] .kbd-help-content { background: #fff; color: var(--text); border-color: var(--border); }
+:root[data-theme="light"] .kbd-help-content h2,
+:root[data-theme="light"] .kbd-help-content td { color: var(--text); }
+:root[data-theme="light"] .kbd-help-content th { color: var(--text-muted); }
+
+/* Hypercore log sections */
+:root[data-theme="light"] .hypercore-head { color: var(--text); }
+:root[data-theme="light"] .hypercore-head-meta code { color: var(--text); }
+
+/* Loss scrubber, charts */
+:root[data-theme="light"] .loss-scrubber { color: var(--text); }
+
+/* Sortable table headers */
+:root[data-theme="light"] .data-table thead th.sortable-th { color: var(--text-muted); }
+:root[data-theme="light"] .data-table thead th.sortable-th:hover { color: var(--text); }
+
+/* Noscript */
+:root[data-theme="light"] .noscript-inner { color: var(--text); }
+:root[data-theme="light"] .noscript-inner strong { color: var(--text); }
+
+/* Bottom nav (mobile) */
+:root[data-theme="light"] .bottom-nav { background: #fff; border-top-color: var(--border); }
+:root[data-theme="light"] .bottom-nav .nav-item { color: var(--text-muted); }
+:root[data-theme="light"] .bottom-nav .nav-item.active { color: var(--green); }
 
 /* ── Marketplace ── */
 .marketplace-wallet { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; }
@@ -165,10 +360,10 @@
 @keyframes voicePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
 
 /* ── Role selector ── */
-.role-selector { margin: 8px 0; padding: 6px 8px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; gap: 8px; }
+.role-selector { margin: 8px 0; padding: 6px 8px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; gap: 8px; overflow: hidden; min-width: 0; }
 .role-label { font-size: 0.8rem; color: var(--text-secondary, #8b949e); white-space: nowrap; }
 #role-badge { color: var(--green); font-weight: 600; text-transform: capitalize; }
-.role-dropdown { background: var(--bg-card, #161b22); color: var(--text-primary, #f0f6fc); border: 1px solid var(--border, #30363d); border-radius: 6px; padding: 3px 6px; font-size: 0.78rem; cursor: pointer; flex: 1; }
+.role-dropdown { background: var(--bg-card, #161b22); color: var(--text-primary, #f0f6fc); border: 1px solid var(--border, #30363d); border-radius: 6px; padding: 3px 6px; font-size: 0.78rem; cursor: pointer; flex: 1; min-width: 0; max-width: 100%; }
 [data-theme="light"] .role-selector { background: rgba(0,0,0,0.04); }
 [data-theme="light"] .role-dropdown { background: #fff; color: #1f2328; border-color: #d0d7de; }
 
@@ -242,7 +437,7 @@
 .eval-table td:last-child { color: var(--green); font-weight: 600; }
 
 /* ── SVG Tactical Pitch ── */
-.pitch-wrapper { overflow: hidden; border-radius: 8px; }
+.pitch-wrapper { overflow: hidden; border-radius: 8px; max-width: 680px; margin: 0 auto; }
 .pitch-svg { width: 100%; height: auto; display: block; }
 .pitch-player { cursor: pointer; transition: transform 0.2s; }
 .pitch-player:hover { transform: scale(1.15); }
