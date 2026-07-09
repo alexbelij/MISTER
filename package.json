@@ -44,6 +44,7 @@
     "mobile": "pear run .",
     "start": "npm run prepare && npm run ui",
     "test": "node tests/run_tests.js",
+    "export:log": "node scripts/export-log.mjs",
     "encrypt": "node -e \"require('./src/security/crypto').encryptClubData(process.argv[1] || prompt('Password: '))\"",
     "decrypt": "node -e \"require('./src/security/crypto').decryptClubData(process.argv[1] || prompt('Password: '))\"",
     "export-data": "node -e \"const p = require('./src/security/crypto').exportAllData(); console.log('Exported to:', p)\"",
