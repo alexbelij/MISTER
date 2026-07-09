@@ -225,7 +225,57 @@ function positionTooltip(e) {
 // ===== TAB SWITCHING =====
 // Exposed on window so other sections (e.g. Match History -> Match Report)
 // can navigate tabs programmatically, not just via the sidebar/bottom nav.
-const VALID_TABS = ['chat', 'analytics', 'suggestions', 'reports', 'distribute', 'proof'];
+const VALID_TABS = ['chat', 'analytics', 'suggestions', 'reports', 'distribute', 'marketplace', 'proof'];
+
+// ── Role-based UI: hide tabs by role scope ──
+// Maps tab → required scope. Tabs not listed are visible to all.
+const TAB_SCOPE_MAP = {
+  analytics:    'read_all',
+  suggestions:  'read_all',
+  reports:      'write_reports',
+  distribute:   'write_all',
+  marketplace:  'read_all',
+};
+
+function getActiveRole() {
+  // In production, pulled from team_manifest via identity.
+  // Demo: read from localStorage or default to head_coach (full access).
+  return localStorage.getItem('mister_role') || 'head_coach';
+}
+
+function getRoleScopes(role) {
+  const SCOPES = {
+    head_coach:      ['read_all', 'write_all', 'invite', 'eject', 'rotate_key', 'write_reports', 'write_training', 'write_notes', 'read_self', 'read_public'],
+    assistant_coach: ['read_all', 'write_training', 'write_notes', 'read_self', 'read_public'],
+    analyst:         ['read_all', 'write_reports', 'read_self', 'read_public'],
+    player:          ['read_self', 'read_public'],
+  };
+  return SCOPES[role] || SCOPES.player;
+}
+
+function applyRoleVisibility() {
+  const role = getActiveRole();
+  const scopes = getRoleScopes(role);
+  document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(el => {
+    const tab = el.dataset.tab;
+    const required = TAB_SCOPE_MAP[tab];
+    if (required && !scopes.includes(required)) {
+      el.style.display = 'none';
+    } else {
+      el.style.display = '';
+    }
+  });
+  // Show role badge in sidebar
+  const badge = document.getElementById('role-badge');
+  if (badge) badge.textContent = role.replace(/_/g, ' ');
+}
+
+window.setRole = function(role) {
+  localStorage.setItem('mister_role', role);
+  applyRoleVisibility();
+  switchTab('chat');
+};
+window.getActiveRole = getActiveRole;
 
 function switchTab(tabName, pushHistory = true) {
   if (!VALID_TABS.includes(tabName)) tabName = 'chat';
@@ -272,6 +322,7 @@ function initTabs() {
 // the initial history entry so the very first back-press has somewhere to
 // go. Runs last in init(), after every other init*() has wired up its DOM.
 function initRouting() {
+  applyRoleVisibility();
   const initialTab = VALID_TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'chat';
   switchTab(initialTab, false);
   history.replaceState({ tab: initialTab }, '', '#' + initialTab);
@@ -372,6 +423,15 @@ function initChat() {
     const withBold = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     const paragraphs = withBold.split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
     addMessage(paragraphs || `<p>${escaped}</p>`, false, true);
+
+    // Voice briefing TTS: read reply aloud when last input was via mic
+    if (window._misterVoiceActive && 'speechSynthesis' in window) {
+      window._misterVoiceActive = false;
+      const plain = text.replace(/\*\*/g, '').slice(0, 600);
+      const u = new SpeechSynthesisUtterance(plain);
+      u.rate = 1.05; u.pitch = 1;
+      speechSynthesis.speak(u);
+    }
   };
 
   // Fetch with a client-side timeout (the Space can be asleep and slow to wake).
@@ -549,6 +609,48 @@ function initChat() {
   inputEl.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') handleSend();
   });
+
+  // ── Voice briefing: STT → QVAC → TTS ──
+  const voiceBtn = document.getElementById('voice-btn');
+  if (voiceBtn && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.continuous = false;
+
+    let listening = false;
+
+    voiceBtn.addEventListener('click', () => {
+      if (listening) {
+        recognition.stop();
+        return;
+      }
+      listening = true;
+      voiceBtn.classList.add('listening');
+      recognition.start();
+    });
+
+    // Flag: when true, next assistant reply is read aloud via TTS
+    window._misterVoiceActive = false;
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      inputEl.value = transcript;
+      window._misterVoiceActive = true;
+      handleSend();
+    };
+
+    recognition.onend = () => {
+      listening = false;
+      voiceBtn.classList.remove('listening');
+    };
+
+    recognition.onerror = () => {
+      listening = false;
+      voiceBtn.classList.remove('listening');
+    };
+  }
 }
 
 // ===== ANALYTICS =====
