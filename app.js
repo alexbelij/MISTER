@@ -602,7 +602,8 @@ function renderPlayerCards(filter = 'all') {
       .join('');
     const spark = sparklineSVG(sparkPointsFor(p));
     const initials = playerInitials(p.name);
-    return `<button class="player-card avatar-${POS_COLOUR[group]}"
+    return `<div class="player-card avatar-${POS_COLOUR[group]}"
+              role="button" tabindex="0"
               data-player-index="${PLAYERS.indexOf(p)}"
               data-tooltip="${p.name} (#${p.num}, ${p.pos}) — avg ${p._avg.toFixed(2)}. Click for the full 8-criteria breakdown."
               aria-label="Open ${p.name} details"
@@ -617,30 +618,56 @@ function renderPlayerCards(filter = 'all') {
       </div>
       <div class="player-strengths">${strengths}</div>
       <div class="player-spark-wrap">${spark}<span class="player-spark-label">Last 8 matches</span></div>
-    </button>`;
+    </div>`;
   }).join('');
 
   // Wire card clicks — belt-and-braces: one delegated listener on the grid
   // AND a direct listener on each card. Delegation alone was reported as
   // unreliable on some browsers/devices; per-card listeners are cheap since
   // the grid holds only ~16 items and we re-attach on every render.
-  const openFromCard = (card) => {
-    if (!card) return;
+  const openFromCard = (card, source) => {
+    console.log('[player-card] openFromCard called from', source, 'card=', card);
+    if (!card) { console.warn('[player-card] no card element'); return; }
     const idx = Number(card.dataset.playerIndex);
-    if (!Number.isNaN(idx) && PLAYERS[idx]) openPlayerModal(PLAYERS[idx]);
+    console.log('[player-card] player index=', idx, 'player=', PLAYERS[idx]);
+    if (Number.isNaN(idx)) { console.warn('[player-card] NaN idx'); return; }
+    if (!PLAYERS[idx]) { console.warn('[player-card] no PLAYERS[idx]'); return; }
+    try {
+      openPlayerModal(PLAYERS[idx]);
+      console.log('[player-card] openPlayerModal returned OK');
+      const m = document.getElementById('player-modal');
+      console.log('[player-card] modal exists=', !!m, 'has open class=', m && m.classList.contains('open'));
+    } catch (err) {
+      console.error('[player-card] openPlayerModal threw', err);
+    }
   };
-  grid.querySelectorAll('.player-card').forEach(card => {
+  console.log('[player-card] wiring', grid.querySelectorAll('.player-card').length, 'cards');
+  grid.querySelectorAll('.player-card').forEach((card, i) => {
     card.addEventListener('click', (e) => {
+      console.log('[player-card] direct click on card', i, 'target=', e.target);
       e.preventDefault();
       e.stopPropagation();
-      openFromCard(card);
+      openFromCard(card, 'direct-click-' + i);
+    });
+    card.addEventListener('pointerup', (e) => {
+      console.log('[player-card] pointerup on card', i);
+    });
+    card.addEventListener('touchend', (e) => {
+      console.log('[player-card] touchend on card', i);
+    });
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openFromCard(card, 'keydown');
+      }
     });
   });
   if (!grid.dataset.clickBound) {
     grid.addEventListener('click', (e) => {
+      console.log('[player-card] delegated click on grid, target=', e.target);
       const card = e.target.closest('.player-card');
-      if (!card || !grid.contains(card)) return;
-      openFromCard(card);
+      if (!card || !grid.contains(card)) { console.warn('[player-card] no closest card'); return; }
+      openFromCard(card, 'delegated');
     });
     grid.dataset.clickBound = '1';
   }
