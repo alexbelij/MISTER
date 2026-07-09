@@ -1275,7 +1275,13 @@ async function initHypercoreLog() {
   let real = null;
   try {
     const res = await fetch('./data/hypercore-tail.json', { cache: 'no-store' });
-    if (res.ok) real = await res.json();
+    if (res.ok) {
+      const parsed = await res.json();
+      // Cheap schema sanity: reject anything that doesn't look like our own export.
+      if (parsed && typeof parsed === 'object' && Array.isArray(parsed.entries)) {
+        real = parsed;
+      }
+    }
   } catch (_) { /* fall through to fallback */ }
 
   if (real && Array.isArray(real.entries) && real.entries.length) {
@@ -1406,32 +1412,38 @@ function renderHypercoreLog(root, snapshot) {
     return `${dd}‑${mm} ${hh}:${mi}Z`;
   };
 
-  const escape = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const escape = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  // Whitelist: only known safe hypercore entry types. Anything else falls back to a generic class.
+  const SAFE_TYPES = { init: 1, ingest: 1, decision: 1, observation: 1, revert: 1 };
+  const safeType = (t) => (t && SAFE_TYPES[t]) ? t : 'observation';
+  const safeInt = (v) => { const n = parseInt(v, 10); return isNaN(n) ? '' : String(n); };
 
   // Newest-first tail (last 6 entries) with head-of-chain highlighted.
   const tail = entries.slice(-6).reverse();
   const listHtml = tail.map((e, i) => {
-    const dotCls = typeDotCls[e.type] || 'hypercore-dot--observation';
+    e = e || {};
+    const type = safeType(e.type);
+    const dotCls = typeDotCls[type] || 'hypercore-dot--observation';
     const isHead = i === 0;
-    const cursor = e.cursor ?? e.meta?.reverts_seq;
+    const cursor = e.cursor ?? (e.meta && e.meta.reverts_seq);
     return `
-      <div class="hypercore-entry${isHead ? ' hypercore-entry--head' : ''}" role="listitem" data-seq="${e.seq}">
-        <div class="hypercore-entry-marker"><span class="hypercore-dot ${dotCls}"></span></div>
+      <div class="hypercore-entry${isHead ? ' hypercore-entry--head' : ''}" role="listitem" data-seq="${escape(safeInt(e.seq))}">
+        <div class="hypercore-entry-marker"><span class="hypercore-dot ${escape(dotCls)}"></span></div>
         <div class="hypercore-entry-body">
           <div class="hypercore-entry-head">
-            <span class="hypercore-seq">#${e.seq}</span>
-            <span class="hypercore-type hypercore-type--${e.type}">${e.type}</span>
+            <span class="hypercore-seq">#${escape(safeInt(e.seq))}</span>
+            <span class="hypercore-type hypercore-type--${escape(type)}">${escape(type)}</span>
             <span class="hypercore-role">by ${escape(e.author)}</span>
-            <span class="hypercore-time">${fmtTime(e.timestamp)}</span>
+            <span class="hypercore-time">${escape(fmtTime(e.timestamp))}</span>
             ${isHead ? '<span class="hypercore-head-tag">HEAD</span>' : ''}
-            <span class="hypercore-verify" data-seq="${e.seq}"></span>
+            <span class="hypercore-verify" data-seq="${escape(safeInt(e.seq))}"></span>
           </div>
-          <div class="hypercore-entry-content">${escape(e.content)}${cursor ? ` <span class="hypercore-cursor">→ seq ${cursor}</span>` : ''}</div>
+          <div class="hypercore-entry-content">${escape(e.content)}${cursor != null ? ` <span class="hypercore-cursor">→ seq ${escape(safeInt(cursor))}</span>` : ''}</div>
           <div class="hypercore-entry-meta">
-            <span class="hypercore-meta-item" title="Autobase entry id">id <code>${e.id}</code></span>
-            <span class="hypercore-meta-item" title="Previous entry hash — forms the append-only chain">prev <code>${e.prev_hash}</code></span>
-            <span class="hypercore-meta-item" title="Hash of this entry's payload chained onto prev">hash <code>${e.hash}</code></span>
-            <span class="hypercore-meta-item" title="ed25519 signature over hash (author key)">sig <code>${e.sig}</code></span>
+            <span class="hypercore-meta-item" title="Autobase entry id">id <code>${escape(e.id)}</code></span>
+            <span class="hypercore-meta-item" title="Previous entry hash — forms the append-only chain">prev <code>${escape(e.prev_hash)}</code></span>
+            <span class="hypercore-meta-item" title="Hash of this entry's payload chained onto prev">hash <code>${escape(e.hash)}</code></span>
+            <span class="hypercore-meta-item" title="ed25519 signature over hash (author key)">sig <code>${escape(e.sig)}</code></span>
           </div>
         </div>
       </div>
@@ -1448,7 +1460,7 @@ function renderHypercoreLog(root, snapshot) {
     : '';
 
   const headMeta = isReal && snapshot.head_hash_short
-    ? `<span class="hypercore-head-meta">head <code>${snapshot.head_hash_short}</code> · ${snapshot.entries_count} entries</span>`
+    ? `<span class="hypercore-head-meta">head <code>${escape(snapshot.head_hash_short)}</code> · ${escape(safeInt(snapshot.entries_count))} entries</span>`
     : '';
 
   root.innerHTML = `
@@ -1470,6 +1482,19 @@ function renderHypercoreLog(root, snapshot) {
 // tail entry with ✓/✗ so anyone can see the snapshot is real.
 async function verifyHypercoreChain(root, snapshot, btn) {
   const status = root.querySelector('.hypercore-verify-status');
+  btn.disabled = true;
+  if (status) status.textContent = 'verifying…';
+
+  // SubtleCrypto is only available on HTTPS / localhost — fail gracefully otherwise.
+  if (!(typeof crypto !== 'undefined' && crypto.subtle)) {
+    if (status) {
+      status.textContent = 'verify unavailable (needs HTTPS)';
+      status.classList.add('hypercore-verify-status--fail');
+    }
+    btn.disabled = false;
+    return;
+  }
+
   const enc = new TextEncoder();
   const canonical = (obj) => {
     if (obj === null || typeof obj !== 'object') return JSON.stringify(obj);
@@ -1481,60 +1506,73 @@ async function verifyHypercoreChain(root, snapshot, btn) {
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
   };
 
-  btn.disabled = true;
-  if (status) status.textContent = 'verifying…';
-
-  let prev = '0'.repeat(64);
-  const results = {};
-  let allOk = true;
-  for (const e of snapshot.entries) {
-    // strip chain/crypto fields, hash the rest
-    const { seq: _s, prev_hash: _p, prev_hash_full, hash: _h, hash_full, sig: _sg, sig_full, public_key: _pk, ...payload } = e;
-    const expected = await sha256(prev + canonical(payload));
-    const ok = expected === hash_full && prev_hash_full === prev;
-    results[e.seq] = ok;
-    if (!ok) allOk = false;
-    prev = hash_full;
-  }
-
-  root.querySelectorAll('.hypercore-verify').forEach(el => {
-    const seq = Number(el.dataset.seq);
-    if (seq in results) {
-      el.textContent = results[seq] ? '✓' : '✗';
-      el.classList.add(results[seq] ? 'hypercore-verify--ok' : 'hypercore-verify--fail');
-      el.title = results[seq] ? 'sha256(prev_hash + canonical(payload)) matches this entry\'s hash' : 'chain mismatch — this entry has been tampered';
+  try {
+    let prev = '0'.repeat(64);
+    const results = {};
+    let allOk = true;
+    const entries = Array.isArray(snapshot && snapshot.entries) ? snapshot.entries : [];
+    for (const e of entries) {
+      // strip chain/crypto fields, hash the rest
+      const { seq: _s, prev_hash: _p, prev_hash_full, hash: _h, hash_full, sig: _sg, sig_full, public_key: _pk, ...payload } = e;
+      const expected = await sha256(prev + canonical(payload));
+      const ok = expected === hash_full && prev_hash_full === prev;
+      results[e.seq] = ok;
+      if (!ok) allOk = false;
+      prev = hash_full;
     }
-  });
 
-  btn.disabled = false;
-  if (status) {
-    status.textContent = allOk ? `verified ${snapshot.entries.length} entries · head ${snapshot.head_hash_short}` : 'chain broken';
-    status.classList.toggle('hypercore-verify-status--ok', allOk);
-    status.classList.toggle('hypercore-verify-status--fail', !allOk);
+    root.querySelectorAll('.hypercore-verify').forEach(el => {
+      const seq = Number(el.dataset.seq);
+      if (seq in results) {
+        el.textContent = results[seq] ? '✓' : '✗';
+        el.classList.add(results[seq] ? 'hypercore-verify--ok' : 'hypercore-verify--fail');
+        el.title = results[seq] ? 'sha256(prev_hash + canonical(payload)) matches this entry\'s hash' : 'chain mismatch — this entry has been tampered';
+      }
+    });
+
+    if (status) {
+      status.textContent = allOk ? `verified ${entries.length} entries · head ${snapshot.head_hash_short || ''}` : 'chain broken';
+      status.classList.toggle('hypercore-verify-status--ok', allOk);
+      status.classList.toggle('hypercore-verify-status--fail', !allOk);
+    }
+  } catch (err) {
+    if (status) {
+      status.textContent = 'verify failed — ' + (err && err.message ? err.message : 'unknown error');
+      status.classList.add('hypercore-verify-status--fail');
+    }
+  } finally {
+    btn.disabled = false;
   }
 }
 
 function init() {
-  initTooltips();
-  initTabs();
-  initSidebar();
-  initBanner();
-  initChat();
-  renderMatchTimeline();
-  renderPlayerCards();
-  initPlayerFilter();
-  renderPlayerRatings();
-  enableSortableTables(document.getElementById('player-ratings-table')?.parentNode || document);
-  renderOpponentRecords();
-  renderPressingChart();
-  renderSuggestions();
-  initReports();
-  initDistribute();
-  initLossScrubber();
-  initHypercoreLog();
-  initKaggleStats();
-  initLandingHero();
-  initRouting();
+  // Isolate every init step: a failure in one section must not prevent the rest
+  // of the UI from loading. Errors are surfaced to the console (and to a toast
+  // if UI_DEBUG is true) but never bubble to the top-level error handler.
+  const safe = (label, fn) => {
+    try { const r = fn(); if (r && typeof r.catch === 'function') r.catch(err => console.warn('[init:' + label + '] async failed', err)); }
+    catch (err) { console.warn('[init:' + label + '] failed', err); if (window.UI_DEBUG && window.UI) UI.error('Init failed', label + ': ' + (err && err.message)); }
+  };
+  safe('tooltips', initTooltips);
+  safe('tabs', initTabs);
+  safe('sidebar', initSidebar);
+  safe('banner', initBanner);
+  safe('chat', initChat);
+  safe('match-timeline', renderMatchTimeline);
+  safe('player-cards', renderPlayerCards);
+  safe('player-filter', initPlayerFilter);
+  safe('player-ratings', renderPlayerRatings);
+  safe('sortable-tables', () => enableSortableTables(document.getElementById('player-ratings-table')?.parentNode || document));
+  safe('opponents', renderOpponentRecords);
+  safe('pressing-chart', renderPressingChart);
+  safe('suggestions', renderSuggestions);
+  safe('reports', initReports);
+  safe('distribute', initDistribute);
+  safe('loss-scrubber', initLossScrubber);
+  safe('hypercore-log', initHypercoreLog);
+  safe('kaggle-stats', initKaggleStats);
+  safe('landing-hero', initLandingHero);
+  safe('routing', initRouting);
   // Skeleton done — fade it out on next paint so the real UI is already visible
   requestAnimationFrame(hideInitialSkeleton);
 }
@@ -1592,13 +1630,18 @@ async function initKaggleStats() {
   let data = null;
   try {
     const res = await fetch('./data/kaggle-runs.json', { cache: 'no-store' });
-    if (res.ok) data = await res.json();
+    if (res.ok) {
+      const parsed = await res.json();
+      if (parsed && typeof parsed === 'object' && Array.isArray(parsed.runs)) data = parsed;
+    }
   } catch (_) { /* fall through */ }
 
   if (!data || !Array.isArray(data.runs)) {
     if (statsEl) statsEl.innerHTML = '<div class="kaggle-empty">Run metadata unavailable offline.</div>';
     return;
   }
+
+  try {
 
   const t = data.totals || {};
   const env = data.environment || {};
@@ -1653,9 +1696,15 @@ async function initKaggleStats() {
       '</table></div>';
     try { enableSortableTables(tableEl); } catch (_) {}
   }
+  } catch (err) {
+    // Any unexpected shape in the JSON must not crash the app.
+    if (statsEl) statsEl.innerHTML = '<div class="kaggle-empty">Run metadata rendering failed.</div>';
+    if (window.UI_DEBUG) console.warn('[kaggle] render failed', err);
+  }
 }
 
-// Small HTML-safety helpers used by initKaggleStats
+// Small HTML-safety helpers used by initKaggleStats + everywhere else that
+// interpolates JSON-fetched strings into templated HTML.
 function escapeText(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); }
 function escapeAttr(s) { return escapeText(s); }
 

@@ -1,7 +1,7 @@
 /* MISTER service worker — offline shell + network-first data
  * bump CACHE_VERSION on every deploy to invalidate old caches
  */
-const CACHE_VERSION = 'mister-v28';
+const CACHE_VERSION = 'mister-v29';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
