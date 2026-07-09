@@ -61,12 +61,12 @@
 </script>
 
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="preload" href="styles.css?v=22" as="style">
+<link rel="preload" href="styles.css?v=23" as="style">
 <link rel="preload" href="app.js" as="script">
 <link rel="preload" href="vendor-qrcode.js" as="script">
 <link rel="preconnect" href="https://alexbelij-mister-qvac-inference.hf.space" crossorigin>
 <link rel="dns-prefetch" href="https://alexbelij-mister-qvac-inference.hf.space">
-<link rel="stylesheet" href="styles.css?v=22">
+<link rel="stylesheet" href="styles.css?v=23">
 <script>document.documentElement.classList.add('js');</script>
 <script src="vendor-qrcode.js" defer></script>
 </head>
@@ -198,6 +198,60 @@
 
     <!-- Tab: Chat -->
     <section id="tab-chat" class="tab-content active">
+
+      <!-- Landing hero (chat tab only, dismissible) -->
+      <div id="landing-hero" class="hero" role="region" aria-label="MISTER product overview">
+        <button id="hero-dismiss" class="hero-dismiss" data-tooltip="Hide the intro (stays hidden on this device)" aria-label="Dismiss intro">&times;</button>
+        <div class="hero-inner">
+          <div class="hero-eyebrow">
+            <span class="hero-eyebrow-dot"></span>
+            Pears × QVAC hackathon submission
+          </div>
+          <h1 class="hero-title">
+            An assistant coach that runs on your laptop.
+            <span class="hero-title-accent">No cloud. No leaks. No excuses.</span>
+          </h1>
+          <p class="hero-lede">
+            <strong>MISTER</strong> — Mobile Intelligent System for Tactical Evaluation &amp; Reporting.
+            A LoRA fine-tune of Qwen3-1.7B, trained on real amateur-football video logs,
+            served fully on-device via <strong>QVAC</strong>, and distributed peer-to-peer via <strong>Pears</strong>.
+            Every claim below is verifiable — proof card at the bottom.
+          </p>
+          <div class="hero-chips">
+            <span class="hero-chip" data-tooltip="Model weights, inference and RAG index run locally in the Electron app. Chat here uses a hosted QVAC bridge with the same config.">
+              <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M4 6h16v10H4z M2 18h20v2H2z"/></svg>
+              On-device inference
+            </span>
+            <span class="hero-chip" data-tooltip="Real Kaggle T4×2 fine-tune runs — checkpoints, loss curves and gate logs are in /proof.">
+              <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              Kaggle-verified LoRA
+            </span>
+            <span class="hero-chip" data-tooltip="Hyperswarm topic key + append-only Hypercore log. Scan the QR from Distribute to sync a game plan peer-to-peer.">
+              <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 4a2 2 0 110 4 2 2 0 010-4zm0 14c-2.5 0-4.7-1.3-6-3.2.03-2 4-3.1 6-3.1s5.97 1.1 6 3.1c-1.3 1.9-3.5 3.2-6 3.2z"/></svg>
+              Pears P2P sync
+            </span>
+            <span class="hero-chip" data-tooltip="Every card is tagged real / example / preview. Nothing is faked without saying so.">
+              <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M12 1L3 5v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V5l-9-4z"/></svg>
+              Honest data labels
+            </span>
+          </div>
+          <div class="hero-ctas">
+            <a href="#chat" class="hero-cta hero-cta--primary" data-hero-scroll="chat" data-tooltip="Jump straight into the tactical chat — live QVAC backend">
+              <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+              Try the chat
+            </a>
+            <a href="#proof" class="hero-cta hero-cta--ghost" data-tab-jump="proof" data-tooltip="Open the Proof tab — real Kaggle logs, real loss values, real Hypercore snapshot">
+              <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+              See the proof
+            </a>
+            <a href="https://github.com/alexbelij/MISTER" target="_blank" rel="noopener" class="hero-cta hero-cta--ghost" data-tooltip="MISTER source on GitHub — Electron + QVAC + Pears">
+              <svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+              GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div class="tab-header">
         <h1 class="tab-title">
           <svg viewBox="0 0 24 24" width="24" height="24" class="title-icon"><path fill="currentColor" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
@@ -626,6 +680,6 @@
 <!-- Tooltip -->
 <div id="tooltip" class="tooltip"></div>
 
-<script src="app.js?v=22"></script>
+<script src="app.js?v=23"></script>
 </body>
 </html>
