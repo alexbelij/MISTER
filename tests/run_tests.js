@@ -342,6 +342,36 @@ test('crypto hashData is consistent', () => {
   assert(hash1.length === 64, 'SHA-256 hash should be 64 hex chars');
 });
 
+test('secure_storage transparent encrypt/decrypt roundtrip', () => {
+  const store = require('../src/security/secure_storage');
+  const fs2 = require('fs');
+  const tmpDir = path.join(process.cwd(), 'tests', '.tmp_enc');
+  if (!fs2.existsSync(tmpDir)) fs2.mkdirSync(tmpDir, { recursive: true });
+  const testFile = path.join(tmpDir, 'test_data.json');
+
+  // Write plain (disabled mode)
+  store.lock();
+  store.writeSecure(testFile, { club: 'FC Nord', secret: 42 });
+  assert(fs2.existsSync(testFile), 'Plain file should exist');
+  const plain = store.readSecure(testFile);
+  assertEqual(plain.club, 'FC Nord', 'Plain read should work');
+
+  // Enable encryption
+  store.unlock('hackathon-2026');
+  store.writeSecure(testFile, { club: 'FC Nord', secret: 42 });
+  assert(fs2.existsSync(testFile + '.enc'), 'Encrypted file should exist');
+  assert(!fs2.existsSync(testFile), 'Plain file should be deleted after encrypt');
+
+  // Read back
+  const decrypted = store.readSecure(testFile);
+  assertEqual(decrypted.secret, 42, 'Decrypted data should match');
+
+  // Cleanup
+  store.lock();
+  try { fs2.unlinkSync(testFile + '.enc'); } catch {}
+  try { fs2.rmdirSync(tmpDir); } catch {}
+});
+
 // --- Mobile App Tests ---
 console.log('\n📱 Mobile App:');
 

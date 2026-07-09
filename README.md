@@ -13,7 +13,7 @@
 [![P2P sync](https://img.shields.io/badge/sync-peer--to--peer-8b5cf6.svg)](https://pears.com/)
 
 **[▶️ Try the live demo](https://alexbelij.github.io/MISTER/)** &nbsp;·&nbsp;
-**[⚙️ Run it locally](#run-the-real-thing)** &nbsp;·&nbsp;
+**[⚙️ Run it locally](#quick-start)** &nbsp;·&nbsp;
 **[🔬 See the proof](https://alexbelij.github.io/MISTER/#proof)**
 
 <br>
@@ -167,6 +167,8 @@ Desktop (Electron)                       Mobile (Pear app)
 
 **Which team you belong to.** A *team manifest* is a signed Hypercore document listing member public keys and their roles (`head_coach`, `assistant_coach`, `analyst`, `player`). The manifest is signed by the team owner’s key; readers verify the signature locally before trusting any role assertion.
 
+**Data encryption at rest.** All club data files (scouting reports, training corpora, player profiles) are encrypted with AES-256-GCM using a password-derived key (PBKDF2, 100 000 iterations). Encryption can be enabled via the Settings → Security panel or CLI (`npm run encrypt`). The password is held in memory only — never written to disk. Secure-delete (overwrite + unlink) erases plaintext originals after migration.
+
 **How access is enforced.** Team data is symmetrically encrypted with a team-shared key. The team owner distributes that key over Pears only to keys that appear in the manifest with a read-capable role. Revoking a member rotates the team key so their copy stops decrypting future writes.
 
 **Multi-team users — the coach-who-is-also-a-player case.** Because identity is a keypair and not an account, the same person can hold different roles in different teams. The app shows every team the local public key is listed in, and a header dropdown swaps context between them. Data across teams is stored in independent Hypercores encrypted with independent keys — there is no path for a query in one team to leak into another.
@@ -184,12 +186,29 @@ Desktop (Electron)                       Mobile (Pear app)
               local Hypercores, symmetrically encrypted with per-team keys
 ```
 
-## Run the real thing
+## Quick start
+
+### 🌐 Option 1 — Use the web app (zero install)
+
+1. Open **[alexbelij.github.io/MISTER](https://alexbelij.github.io/MISTER/)**
+2. Tap **"Install"** (browser bar or menu → "Add to Home Screen")
+3. Done — works offline as a native-like PWA on any device
+
+### 🖥️ Option 2 — Run locally (one click)
 
 ```bash
 git clone https://github.com/alexbelij/MISTER.git
 cd MISTER
-npm install                  # Node 20+
+./start.sh          # macOS / Linux — double-click or run in terminal
+start.bat           # Windows — double-click
+```
+
+The launcher auto-installs dependencies on first run, opens Electron if available, otherwise starts a local web server and opens your browser.
+
+### ⚙️ Option 3 — Full CLI (advanced)
+
+```bash
+npm install --legacy-peer-deps
 npm run gate                 # Day-0 GATE: prepare → LoRA finetune → eval
 npm run chat -- \            # Chat with your club brain (streaming)
   --adapter adapters/adapter.gguf

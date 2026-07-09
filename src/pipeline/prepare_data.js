@@ -14,8 +14,19 @@ const path = require('path');
 const INPUT_DIR = process.argv.find(a => a.startsWith('--input='))?.split('=')[1] || 'data';
 const OUTPUT_DIR = process.argv.find(a => a.startsWith('--output='))?.split('=')[1] || 'data/processed';
 
+const secureStorage = require('../security/secure_storage');
+
+// If MISTER_PASSWORD env var is set, enable transparent encryption
+if (process.env.MISTER_PASSWORD) {
+  secureStorage.unlock(process.env.MISTER_PASSWORD);
+}
+
 // --- Helpers ---
 function readJSON(filePath) {
+  // Use secure storage if encryption is enabled (reads .enc if available)
+  if (secureStorage.isEnabled()) {
+    try { return secureStorage.readSecure(filePath); } catch {}
+  }
   return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 }
 
