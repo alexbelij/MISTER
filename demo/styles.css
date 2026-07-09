@@ -57,6 +57,14 @@
   background: linear-gradient(90deg, #f0f3f6, #f6f8fa);
 }
 
+/* Tour tip — force correct colors per theme (inline styles don't respond to theme) */
+:root[data-theme="light"] .tour-tip {
+  background: #fff !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+  box-shadow: 0 12px 32px rgba(31,35,40,0.12) !important;
+}
+
 /* Tooltip */
 :root[data-theme="light"] .tooltip {
   background: var(--card-bg);
