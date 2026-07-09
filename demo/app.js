@@ -1072,11 +1072,16 @@ function initReports() {
     `;
   };
 
-  select.addEventListener('change', () => renderMatchReport(select.value));
-  seasonBtn.addEventListener('click', renderSeasonReport);
+  // Wrap renderers so tables inside the injected report HTML pick up sort behaviour.
+  const withSort = (fn) => (...args) => { const r = fn(...args); try { enableSortableTables(content); } catch (_) {} return r; };
+  const renderMatchReportSorted = withSort(renderMatchReport);
+  const renderSeasonReportSorted = withSort(renderSeasonReport);
+
+  select.addEventListener('change', () => renderMatchReportSorted(select.value));
+  seasonBtn.addEventListener('click', renderSeasonReportSorted);
 
   // Initial render
-  renderMatchReport(MATCHES[0].id);
+  renderMatchReportSorted(MATCHES[0].id);
 }
 
 // ===== DISTRIBUTE (QR CODE) =====
@@ -1519,6 +1524,7 @@ function init() {
   renderPlayerCards();
   initPlayerFilter();
   renderPlayerRatings();
+  enableSortableTables(document.getElementById('player-ratings-table')?.parentNode || document);
   renderOpponentRecords();
   renderPressingChart();
   renderSuggestions();
@@ -1572,6 +1578,82 @@ function initLandingHero() {
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
+}
+
+// ===== SORTABLE TABLES =====
+// Attach click-to-sort behaviour to every .data-table inside the given root.
+// Numeric-aware (parses numbers from strings like "7.5", "+0.4", "8.9185").
+// Safe: swallows any parse error so a broken cell can never break the app.
+function enableSortableTables(root) {
+  try {
+    var scope = root || document;
+    var tables = scope.querySelectorAll('.data-table');
+    tables.forEach(function (table) {
+      if (table.dataset.sortable === 'true') return;
+      var thead = table.querySelector('thead');
+      var tbody = table.querySelector('tbody');
+      if (!thead || !tbody) return;
+      if (tbody.rows.length < 2) return; // pointless to sort < 2 rows
+      var ths = thead.querySelectorAll('th');
+      if (!ths.length) return;
+      table.dataset.sortable = 'true';
+      ths.forEach(function (th, colIdx) {
+        th.classList.add('sortable-th');
+        th.setAttribute('role', 'button');
+        th.setAttribute('tabindex', '0');
+        var handler = function () {
+          try {
+            var dir = th.dataset.sortDir === 'asc' ? 'desc' : 'asc';
+            // Clear siblings
+            ths.forEach(function (other) {
+              if (other !== th) {
+                other.removeAttribute('data-sort-dir');
+                other.classList.remove('sorted-asc', 'sorted-desc');
+              }
+            });
+            th.dataset.sortDir = dir;
+            th.classList.toggle('sorted-asc', dir === 'asc');
+            th.classList.toggle('sorted-desc', dir === 'desc');
+
+            var rows = Array.prototype.slice.call(tbody.rows);
+            var parseCell = function (row) {
+              try {
+                var cell = row.cells[colIdx];
+                if (!cell) return { num: NaN, txt: '' };
+                // Prefer inner numeric text from first .rating-cell/etc; fallback to textContent
+                var raw = (cell.textContent || '').trim();
+                var m = raw.match(/-?\d+(?:[\.,]\d+)?/);
+                var num = m ? parseFloat(m[0].replace(',', '.')) : NaN;
+                return { num: num, txt: raw.toLowerCase() };
+              } catch (_) { return { num: NaN, txt: '' }; }
+            };
+            rows.sort(function (a, b) {
+              var av = parseCell(a), bv = parseCell(b);
+              var aNum = !isNaN(av.num), bNum = !isNaN(bv.num);
+              var cmp;
+              if (aNum && bNum) cmp = av.num - bv.num;
+              else if (aNum) cmp = -1;
+              else if (bNum) cmp = 1;
+              else cmp = av.txt.localeCompare(bv.txt);
+              return dir === 'asc' ? cmp : -cmp;
+            });
+            var frag = document.createDocumentFragment();
+            rows.forEach(function (r) { frag.appendChild(r); });
+            tbody.appendChild(frag);
+          } catch (err) {
+            // Fail silent — the user still sees the unsorted table.
+            if (window.UI_DEBUG) console.warn('[sort] failed', err);
+          }
+        };
+        th.addEventListener('click', handler);
+        th.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); }
+        });
+      });
+    });
+  } catch (err) {
+    if (window.UI_DEBUG) console.warn('[enableSortableTables] failed', err);
+  }
 }
 
 if (document.readyState === 'loading') {
