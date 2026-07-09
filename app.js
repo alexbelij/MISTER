@@ -1811,12 +1811,118 @@ function init() {
   safe('hypercore-log', initHypercoreLog);
   safe('kaggle-stats', initKaggleStats);
   safe('marketplace', initMarketplace);
+  safe('tactical-pitch', initTacticalPitch);
   safe('ocr-notes', initOCRNotes);
   safe('multi-agent-routing', initMultiAgentRouting);
   safe('landing-hero', initLandingHero);
   safe('routing', initRouting);
   // Skeleton done — fade it out on next paint so the real UI is already visible
   requestAnimationFrame(hideInitialSkeleton);
+}
+
+// ===== SVG TACTICAL PITCH =====
+function initTacticalPitch() {
+  const svg = document.getElementById('tactical-pitch');
+  if (!svg) return;
+
+  // 4-3-3 formation positions (x, y on 680x440 viewBox)
+  // Attacking right to left: GK far left, ST far right
+  const FORMATION_433 = {
+    GK:  [{ x: 50,  y: 220 }],
+    CB:  [{ x: 150, y: 160 }, { x: 150, y: 280 }],
+    LB:  [{ x: 180, y: 380 }],
+    RB:  [{ x: 180, y: 60 }],
+    CM:  [{ x: 300, y: 140 }, { x: 300, y: 300 }],
+    AM:  [{ x: 340, y: 220 }],
+    LW:  [{ x: 500, y: 370 }],
+    RW:  [{ x: 500, y: 70 }],
+    ST:  [{ x: 540, y: 220 }],
+  };
+
+  const POS_COLORS = { GK: '#f78166', CB: '#58a6ff', LB: '#58a6ff', RB: '#58a6ff', CM: '#238636', AM: '#238636', LW: '#d29922', RW: '#d29922', ST: '#d29922' };
+
+  // Arrowhead marker
+  const ns = 'http://www.w3.org/2000/svg';
+  const defs = document.createElementNS(ns, 'defs');
+  const marker = document.createElementNS(ns, 'marker');
+  marker.setAttribute('id', 'arrowhead');
+  marker.setAttribute('markerWidth', '6');
+  marker.setAttribute('markerHeight', '4');
+  marker.setAttribute('refX', '6');
+  marker.setAttribute('refY', '2');
+  marker.setAttribute('orient', 'auto');
+  const arrowPath = document.createElementNS(ns, 'path');
+  arrowPath.setAttribute('d', 'M0,0 L6,2 L0,4');
+  arrowPath.setAttribute('fill', 'rgba(255,255,255,0.25)');
+  marker.appendChild(arrowPath);
+  defs.appendChild(marker);
+  svg.appendChild(defs);
+
+  // Place starting XI (first player per position)
+  const placed = {};
+  const startingXI = [];
+
+  PLAYERS.forEach(p => {
+    const pos = p.pos;
+    if (!FORMATION_433[pos]) return;
+    if (!placed[pos]) placed[pos] = 0;
+    const slots = FORMATION_433[pos];
+    if (placed[pos] >= slots.length) return;
+    const slot = slots[placed[pos]];
+    placed[pos]++;
+    startingXI.push({ ...p, cx: slot.x, cy: slot.y });
+  });
+
+  // Draw pressing arrows (from forwards toward center)
+  startingXI.forEach(p => {
+    if (['ST', 'LW', 'RW'].includes(p.pos)) {
+      const line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', p.cx);
+      line.setAttribute('y1', p.cy);
+      line.setAttribute('x2', p.cx - 40);
+      line.setAttribute('y2', p.cy + (p.cy > 220 ? -15 : 15));
+      line.setAttribute('class', 'pitch-arrow');
+      svg.appendChild(line);
+    }
+  });
+
+  // Draw players
+  startingXI.forEach(p => {
+    const g = document.createElementNS(ns, 'g');
+    g.setAttribute('class', 'pitch-player');
+    g.setAttribute('data-tooltip', `${p.name} #${p.num} (${p.pos}) — Avg: ${(Object.values(p.ratings).reduce((a, b) => a + b, 0) / 8).toFixed(1)}`);
+
+    const circle = document.createElementNS(ns, 'circle');
+    circle.setAttribute('cx', p.cx);
+    circle.setAttribute('cy', p.cy);
+    circle.setAttribute('r', '18');
+    circle.setAttribute('fill', POS_COLORS[p.pos] || '#666');
+    circle.setAttribute('class', 'pitch-player-circle');
+    circle.setAttribute('stroke', 'rgba(255,255,255,0.6)');
+
+    const num = document.createElementNS(ns, 'text');
+    num.setAttribute('x', p.cx);
+    num.setAttribute('y', p.cy);
+    num.setAttribute('class', 'pitch-player-label');
+    num.textContent = p.num;
+
+    const name = document.createElementNS(ns, 'text');
+    name.setAttribute('x', p.cx);
+    name.setAttribute('y', p.cy + 28);
+    name.setAttribute('class', 'pitch-player-name');
+    name.textContent = p.name;
+
+    g.appendChild(circle);
+    g.appendChild(num);
+    g.appendChild(name);
+
+    // Click to open player modal if available
+    g.addEventListener('click', () => {
+      if (typeof openPlayerModal === 'function') openPlayerModal(p);
+    });
+
+    svg.appendChild(g);
+  });
 }
 
 // ===== OCR NOTES (src/ocr/notes.js) =====

@@ -241,6 +241,23 @@
 /* ── Eval table ── */
 .eval-table td:last-child { color: var(--green); font-weight: 600; }
 
+/* ── SVG Tactical Pitch ── */
+.pitch-wrapper { overflow: hidden; border-radius: 8px; }
+.pitch-svg { width: 100%; height: auto; display: block; }
+.pitch-player { cursor: pointer; transition: transform 0.2s; }
+.pitch-player:hover { transform: scale(1.15); }
+.pitch-player-circle { stroke-width: 2; }
+.pitch-player-label { font-size: 10px; fill: #fff; text-anchor: middle; dominant-baseline: central; font-weight: 600; pointer-events: none; }
+.pitch-player-name { font-size: 8px; fill: rgba(255,255,255,0.7); text-anchor: middle; pointer-events: none; }
+.pitch-legend { display: flex; gap: 12px; justify-content: center; margin-top: 8px; }
+.pitch-legend-item { display: flex; align-items: center; gap: 4px; font-size: 0.75rem; color: var(--text-secondary, #8b949e); }
+.pitch-dot { width: 10px; height: 10px; border-radius: 50%; }
+.pitch-dot--gk { background: #f78166; }
+.pitch-dot--def { background: #58a6ff; }
+.pitch-dot--mid { background: #238636; }
+.pitch-dot--fwd { background: #d29922; }
+.pitch-arrow { stroke: rgba(255,255,255,0.15); stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+
 /* ── Before/After Compare ── */
 .compare-split { display: flex; gap: 12px; width: 100%; }
 .compare-col { flex: 1; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
