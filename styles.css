@@ -154,6 +154,104 @@ input, select, textarea, button,
 .theme-toggle--mobile { border: none; background: transparent; }
 .theme-toggle--mobile:hover { background: var(--card-hover); }
 
+/* ===== Keyboard-shortcuts help modal ===== */
+.kbd-help-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.kbd-help-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+:root[data-theme="light"] .kbd-help-backdrop { background: rgba(31, 35, 40, 0.35); }
+
+.kbd-help-inner {
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 28px;
+  min-width: 320px;
+  max-width: 480px;
+  box-shadow: var(--shadow-lg);
+  animation: fadeInUp 0.22s ease-out both;
+}
+.kbd-help-title {
+  font-size: 1.15rem;
+  margin: 0 0 16px 0;
+  color: var(--text);
+}
+.kbd-help-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+.kbd-help-table td {
+  padding: 7px 4px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+}
+.kbd-help-table tr:last-child td { border-bottom: none; }
+.kbd-help-table td:first-child { width: 130px; white-space: nowrap; }
+.kbd-help-table td:last-child { color: var(--text-muted); }
+.kbd-help-footnote {
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+kbd {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--card-hover);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  box-shadow: 0 1px 0 var(--border);
+  min-width: 20px;
+  text-align: center;
+}
+:root[data-theme="light"] kbd {
+  background: #f6f8fa;
+  color: #1f2328;
+}
+
+.kbd-help-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.kbd-help-btn:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--card-hover);
+}
+
 /* ===== Banner ===== */
 .banner {
   display: flex;
