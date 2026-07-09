@@ -2999,3 +2999,164 @@ html.js .initial-skeleton { display: flex; }
   border-radius: 8px;
   font-size: 12.5px;
 }
+
+/* ========================================================================
+   chat-signing.js — signed message badge + details popover.
+   Every user bubble gets a small "Signed · FING ERP RINT" chip; clicking
+   opens a 320px panel with pubkey, signature, live re-verification.
+   ======================================================================== */
+
+.chat-sig-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 2px 8px;
+  background: rgba(35, 134, 54, 0.12);
+  border: 1px solid rgba(35, 134, 54, 0.35);
+  color: #3fb950;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  font-family: ui-monospace, monospace;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s ease, transform 0.08s ease;
+}
+.chat-sig-badge:hover { background: rgba(35, 134, 54, 0.2); }
+.chat-sig-badge:active { transform: scale(0.98); }
+.chat-sig-badge:focus-visible { outline: 2px solid rgba(35, 134, 54, 0.7); outline-offset: 2px; }
+.chat-sig-icon { flex: 0 0 auto; }
+.chat-sig-text { line-height: 1.4; }
+
+.chat-sig-badge-unavailable {
+  background: rgba(139, 148, 158, 0.12);
+  border-color: rgba(139, 148, 158, 0.35);
+  color: var(--text-muted, #8b949e);
+  cursor: default;
+}
+
+.chat-sig-panel {
+  position: fixed;
+  width: 320px;
+  background: var(--bg-elevated, #161b22);
+  border: 1px solid var(--border, #30363d);
+  border-radius: 10px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+  padding: 14px 16px 12px;
+  z-index: 220;
+  color: var(--text, #f0f6fc);
+  font-size: 12px;
+  animation: chatSigIn 0.14s ease-out;
+}
+@keyframes chatSigIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.chat-sig-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-size: 13px;
+}
+.chat-sig-panel-close {
+  background: transparent;
+  border: 0;
+  color: var(--text-muted, #8b949e);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+.chat-sig-panel-close:hover { background: var(--bg-hover, #21262d); color: var(--text, #f0f6fc); }
+.chat-sig-row {
+  display: flex;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--border, #30363d);
+}
+.chat-sig-row:last-of-type { border-bottom: 0; }
+.chat-sig-row > span {
+  flex: 0 0 84px;
+  color: var(--text-muted, #8b949e);
+  font-size: 11px;
+  padding-top: 2px;
+}
+.chat-sig-row > code {
+  flex: 1;
+  font-family: ui-monospace, monospace;
+  color: var(--text, #f0f6fc);
+  word-break: break-all;
+  font-size: 11px;
+  line-height: 1.4;
+}
+.chat-sig-mono { font-family: ui-monospace, monospace; }
+.chat-sig-sig { max-height: 60px; overflow: auto; }
+.chat-sig-verify {
+  margin-top: 10px;
+  padding: 8px 10px;
+  background: rgba(139, 148, 158, 0.1);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+.chat-sig-verify-label.is-ok   { color: #3fb950; }
+.chat-sig-verify-label.is-fail { color: #f85149; }
+
+/* ========================================================================
+   export-report.js — email composer modal (reuses .ts-modal-* styles).
+   Adds a wider variant for the body textarea and a 3-button footer.
+   ======================================================================== */
+
+.em-modal { width: min(540px, 100%); }
+.em-modal textarea {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg, #0d1117);
+  border: 1px solid var(--border, #30363d);
+  border-radius: 8px;
+  color: var(--text, #f0f6fc);
+  font: inherit;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 140px;
+  max-height: 380px;
+}
+.em-modal textarea:focus {
+  outline: none;
+  border-color: var(--accent, #238636);
+  box-shadow: 0 0 0 3px rgba(35, 134, 54, 0.22);
+}
+.em-optional {
+  font-style: normal;
+  color: var(--text-muted, #8b949e);
+  font-size: 10.5px;
+  font-weight: 500;
+  margin-left: 4px;
+}
+.em-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(139, 148, 158, 0.08);
+  border-radius: 6px;
+  font-size: 11.5px;
+  color: var(--text-muted, #8b949e);
+}
+.em-meta strong { color: var(--text, #f0f6fc); font-weight: 700; }
+.em-meta-item.em-warn { color: #d29922; }
+.em-footer { justify-content: space-between; }
+.em-footer .ts-btn { flex: 0 0 auto; }
+@media (max-width: 520px) {
+  .em-footer { flex-direction: column-reverse; align-items: stretch; gap: 6px; }
+  .em-footer .ts-btn { width: 100%; }
+}
