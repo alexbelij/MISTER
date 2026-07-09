@@ -106,11 +106,28 @@ input, select, textarea, button,
 }
 
 /* Apply entrance animation to freshly-mounted view containers */
-.view.enter {
+.view.enter,
+.tab-content.enter {
   animation: fadeInUp 0.28s ease-out both;
 }
 .card.enter, .stat-chip.enter {
   animation: fadeInUp 0.32s ease-out both;
+}
+
+/* Chip/badge hover polish */
+.hero-chip, .chip, .stat-chip, .badge, .data-badge {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+}
+.hero-chip:hover, .chip:hover {
+  transform: translateY(-1px);
+}
+
+/* Sidebar nav items */
+.nav-item {
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.15s ease;
+}
+.nav-item:hover {
+  transform: translateX(2px);
 }
 
 /* Stagger children by adding CSS custom property --delay (px → ms) */

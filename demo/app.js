@@ -232,7 +232,15 @@ function switchTab(tabName, pushHistory = true) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(t => t.classList.remove('active'));
   const tab = document.getElementById('tab-' + tabName);
-  if (tab) tab.classList.add('active');
+  if (tab) {
+    tab.classList.add('active');
+    // Retrigger entrance animation — remove then add on next frame so the
+    // browser sees a class change even when re-visiting the same tab.
+    tab.classList.remove('enter');
+    // eslint-disable-next-line no-unused-expressions
+    tab.offsetWidth; // force reflow so animation restarts
+    tab.classList.add('enter');
+  }
   document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(t => t.classList.add('active'));
   if (typeof window.closeSidebar === 'function') window.closeSidebar();
   // Scroll to top
