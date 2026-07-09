@@ -1213,12 +1213,12 @@ function initLossScrubber() {
     ticksEl.appendChild(tick);
   });
 
-  let prevLoss = points[0].loss;
+  let prevIdx = -1;
 
   function paint(idx) {
     const p = points[idx] || points[0];
-    runEl.textContent = p.run;
-    stepEl.textContent = p.step;
+    runEl.textContent = `Run ${p.run} · ${p.step}`;
+    stepEl.textContent = `${idx + 1} / ${points.length}`;
     valueEl.textContent = p.loss.toFixed(4);
     artifactEl.textContent = p.artifact;
 
@@ -1226,22 +1226,23 @@ function initLossScrubber() {
     fillEl.style.width = pct + '%';
 
     if (idx === 0) {
-      deltaEl.textContent = 'BEFORE — baseline loss';
+      deltaEl.textContent = 'Baseline datapoint';
       deltaEl.className = 'loss-scrubber-delta';
     } else {
-      const diff = p.loss - prevLoss;
+      const prev = points[idx - 1];
+      const diff = p.loss - prev.loss;
       const arrow = diff < 0 ? '↓' : diff > 0 ? '↑' : '→';
       const cls = diff < 0 ? 'down' : diff > 0 ? 'up' : '';
-      deltaEl.textContent = `${arrow} ${Math.abs(diff).toFixed(4)} vs previous step`;
+      deltaEl.textContent = `${arrow} ${Math.abs(diff).toFixed(4)} vs previous datapoint (${prev.run} · ${prev.step})`;
       deltaEl.className = 'loss-scrubber-delta ' + cls;
     }
-    prevLoss = p.loss;
 
-    // Little pulse on value change so the number feels alive.
-    valueEl.classList.remove('pulse');
-    // Force reflow so the animation restarts on every step.
-    void valueEl.offsetWidth;
-    valueEl.classList.add('pulse');
+    if (idx !== prevIdx) {
+      valueEl.classList.remove('pulse');
+      void valueEl.offsetWidth;
+      valueEl.classList.add('pulse');
+    }
+    prevIdx = idx;
   }
 
   input.addEventListener('input', e => paint(parseInt(e.target.value, 10)));
