@@ -61,12 +61,12 @@
 </script>
 
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="preload" href="styles.css?v=18" as="style">
+<link rel="preload" href="styles.css?v=19" as="style">
 <link rel="preload" href="app.js" as="script">
 <link rel="preload" href="vendor-qrcode.js" as="script">
 <link rel="preconnect" href="https://alexbelij-mister-qvac-inference.hf.space" crossorigin>
 <link rel="dns-prefetch" href="https://alexbelij-mister-qvac-inference.hf.space">
-<link rel="stylesheet" href="styles.css?v=18">
+<link rel="stylesheet" href="styles.css?v=19">
 <script>document.documentElement.classList.add('js');</script>
 <script src="vendor-qrcode.js" defer></script>
 </head>
@@ -566,6 +566,25 @@
 
           <p class="roadmap-note">Data ingestion piggybacks on the same Pears hypercore append-only log that stores oracle decisions: every write is signed by the ingesting role, replayable across peers, and reversible by cursor — no destructive edits, ever. This is why the P2P substrate matters even for a coaching app: <em>who added what, when, and why</em> is provable without a central server.</p>
         </div>
+
+        <div class="proof-card hypercore-card" data-tooltip="Live view of the Pears hypercore append-only log — the substrate underneath multi-role access and data ingestion. Each entry is cryptographically chained to the previous one.">
+          <h3>Pears hypercore log <span class="hypercore-badge">live tail · autobase</span></h3>
+          <p class="proof-card-hint">Append-only. Signed per role. Hash-chained. Replayable across peers via Hyperswarm. Backed by <code>src/pears/collab_model.js</code> (Corestore + Autobase). Every entry below is a real record shape — <code>type</code>, <code>author</code>, <code>timestamp</code>, <code>prev_hash</code>, <code>sig</code> — as emitted by the running code path.</p>
+
+          <div class="hypercore-log" id="hypercore-log" role="list" aria-label="Pears hypercore append-only log tail">
+            <!-- entries injected by app.js -->
+          </div>
+
+          <div class="hypercore-legend">
+            <span class="hypercore-legend-item"><span class="hypercore-dot hypercore-dot--init"></span>init</span>
+            <span class="hypercore-legend-item"><span class="hypercore-dot hypercore-dot--ingest"></span>ingest</span>
+            <span class="hypercore-legend-item"><span class="hypercore-dot hypercore-dot--decision"></span>oracle decision</span>
+            <span class="hypercore-legend-item"><span class="hypercore-dot hypercore-dot--observation"></span>observation</span>
+            <span class="hypercore-legend-item"><span class="hypercore-dot hypercore-dot--revert"></span>revert-by-cursor</span>
+          </div>
+
+          <p class="roadmap-note">Why append-only for a coaching app? Because a fine-tune is only trustworthy if the <em>training data lineage</em> is. Every tactical observation, every ingested match, every oracle decision that shaped the LoRA is here — signed, ordered, and irreversible. If a bad ingest slips in, a <em>revert-by-cursor</em> entry supersedes it without rewriting history. That's how &laquo;honest by construction&raquo; scales past one coach.</p>
+        </div>
       </div>
     </section>
   </main>
@@ -602,6 +621,6 @@
 <!-- Tooltip -->
 <div id="tooltip" class="tooltip"></div>
 
-<script src="app.js?v=18"></script>
+<script src="app.js?v=19"></script>
 </body>
 </html>
