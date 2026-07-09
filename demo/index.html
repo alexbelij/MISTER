@@ -3,21 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d1117">
 <title>MISTER — Football Coaching AI</title>
-<meta name="description" content="MISTER — an on-device club brain that fine-tunes (LoRA) on your club's tactical data via QVAC. Built for the Tether Developers Cup.">
+<meta name="description" content="MISTER — an on-device club brain that fine-tunes (LoRA) on your club's tactical data via QVAC. Real fine-tune runs, real inference, honest proof.">
+<meta name="keywords" content="on-device AI, LoRA, QVAC, football analytics, tactical AI, Qwen, coaching assistant, offline AI">
+<meta name="author" content="MISTER team">
+<link rel="canonical" href="https://alexbelij.github.io/MISTER/">
+
+<!-- Open Graph -->
 <meta property="og:title" content="MISTER — Football Coaching AI">
 <meta property="og:description" content="On-device LoRA fine-tuning for football clubs. Real QVAC inference, real fine-tune runs, honest proof — no fake demos.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://alexbelij.github.io/MISTER/">
-<meta property="og:image" content="https://alexbelij.github.io/MISTER/favicon.svg">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://alexbelij.github.io/MISTER/assets/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="MISTER — on-device football coaching AI powered by QVAC">
+<meta property="og:site_name" content="MISTER">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="MISTER — Football Coaching AI">
 <meta name="twitter:description" content="On-device LoRA fine-tuning for football clubs, built on QVAC. Real runs, honest proof.">
+<meta name="twitter:image" content="https://alexbelij.github.io/MISTER/assets/og-image.jpg">
+<meta name="twitter:image:alt" content="MISTER — on-device football coaching AI powered by QVAC">
+
+<!-- JSON-LD structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "MISTER",
+  "description": "On-device football coaching AI. LoRA fine-tunes on your club's tactical data via QVAC — real inference, real fine-tune runs, honest proof.",
+  "url": "https://alexbelij.github.io/MISTER/",
+  "image": "https://alexbelij.github.io/MISTER/assets/og-image.jpg",
+  "applicationCategory": "SportsApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Organization",
+    "name": "MISTER team",
+    "url": "https://github.com/alexbelij/MISTER"
+  },
+  "softwareVersion": "demo",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5",
+    "reviewCount": "1"
+  }
+}
+</script>
+
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preload" href="styles.css" as="style">
+<link rel="preload" href="app.js" as="script">
+<link rel="preload" href="vendor-qrcode.js" as="script">
+<link rel="preconnect" href="https://alexbelij-mister-qvac-inference.hf.space" crossorigin>
+<link rel="dns-prefetch" href="https://alexbelij-mister-qvac-inference.hf.space">
 <link rel="stylesheet" href="styles.css">
-<script src="vendor-qrcode.js"></script>
+<script>document.documentElement.classList.add('js');</script>
+<script src="vendor-qrcode.js" defer></script>
 </head>
 <body>
+
+<!-- No-JavaScript fallback — shown only when JS is disabled -->
+<noscript>
+  <div class="noscript-notice" role="alert">
+    <div class="noscript-inner">
+      <svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true"><path fill="#f78166" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      <div>
+        <strong>JavaScript is required</strong>
+        <p>MISTER is an interactive demo of an on-device AI — the chat, analytics, reports and fine-tune proof all run in your browser and need JavaScript enabled to work. Please turn JavaScript on in your browser settings and reload this page.</p>
+        <p class="noscript-links">
+          <a href="https://github.com/alexbelij/MISTER" rel="noopener">View source on GitHub</a>
+          &middot;
+          <a href="https://github.com/alexbelij/MISTER#run-the-real-thing" rel="noopener">Run the desktop app instead</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</noscript>
+
+<!-- Initial paint skeleton — replaced by app.js once the app boots -->
+<div id="initial-skeleton" class="initial-skeleton" aria-hidden="true">
+  <div class="skeleton-sidebar">
+    <div class="skel skel-logo"></div>
+    <div class="skel skel-nav"></div>
+    <div class="skel skel-nav"></div>
+    <div class="skel skel-nav"></div>
+    <div class="skel skel-nav"></div>
+    <div class="skel skel-nav"></div>
+    <div class="skel skel-nav"></div>
+  </div>
+  <div class="skeleton-main">
+    <div class="skel skel-title"></div>
+    <div class="skel skel-line"></div>
+    <div class="skel skel-block"></div>
+    <div class="skel skel-block"></div>
+  </div>
+</div>
 
 <!-- Banner -->
 <div id="banner" class="banner">

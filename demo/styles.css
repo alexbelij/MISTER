@@ -1024,7 +1024,10 @@ body {
   .data-table { font-size: 0.7rem; }
   .data-table th, .data-table td { padding: 6px 4px; }
   .report-controls { flex-direction: column; align-items: stretch; }
-  .report-selector { justify-content: space-between; }
+  .report-selector { justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+  .report-selector label { flex-shrink: 0; }
+  .report-select { flex: 1 1 auto; min-width: 0; max-width: 100%; text-overflow: ellipsis; }
+  .btn-secondary, .btn-primary { width: 100%; justify-content: center; }
   .banner { font-size: 0.7rem; padding: 6px 10px; }
   .banner span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
@@ -1032,4 +1035,91 @@ body {
 @media (max-width: 400px) {
   .match-date { width: 60px; font-size: 0.65rem; }
   .bottom-nav-item span { font-size: 0.6rem; }
+  .report-select { font-size: 0.75rem; padding: 8px; }
 }
+
+/* ============================================================ */
+/* No-JS fallback notice                                        */
+/* ============================================================ */
+.noscript-notice {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0d1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.noscript-inner {
+  max-width: 560px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 28px 32px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  color: #c9d1d9;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.55;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+.noscript-inner strong { color: #f0f6fc; font-size: 1.15rem; display: block; margin-bottom: 8px; }
+.noscript-inner p { margin: 0 0 10px 0; font-size: 0.92rem; }
+.noscript-inner .noscript-links a { color: #58a6ff; text-decoration: none; }
+.noscript-inner .noscript-links a:hover { text-decoration: underline; }
+
+/* ============================================================ */
+/* Initial paint skeleton (hidden once app.js boots)            */
+/* ============================================================ */
+.initial-skeleton {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  background: #0d1117;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+html.js .initial-skeleton { display: flex; }
+.initial-skeleton.faded {
+  opacity: 0;
+}
+.skeleton-sidebar {
+  width: 260px;
+  padding: 20px 16px;
+  border-right: 1px solid #21262d;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.skeleton-main {
+  flex: 1;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.skel {
+  background: linear-gradient(90deg, #161b22 25%, #21262d 50%, #161b22 75%);
+  background-size: 200% 100%;
+  border-radius: 6px;
+  animation: skel-shimmer 1.4s infinite linear;
+}
+.skel-logo { height: 32px; width: 60%; margin-bottom: 12px; }
+.skel-nav { height: 34px; width: 100%; }
+.skel-title { height: 28px; width: 45%; }
+.skel-line { height: 14px; width: 70%; }
+.skel-block { height: 180px; width: 100%; }
+@keyframes skel-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (max-width: 1023px) {
+  .skeleton-sidebar { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skel { animation: none; }
+}
+
