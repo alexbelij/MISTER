@@ -33,7 +33,7 @@
   function go(tab) {
     if (typeof window.switchTab === 'function') {
       window.switchTab(tab);
-      if (window.UI && window.UI.toast) window.UI.toast('\u2192 ' + capitalise(tab), { level: 'info', duration: 900 });
+      if (window.UI && window.UI.toast) window.UI.toast({ title: '\u2192 ' + capitalise(tab), variant: 'info', duration: 900 });
     }
   }
   function capitalise(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -52,6 +52,7 @@
 
   var HELP_HTML = ''
     + '<div class="kbd-help-inner">'
+    + '  <button class="kbd-help-close" type="button" aria-label="Close" onclick="window.KbdShortcuts && window.KbdShortcuts.hideHelp()">&times;</button>'
     + '  <h3 class="kbd-help-title">Keyboard shortcuts</h3>'
     + '  <table class="kbd-help-table">'
     + '    <tr><td><kbd>?</kbd></td><td>Open this help</td></tr>'

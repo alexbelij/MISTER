@@ -280,12 +280,80 @@
 /* Chat input */
 :root[data-theme="light"] .chat-input-wrap { background: #fff; border-color: var(--border); }
 :root[data-theme="light"] .chat-input { color: var(--text); }
-:root[data-theme="light"] .chat-send-btn { color: var(--green); }
+:root[data-theme="light"] .chat-send-btn { color: #fff; background: var(--green); }
+
+/* Chat page — buttons and badges */
+:root[data-theme="light"] .chat-suggestion-btn { background: rgba(0,0,0,0.03); color: var(--text-muted); border-color: var(--border); }
+:root[data-theme="light"] .chat-suggestion-btn:hover { background: rgba(0,0,0,0.06); color: var(--text); }
+:root[data-theme="light"] .chat-compare-btn { color: var(--text-muted); border-color: var(--border); }
+:root[data-theme="light"] .chat-compare-btn:hover { background: rgba(35,134,54,0.06); }
+:root[data-theme="light"] .voice-btn { color: var(--text-muted); }
+:root[data-theme="light"] .chat-sig-badge { background: rgba(35,134,54,0.08); color: var(--green); }
+:root[data-theme="light"] .chat-sig-badge:hover { background: rgba(35,134,54,0.14); }
+:root[data-theme="light"] .chat-sig-panel { background: #fff; border-color: var(--border); box-shadow: 0 12px 32px rgba(31,35,40,0.12); color: var(--text); }
+:root[data-theme="light"] .data-badge { border-color: rgba(46,160,67,0.25); }
+:root[data-theme="light"] .data-badge--real { color: var(--green); background: rgba(46,160,67,0.08); }
+:root[data-theme="light"] .data-badge--example,
+:root[data-theme="light"] .data-badge--mock,
+:root[data-theme="light"] .data-badge--preview { color: #9a6700; background: rgba(154,103,0,0.08); border-color: rgba(154,103,0,0.25); }
+:root[data-theme="light"] .priority-badge.high { background: rgba(248,81,73,0.08); }
+:root[data-theme="light"] .priority-badge.medium { background: rgba(210,153,34,0.08); }
+:root[data-theme="light"] .priority-badge.low { background: rgba(35,134,54,0.08); }
 
 /* Sidebar footer, club card */
 :root[data-theme="light"] .sidebar-footer { border-top-color: var(--border); }
 :root[data-theme="light"] .club-info { color: var(--text); }
 :root[data-theme="light"] .club-stat { color: var(--text-muted); }
+
+/* Team switcher */
+:root[data-theme="light"] .team-switcher-trigger { background: #fff; border-color: var(--border); }
+:root[data-theme="light"] .team-switcher-trigger:hover { background: rgba(0,0,0,0.03); }
+:root[data-theme="light"] .team-switcher-root.is-open .team-switcher-trigger { background: rgba(0,0,0,0.03); }
+:root[data-theme="light"] .team-switcher-name { color: var(--text); }
+:root[data-theme="light"] .team-switcher-meta { color: var(--text-muted); }
+:root[data-theme="light"] .team-switcher-role { color: var(--text-muted); }
+:root[data-theme="light"] .team-switcher-menu { background: #fff; border-color: var(--border); box-shadow: 0 12px 32px rgba(31,35,40,0.12); }
+:root[data-theme="light"] .team-switcher-item:hover,
+:root[data-theme="light"] .team-switcher-item.is-active { background: rgba(0,0,0,0.04); }
+:root[data-theme="light"] .team-switcher-divider { background: var(--border); }
+:root[data-theme="light"] .team-switcher-action { color: var(--text); }
+:root[data-theme="light"] .team-switcher-action:hover { background: rgba(0,0,0,0.04); color: var(--green); }
+:root[data-theme="light"] .team-switcher-info { color: var(--text); }
+
+/* Hypercore log */
+:root[data-theme="light"] .hypercore-log { background: #fafbfc; border-color: var(--border); }
+:root[data-theme="light"] .hypercore-entry { border-top-color: rgba(0,0,0,0.08); }
+:root[data-theme="light"] .hypercore-entry:hover { background: rgba(0,0,0,0.03); }
+:root[data-theme="light"] .hypercore-entry--head { background: linear-gradient(90deg, rgba(88,166,255,0.08), transparent); border-left-color: rgba(88,166,255,0.5); }
+:root[data-theme="light"] .hypercore-entry-content { color: var(--text); }
+:root[data-theme="light"] .hypercore-entry-head { color: var(--text); }
+:root[data-theme="light"] .hypercore-seq { color: var(--text-muted); }
+:root[data-theme="light"] .hypercore-role { color: var(--text-muted); }
+:root[data-theme="light"] .hypercore-time { color: var(--text-muted); }
+:root[data-theme="light"] .hypercore-type { background: rgba(0,0,0,0.04); color: var(--text-muted); border-color: rgba(0,0,0,0.08); }
+:root[data-theme="light"] .hypercore-type--init { color: #7c3aed; background: rgba(124,58,237,0.06); border-color: rgba(124,58,237,0.25); }
+:root[data-theme="light"] .hypercore-type--ingest { color: #059669; background: rgba(5,150,105,0.06); border-color: rgba(5,150,105,0.25); }
+:root[data-theme="light"] .hypercore-type--decision { color: #2563eb; background: rgba(37,99,235,0.06); border-color: rgba(37,99,235,0.25); }
+:root[data-theme="light"] .hypercore-type--observation { color: #d97706; background: rgba(217,119,6,0.06); border-color: rgba(217,119,6,0.25); }
+:root[data-theme="light"] .hypercore-type--revert { color: #dc2626; background: rgba(220,38,38,0.06); border-color: rgba(220,38,38,0.25); }
+:root[data-theme="light"] .hypercore-entry-meta { color: var(--text-muted); }
+:root[data-theme="light"] .hypercore-meta-item code { color: var(--text); background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); }
+:root[data-theme="light"] .hypercore-entry-marker { color: var(--text-muted); }
+:root[data-theme="light"] .hypercore-dot { background: var(--text-muted); }
+:root[data-theme="light"] .hypercore-entry--head .hypercore-dot { background: var(--blue); }
+:root[data-theme="light"] .hypercore-legend { color: var(--text-muted); }
+
+/* Loss scrubber */
+:root[data-theme="light"] .loss-scrubber { background: linear-gradient(135deg, rgba(88,166,255,0.04), rgba(63,185,80,0.03)); }
+:root[data-theme="light"] .loss-scrubber::before { background: radial-gradient(circle at 20% 30%, rgba(88,166,255,0.04), transparent 50%); }
+:root[data-theme="light"] .loss-scrubber-header { color: var(--text-muted); }
+:root[data-theme="light"] .loss-value { color: var(--text); }
+:root[data-theme="light"] .loss-scrubber-bar { background: rgba(0,0,0,0.06); }
+
+/* Marketplace indent fix */
+:root[data-theme="light"] .marketplace-wallet { padding-left: 20px; }
+
+/* Match history — constrain width (both themes) */
 
 /* UI Dialog (modals) */
 :root[data-theme="light"] .ui-dialog__panel { background: #fff; border-color: var(--border); box-shadow: 0 8px 24px rgba(31,35,40,0.15); }
@@ -651,7 +719,15 @@ input, select, textarea, button,
   max-width: 480px;
   box-shadow: var(--shadow-lg);
   animation: fadeInUp 0.22s ease-out both;
+  position: relative;
 }
+.kbd-help-close {
+  position: absolute; top: 12px; right: 14px;
+  background: transparent; border: none;
+  color: var(--text-muted); font-size: 22px; line-height: 1;
+  cursor: pointer; padding: 2px 6px; border-radius: 4px;
+}
+.kbd-help-close:hover { color: var(--text); background: rgba(128,128,128,0.15); }
 .kbd-help-title {
   font-size: 1.15rem;
   margin: 0 0 16px 0;
@@ -953,7 +1029,7 @@ kbd {
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-top: 4px;
-  margin-left: 32px;
+  margin-left: 0;
 }
 
 /* ===== Cards ===== */
@@ -1054,6 +1130,7 @@ kbd {
   flex-direction: column;
   gap: 8px;
 }
+.match-history-card { max-width: 720px; }
 .match-row {
   display: flex;
   align-items: center;
