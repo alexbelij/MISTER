@@ -206,12 +206,10 @@ body {
   display: none;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: 10px 14px;
   background: var(--sidebar-bg);
   border-bottom: 1px solid var(--border);
   margin: -24px -24px 16px;
-  position: sticky;
-  top: 37px;
   z-index: 30;
 }
 .hamburger {
@@ -987,37 +985,48 @@ body {
   .qr-card, .peers-card, .plan-card { grid-column: span 1; }
 }
 
-/* Drawer sidebar + hamburger below desktop breakpoint (<1024) */
-@media (max-width: 1023px) {
+/* Tablet (768-1023): sidebar becomes drawer with hamburger topbar, no bottom-nav. */
+@media (min-width: 768px) and (max-width: 1023px) {
   .sidebar {
     position: fixed;
-    top: 37px;
+    top: 0;
     left: 0;
     transform: translateX(-100%);
     width: 260px;
-    height: calc(100vh - 37px);
+    height: 100vh;
     box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+    z-index: 60;
   }
-  .sidebar.open {
-    transform: translateX(0);
-  }
+  .sidebar.open { transform: translateX(0); }
   .sidebar-close-mobile { display: block; }
   .mobile-topbar { display: flex; }
   .hamburger { display: block; }
 }
 
-/* Phone-only tweaks */
+/* Phone (<768): sidebar hidden entirely — bottom-nav replaces it. No topbar. */
 @media (max-width: 767px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    width: 260px;
+    height: 100vh;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+    z-index: 60;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-close-mobile { display: block; }
+  .mobile-topbar { display: none; }
+  .hamburger { display: none; }
+  .bottom-nav { display: flex; }
   .main-content {
     padding: 16px;
-    padding-bottom: 70px;
-  }
-  .bottom-nav {
-    display: flex;
+    padding-bottom: 76px;
   }
   .tab-title { font-size: 1.15rem; }
   .tab-subtitle { margin-left: 0; }
-  .chat-container { height: calc(100vh - 220px); }
+  .chat-container { height: calc(100vh - 200px); }
   .season-record { gap: 8px; }
   .record-num { font-size: 1.4rem; }
   .match-stats-mini { display: none; }
