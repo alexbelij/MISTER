@@ -209,8 +209,15 @@ body {
   padding: 10px 14px;
   background: var(--sidebar-bg);
   border-bottom: 1px solid var(--border);
+  /* Pull topbar to the edges of main-content (which has padding:24px)
+     and stick it to the top so it stays visible while scrolling. */
   margin: -24px -24px 16px;
-  z-index: 30;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  /* Slight blur so tab content shows through subtly on scroll. */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 .hamburger {
   background: none;
