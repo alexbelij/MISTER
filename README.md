@@ -95,6 +95,11 @@ The demo is a working slice of the product — chat with the on-device backend, 
 | 25 | 📋 Audit log for compliance | Structured JSON |
 | 26 | 📦 PCM → WAV conversion for TTS playback | Local codec |
 | 27 | 🔄 Full RAG workspace lifecycle | QVAC `rag*` |
+| 28 | 🎭 Role-based UI (head coach / analyst / assistant / player) | Team manifest |
+| 29 | ⚽ Interactive tactical pitch (SVG formation editor) | In-browser SVG |
+| 30 | ⚖️ Before/After compare (vanilla vs fine-tuned side-by-side) | QVAC `completion` |
+| 31 | 🌓 Light & dark themes with system preference detection | CSS custom properties |
+| 32 | 🖥️ One-click launcher (start.sh / start.bat) | Cross-platform |
 
 ## Sponsor stack integration — 3 / 3 stacks, verified in code
 
@@ -216,7 +221,10 @@ npm run ui                   # Desktop UI (Electron)
 npm run mobile               # Mobile UI (Pear app)
 ```
 
-Full CLI (voice briefing, footage analysis, translation, marketplace, GDPR export, …) lives inside `package.json` scripts — run `npm run` to list them.
+Full CLI (voice briefing, footage analysis, translation, marketplace, encryption, GDPR export, …) lives inside `package.json` scripts — run `npm run` to list them.
+
+> [!TIP]
+> **Enable encryption:** Settings → Security, or CLI: `npm run encrypt`. Uses AES-256-GCM + PBKDF2 (100k iterations). Password is held in memory only — never written to disk.
 
 ## Training profiles
 
@@ -237,7 +245,7 @@ We publish evals, checkpoints, training logs and the append-only Pears hypercore
 |---|---|---|
 | Live demo (real QVAC inference) | [alexbelij.github.io/MISTER](https://alexbelij.github.io/MISTER/) | QVAC |
 | 5 Kaggle training runs | [Proof tab](https://alexbelij.github.io/MISTER/#proof) | QVAC |
-| CI tests (37/37) | [![tests](https://github.com/alexbelij/MISTER/actions/workflows/tests.yml/badge.svg)](https://github.com/alexbelij/MISTER/actions/workflows/tests.yml) | All |
+| CI tests (51/51) | [![tests](https://github.com/alexbelij/MISTER/actions/workflows/tests.yml/badge.svg)](https://github.com/alexbelij/MISTER/actions/workflows/tests.yml) | All |
 | WDK wallet creation (real SDK) | [`src/wdk/marketplace.js`](src/wdk/marketplace.js) | WDK |
 | Autobase multi-writer (real) | [`src/pears/collab_model.js`](src/pears/collab_model.js) | Pears |
 | Ed25519 signed P2P adapters | [`src/pears/distribute.js`](src/pears/distribute.js) | Pears+Identity |
@@ -298,7 +306,8 @@ mister/
 │   ├── pears/           # P2P distribution + inference delegation + collab game model
 │   ├── wdk/             # adapter marketplace
 │   ├── model_registry/  # hardware-aware model selection
-│   └── security/        # AES-256, secure delete, audit log
+│   ├── identity/        # Ed25519 keypair, team manifests, role-based access
+│   └── security/        # AES-256-GCM encryption, secure delete, audit log
 ├── mobile/              # Pear app (touch-first UI)
 ├── ui/                  # Desktop UI (Electron)
 ├── data/                # Sample club dataset (FC Metall Nord)
