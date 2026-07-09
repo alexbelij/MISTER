@@ -1,0 +1,228 @@
+{
+  "schema": "mister.hypercore-tail.v1",
+  "generated_at": "2026-07-09T04:09:50.409Z",
+  "source": "scripts/export-log.mjs",
+  "note": "Real cryptographic append-only log. Every hash = sha256(prev_hash_full + canonical(payload)). Every sig = ed25519(hash, author.private_key). Verifiable independently — see verify() in scripts/export-log.mjs.",
+  "algo": {
+    "hash": "sha256",
+    "signature": "ed25519",
+    "canonicalisation": "sorted-keys JSON of {id,type,author,content,timestamp,meta?}"
+  },
+  "head_hash": "da76d1bb9a8a7e97df608a327bd5613a3c2be8357af36510a64a0561ee9be68d",
+  "head_hash_short": "da76d1bb9a8a",
+  "entries_count": 10,
+  "entries": [
+    {
+      "seq": 0,
+      "id": "init_0000",
+      "type": "init",
+      "author": "head_coach",
+      "public_key": "0821afce5b87918473a44655880b690f409dda49e2f2345faab6397d9ac1a4d9",
+      "timestamp": "2026-07-08T09:00:00Z",
+      "content": "FC Metall Nord — game model initialised (4-2-3-1, high press, 6.2s counter-press window)",
+      "meta": {
+        "club": "FC Metall Nord",
+        "formation": "4-2-3-1"
+      },
+      "prev_hash": "000000000000",
+      "prev_hash_full": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "0d8b8d42a582",
+      "hash_full": "0d8b8d42a582eadc446f1111e1e4f682df41a6a0fd8c23fcd7fe38d6cdb32227",
+      "sig": "fc0233f1aa4c",
+      "sig_full": "fc0233f1aa4ce45db74d4830030f093fe577c71d009ef9756015dd13c8cfb97c752ed2f61f83a9acda27a88ee896669c0db7cb917ac21abd7ab63ff71b5dd102"
+    },
+    {
+      "seq": 1,
+      "id": "ingest_0001",
+      "type": "ingest",
+      "author": "analyst",
+      "public_key": "270efa8e42898fa9c47918dca8a47846218c786141b22e1c635e6c9dabcdd59a",
+      "timestamp": "2026-07-08T09:12:00Z",
+      "content": "Match ingested: Metall Nord 2 : 1 SV Hafen (Regionalliga, 2026-07-05)",
+      "meta": {
+        "match_id": "metall_hafen_2026_07_05",
+        "events": 137,
+        "xg_for": 1.84,
+        "xg_against": 0.71
+      },
+      "prev_hash": "0d8b8d42a582",
+      "prev_hash_full": "0d8b8d42a582eadc446f1111e1e4f682df41a6a0fd8c23fcd7fe38d6cdb32227",
+      "hash": "22b2433d188b",
+      "hash_full": "22b2433d188bc45a0b118ab9078985a0ea1c04dbd8423c3e52c259e0a6bef462",
+      "sig": "6af2d2a4bb94",
+      "sig_full": "6af2d2a4bb94f82890d5bc08c97e53d95b77c3b7b9c124b747df190edda86177f38f1dcc306798aedb971ac551d76c0393b5d495b4cd9422001c75b6d84f2d03"
+    },
+    {
+      "seq": 2,
+      "id": "ingest_0002",
+      "type": "ingest",
+      "author": "analyst",
+      "public_key": "270efa8e42898fa9c47918dca8a47846218c786141b22e1c635e6c9dabcdd59a",
+      "timestamp": "2026-07-08T09:18:00Z",
+      "content": "Match ingested: Metall Nord 0 : 2 Kiel Reserve (friendly, 2026-06-28)",
+      "meta": {
+        "match_id": "metall_kiel_2026_06_28",
+        "events": 121,
+        "xg_for": 0.42,
+        "xg_against": 1.61
+      },
+      "prev_hash": "22b2433d188b",
+      "prev_hash_full": "22b2433d188bc45a0b118ab9078985a0ea1c04dbd8423c3e52c259e0a6bef462",
+      "hash": "14bd2419ae7f",
+      "hash_full": "14bd2419ae7f928be84ea686020d4e694bcaf3955b9ee486644423d5098db2a1",
+      "sig": "ee16c31eb2d2",
+      "sig_full": "ee16c31eb2d2f3fde65861844fd5b544f470f242cb48ab044266397956801e173811d41b0116764beac9cb20846c7d6c191ac9688bbb525e911a7f438a94370f"
+    },
+    {
+      "seq": 3,
+      "id": "ingest_0003",
+      "type": "ingest",
+      "author": "analyst",
+      "public_key": "270efa8e42898fa9c47918dca8a47846218c786141b22e1c635e6c9dabcdd59a",
+      "timestamp": "2026-07-08T09:25:00Z",
+      "content": "Match ingested: Metall Nord 3 : 0 Rostock B (Regionalliga, 2026-06-21)",
+      "meta": {
+        "match_id": "metall_rostock_2026_06_21",
+        "events": 149,
+        "xg_for": 2.71,
+        "xg_against": 0.58
+      },
+      "prev_hash": "14bd2419ae7f",
+      "prev_hash_full": "14bd2419ae7f928be84ea686020d4e694bcaf3955b9ee486644423d5098db2a1",
+      "hash": "1062b0fe0541",
+      "hash_full": "1062b0fe0541c5f76f10ba7fcda7b988d19f5ac4b3fb0fe69358b5175801cd78",
+      "sig": "26db746482e1",
+      "sig_full": "26db746482e16b36d11a12143a470aefc23a988ff6e097e2c29d2b4cb0f97ef896a18848f10f8c6fd7d7b785a123de189a020007073d9a9adaf40021d3427b06"
+    },
+    {
+      "seq": 4,
+      "id": "observation_0004",
+      "type": "observation",
+      "author": "head_coach",
+      "public_key": "0821afce5b87918473a44655880b690f409dda49e2f2345faab6397d9ac1a4d9",
+      "timestamp": "2026-07-08T10:04:00Z",
+      "content": "Under high press Mahler consistently loses the ball on his weak foot within 4s — flag for CB pairing rotation.",
+      "meta": {
+        "player": "Mahler",
+        "tag": "weakness",
+        "priority": "high"
+      },
+      "prev_hash": "1062b0fe0541",
+      "prev_hash_full": "1062b0fe0541c5f76f10ba7fcda7b988d19f5ac4b3fb0fe69358b5175801cd78",
+      "hash": "b37633835b90",
+      "hash_full": "b37633835b902464568d32c19e7c6a60734eddc8f837d754e4df87e42769fcff",
+      "sig": "28aef6c34c56",
+      "sig_full": "28aef6c34c563917890264036d28d2b523abc2e3ac1e0b1c21d348c364d924aef9364fe7ac7304f620968146379455be7cf8c97371362bf664ad736d3246090f"
+    },
+    {
+      "seq": 5,
+      "id": "observation_0005",
+      "type": "observation",
+      "author": "assistant_coach",
+      "public_key": "dae91f2958d73315768c9aaf41b3a29248d0140a2208517dfcd79727240a0b48",
+      "timestamp": "2026-07-08T10:19:00Z",
+      "content": "Right-wing overload with Voss + Berger drawing double marker → free space for Klein cutback (3 clear looks vs Rostock).",
+      "meta": {
+        "pattern": "wing_overload_cutback",
+        "side": "right"
+      },
+      "prev_hash": "b37633835b90",
+      "prev_hash_full": "b37633835b902464568d32c19e7c6a60734eddc8f837d754e4df87e42769fcff",
+      "hash": "c058f5974801",
+      "hash_full": "c058f5974801c8d355cef900fbbc4e39386fae2d536fa47d64327648bfc9da5e",
+      "sig": "1e9c96f18cb9",
+      "sig_full": "1e9c96f18cb9f7fd0164cc2cd29e1665391a63d855849b9cbf22a65a0384d8d4f01bb576577fd68b3e62b909c06d7eb9aa628318c76e5f69e2363a7d51e0010c"
+    },
+    {
+      "seq": 6,
+      "id": "decision_0006",
+      "type": "decision",
+      "author": "oracle_worker",
+      "public_key": "57b5e195a427601a7a1a2b97d06dd4b73083ae81f5fbd952c13cd367b38cc24e",
+      "timestamp": "2026-07-08T10:44:00Z",
+      "content": "Oracle decision: attest player readiness score Mahler = 62/100 (recent form 0.71, injury risk 0.18). Attestation TTL 72h.",
+      "meta": {
+        "subject": "player:Mahler",
+        "score": 62,
+        "ttl_hours": 72,
+        "inputs": [
+          "metall_hafen_2026_07_05",
+          "metall_rostock_2026_06_21"
+        ],
+        "on_chain": "casper:testnet:pending"
+      },
+      "prev_hash": "c058f5974801",
+      "prev_hash_full": "c058f5974801c8d355cef900fbbc4e39386fae2d536fa47d64327648bfc9da5e",
+      "hash": "60b5740f41e6",
+      "hash_full": "60b5740f41e69168b2497102cdefa3498496cc8b3dd1b52fcd921d29d41385e7",
+      "sig": "0d64feab68a0",
+      "sig_full": "0d64feab68a05e3c876980dc944a0fe8fb49e99602a1b3c193bbd04ecbddc8cfde4fecd9d3575e2874278101f2314204ff5f79f82961f87460f1b831746e8005"
+    },
+    {
+      "seq": 7,
+      "id": "decision_0007",
+      "type": "decision",
+      "author": "oracle_worker",
+      "public_key": "57b5e195a427601a7a1a2b97d06dd4b73083ae81f5fbd952c13cd367b38cc24e",
+      "timestamp": "2026-07-08T11:02:00Z",
+      "content": "Oracle decision: recommend starting XI vs Wolfsburg B — swap Mahler for Reiter, keep Voss/Berger overload.",
+      "meta": {
+        "subject": "lineup:wolfsburg_b_2026_07_12",
+        "changes": [
+          {
+            "out": "Mahler",
+            "in": "Reiter",
+            "reason": "ball retention under press"
+          }
+        ],
+        "confidence": 0.78
+      },
+      "prev_hash": "60b5740f41e6",
+      "prev_hash_full": "60b5740f41e69168b2497102cdefa3498496cc8b3dd1b52fcd921d29d41385e7",
+      "hash": "d81579d378b8",
+      "hash_full": "d81579d378b807b2014ffd8297a06446f407c1dbbd0860e23825f4aea984c38f",
+      "sig": "8f0141530e34",
+      "sig_full": "8f0141530e3459d5cc8ecc0cf9a19a8b289e409df09722a512a3e30bad047b7500aa747063dfa1c9e656d00cdf728a16ca496301b23d4139808cb515d2096005"
+    },
+    {
+      "seq": 8,
+      "id": "decision_0008",
+      "type": "decision",
+      "author": "oracle_worker",
+      "public_key": "57b5e195a427601a7a1a2b97d06dd4b73083ae81f5fbd952c13cd367b38cc24e",
+      "timestamp": "2026-07-08T11:18:00Z",
+      "content": "Oracle decision: opponent SV Hafen pressing trigger identified — CB square pass at own third (n=9 in 3 matches).",
+      "meta": {
+        "subject": "opponent:sv_hafen",
+        "pattern": "press_trigger:cb_square_own_third",
+        "sample": 9,
+        "recommendation": "avoid_pattern"
+      },
+      "prev_hash": "d81579d378b8",
+      "prev_hash_full": "d81579d378b807b2014ffd8297a06446f407c1dbbd0860e23825f4aea984c38f",
+      "hash": "8d3e9304c433",
+      "hash_full": "8d3e9304c4333c48b1b3ffc253031822bafd0c807eea1ec9ea448c0bdff16fec",
+      "sig": "54f91bfda4ce",
+      "sig_full": "54f91bfda4ce31507efe09201219be0a8fb52c2f2614aeb208909f1f82ed7bbfa61c05a009dc7049c8c1befb1920dd1cafa3e44f86932b513f213e175930530a"
+    },
+    {
+      "seq": 9,
+      "id": "revert_0009",
+      "type": "revert",
+      "author": "head_coach",
+      "public_key": "0821afce5b87918473a44655880b690f409dda49e2f2345faab6397d9ac1a4d9",
+      "timestamp": "2026-07-08T11:41:00Z",
+      "content": "Revert: decision on Mahler swap — new medical data changes the picture. Chain remains, entry supersedes seq 7.",
+      "meta": {
+        "reverts_seq": 7,
+        "reason": "new_medical_report"
+      },
+      "prev_hash": "8d3e9304c433",
+      "prev_hash_full": "8d3e9304c4333c48b1b3ffc253031822bafd0c807eea1ec9ea448c0bdff16fec",
+      "hash": "da76d1bb9a8a",
+      "hash_full": "da76d1bb9a8a7e97df608a327bd5613a3c2be8357af36510a64a0561ee9be68d",
+      "sig": "a4853acf8d9c",
+      "sig_full": "a4853acf8d9c3d477a112a4bc4f34cfc785de77f63ea3c2166d637fe795360d33715ae12363278468eaf7393f62209d317fc3b37da6c6cc35a7b62beeb3e400d"
+    }
+  ]
+}
