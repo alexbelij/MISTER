@@ -413,15 +413,61 @@ function initChat() {
     throw new Error('Backend did not respond in time');
   };
 
+  // ── Streaming chat (SSE) — show tokens as they arrive ──
+  const askBackendStream = async (message, onToken) => {
+    const endpoint = QVAC_BRIDGE_URL.replace(/\/$/, '') + '/chat/stream';
+    try {
+      const res = await fetchWithTimeout(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      }, 60000);
+      if (!res.ok || !res.body) throw new Error(`Stream unavailable (${res.status})`);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let full = '';
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        full += chunk;
+        onToken(chunk, full);
+      }
+      return full;
+    } catch {
+      // Fallback to non-streaming
+      return askBackend(message);
+    }
+  };
+
   const sendToBackend = async (text) => {
     addMessage(text, true);
-    addTyping();
+
+    // Try streaming first — show tokens live
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg assistant';
+    const avatar = document.createElement('div');
+    avatar.className = 'chat-avatar';
+    avatar.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>';
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble';
+    bubble.innerHTML = '<span class="streaming-cursor">▊</span>';
+    msg.appendChild(avatar);
+    msg.appendChild(bubble);
+    messagesEl.appendChild(msg);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
     try {
-      const reply = await askBackend(text);
-      removeTyping();
+      const reply = await askBackendStream(text, (chunk, full) => {
+        const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        bubble.innerHTML = escapeHtml(full) + '<span class="streaming-cursor">▊</span>';
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      });
+      // Final render with formatting
+      msg.remove();
       renderReply(reply);
     } catch (e) {
-      removeTyping();
+      msg.remove();
       addMessage(
         `⚠️ Could not reach the live QVAC backend (${e.message || e}). It may be waking up from sleep — ` +
         `please wait ~30-60s and try again, or check the Space status directly: ${QVAC_BRIDGE_URL}`,
