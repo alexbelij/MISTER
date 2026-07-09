@@ -53,9 +53,9 @@
   "dependencies": {
     "@qvac/sdk": "0.9.0",
     "@tetherto/wdk": "1.0.0-beta.13",
-    "hyperswarm": "4.9.2",
+    "hyperswarm": "4.17.0",
     "hyperblobs": "2.4.2",
-    "corestore": "6.19.3",
+    "corestore": "6.18.4",
     "autobase": "6.2.1",
     "qrcode": "^1.5.4",
     "@tetherto/wdk-wallet-evm": "^1.0.0-beta.15",
