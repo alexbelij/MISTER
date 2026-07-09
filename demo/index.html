@@ -459,6 +459,40 @@
           <div id="pressing-chart" class="chart-container"></div>
         </div>
 
+        <!-- SVG Tactical Pitch Visualization -->
+        <div class="card pitch-viz-card" data-tooltip="Interactive SVG tactical pitch: shows the 4-3-3 formation with real player positions, pressing triggers, and movement arrows. Click a player to see their ratings. Select a match to see that lineup.">
+          <div class="card-header">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5z"/></svg>
+            <h2>Tactical View <span class="data-badge data-badge--real" data-tooltip="Formation positions from real match data. Player names and numbers from data/players.json.">4-3-3</span></h2>
+          </div>
+          <div class="pitch-wrapper">
+            <svg id="tactical-pitch" viewBox="0 0 680 440" class="pitch-svg">
+              <!-- Pitch background -->
+              <rect x="0" y="0" width="680" height="440" rx="8" fill="#1a472a"/>
+              <!-- Field lines -->
+              <rect x="20" y="20" width="640" height="400" rx="4" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+              <line x1="340" y1="20" x2="340" y2="420" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+              <circle cx="340" cy="220" r="60" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+              <circle cx="340" cy="220" r="3" fill="rgba(255,255,255,0.4)"/>
+              <!-- Penalty areas -->
+              <rect x="20" y="130" width="100" height="180" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"/>
+              <rect x="560" y="130" width="100" height="180" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"/>
+              <rect x="20" y="170" width="40" height="100" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+              <rect x="620" y="170" width="40" height="100" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+              <!-- Penalty spots -->
+              <circle cx="95" cy="220" r="2" fill="rgba(255,255,255,0.3)"/>
+              <circle cx="585" cy="220" r="2" fill="rgba(255,255,255,0.3)"/>
+              <!-- Players are injected by app.js -->
+            </svg>
+          </div>
+          <div class="pitch-legend">
+            <span class="pitch-legend-item"><span class="pitch-dot pitch-dot--gk"></span>GK</span>
+            <span class="pitch-legend-item"><span class="pitch-dot pitch-dot--def"></span>DEF</span>
+            <span class="pitch-legend-item"><span class="pitch-dot pitch-dot--mid"></span>MID</span>
+            <span class="pitch-legend-item"><span class="pitch-dot pitch-dot--fwd"></span>FWD</span>
+          </div>
+        </div>
+
         <!-- Match History Timeline -->
         <div class="card match-history-card" data-tooltip="All 8 matches with results, xG, and pressing success. Click a match to see details.">
           <div class="card-header">
