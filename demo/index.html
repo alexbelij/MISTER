@@ -69,12 +69,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MISTER">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="preload" href="styles.css?v=23" as="style">
+<link rel="preload" href="styles.css?v=24" as="style">
 <link rel="preload" href="app.js" as="script">
 <link rel="preload" href="vendor-qrcode.js" as="script">
 <link rel="preconnect" href="https://alexbelij-mister-qvac-inference.hf.space" crossorigin>
 <link rel="dns-prefetch" href="https://alexbelij-mister-qvac-inference.hf.space">
-<link rel="stylesheet" href="styles.css?v=23">
+<link rel="stylesheet" href="styles.css?v=24">
 <script>document.documentElement.classList.add('js');</script>
 <script src="vendor-qrcode.js" defer></script>
 </head>
@@ -213,7 +213,7 @@
         <div class="hero-inner">
           <div class="hero-eyebrow">
             <span class="hero-eyebrow-dot"></span>
-            Pears × QVAC hackathon submission
+            Private tactical AI · runs on your device
           </div>
           <h1 class="hero-title">
             An assistant coach that runs on your laptop.
@@ -264,7 +264,7 @@
         <h1 class="tab-title">
           <svg viewBox="0 0 24 24" width="24" height="24" class="title-icon"><path fill="currentColor" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
           Tactical Chat
-          <span class="data-badge data-badge--real" title="Real hosted QVAC backend (Qwen3-1.7B-Q4) on a Hugging Face Space. Every response is live inference — not keyword-matched.">real</span>
+          <span class="data-badge data-badge--real" data-tooltip="Real hosted QVAC backend (Qwen3-1.7B-Q4) on a Hugging Face Space. Every response is live inference — not keyword-matched.">real</span>
         </h1>
         <div class="tab-subtitle" data-tooltip="This browser demo calls a real hosted QVAC inference backend (Qwen3-1.7B-Q4) over HTTP. Same model config as the Electron app, but served from a free Hugging Face Space instead of running fully on-device.">Live QVAC backend (hosted) · real Electron app runs the same model fully on-device</div>
       </div>
@@ -323,7 +323,7 @@
         <h1 class="tab-title">
           <svg viewBox="0 0 24 24" width="24" height="24" class="title-icon"><path fill="currentColor" d="M3 13h2v8H3v-8zm4-6h2v14H7V7zm4 3h2v11h-2V10zm4-7h2v18h-2V3zm4 4h2v14h-2V7z"/></svg>
           Season Analytics
-          <span class="data-badge data-badge--real" title="All 8 matches, 16 players and 3 opponents are real fixture data from data/— stored in data/opponents/results.json, data/players.json, data/opponents/opponents.json.">real</span>
+          <span class="data-badge data-badge--real" data-tooltip="All 8 matches, 16 players and 3 opponents are real fixture data from data/— stored in data/opponents/results.json, data/players.json, data/opponents/opponents.json.">real</span>
         </h1>
         <div class="tab-subtitle" data-tooltip="All metrics computed locally from WDK (Web Data Kit) event exports. No cloud processing.">8 matches · 16 players · computed on-device</div>
       </div>
@@ -333,7 +333,7 @@
         <div class="card season-summary-card" data-tooltip="Season aggregate: 5 wins, 2 draws, 1 loss. Goal difference +8. Trends computed from per-match WDK data.">
           <div class="card-header">
             <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
-            <h2>Season Summary <span class="data-badge data-badge--real" title="Aggregated from data/opponents/results.json — 8 real match records with scores, xG, pressing success, transition speed.">real</span></h2>
+            <h2>Season Summary <span class="data-badge data-badge--real" data-tooltip="Aggregated from data/opponents/results.json — 8 real match records with scores, xG, pressing success, transition speed.">real</span></h2>
           </div>
           <div class="season-record">
             <div class="record-item win" data-tooltip="5 wins from 8 matches">
@@ -375,7 +375,7 @@
         <div class="card trends-chart-card" data-tooltip="Pressing success rate across all 8 matches. SVG line chart rendered locally.">
           <div class="card-header">
             <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
-            <h2>Pressing Success Trend <span class="data-badge data-badge--real" title="Rendered from data/opponents/results.json — pressing_success values per match.">real</span></h2>
+            <h2>Pressing Success Trend <span class="data-badge data-badge--real" data-tooltip="Rendered from data/opponents/results.json — pressing_success values per match.">real</span></h2>
           </div>
           <div id="pressing-chart" class="chart-container"></div>
         </div>
@@ -384,7 +384,7 @@
         <div class="card match-history-card" data-tooltip="All 8 matches with results, xG, and pressing success. Click a match to see details.">
           <div class="card-header">
             <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-            <h2>Match History <span class="data-badge data-badge--real" title="Backed by data/opponents/results.json — 8 real match records.">real</span></h2>
+            <h2>Match History <span class="data-badge data-badge--real" data-tooltip="Backed by data/opponents/results.json — 8 real match records.">real</span></h2>
           </div>
           <div id="match-timeline" class="match-timeline"></div>
         </div>
@@ -393,7 +393,7 @@
         <div class="card player-cards-card" data-tooltip="Squad overview — 16 players with position, average rating and top-2 strengths. Click a card for the full 8-criteria breakdown.">
           <div class="card-header">
             <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-            <h2>Squad <span class="data-badge data-badge--real" title="16 real players from data/players.json — FC Metall Nord roster with positions, numbers and tactical notes.">real</span></h2>
+            <h2>Squad <span class="data-badge data-badge--real" data-tooltip="16 real players from data/players.json — FC Metall Nord roster with positions, numbers and tactical notes.">real</span></h2>
             <div class="player-filter" role="tablist" aria-label="Filter by position">
               <button class="filter-chip active" data-pos="all" role="tab" aria-selected="true">All</button>
               <button class="filter-chip" data-pos="GK" role="tab" aria-selected="false">GK</button>
@@ -409,7 +409,7 @@
         <div class="card player-ratings-card" data-tooltip="Per-player average ratings across 8 tactical criteria. Color-coded: green ≥7.0, yellow 5.0-6.9, red <5.0.">
           <div class="card-header">
             <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-            <h2>Player Ratings <span class="data-badge data-badge--example" title="Rating values per criteria are illustrative — real ratings will be computed from LoRA output once eval harness completes. Player list and positions are real (data/players.json).">example</span></h2>
+            <h2>Player Ratings <span class="data-badge data-badge--example" data-tooltip="Rating values per criteria are illustrative — real ratings will be computed from LoRA output once eval harness completes. Player list and positions are real (data/players.json).">example</span></h2>
           </div>
           <div class="table-wrapper">
             <table id="player-ratings-table" class="data-table"></table>
@@ -420,7 +420,7 @@
         <div class="card opponent-card" data-tooltip="Opponent scouting records with formation and identified weaknesses. Used by the LoRA model for game plan generation.">
           <div class="card-header">
             <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/></svg>
-            <h2>Opponent Records <span class="data-badge data-badge--real" title="Backed by data/opponents/opponents.json — 3 real opponent scouting records with formation, strengths, weaknesses and key players.">real</span></h2>
+            <h2>Opponent Records <span class="data-badge data-badge--real" data-tooltip="Backed by data/opponents/opponents.json — 3 real opponent scouting records with formation, strengths, weaknesses and key players.">real</span></h2>
           </div>
           <div id="opponent-records" class="opponent-records"></div>
         </div>
@@ -433,7 +433,7 @@
         <h1 class="tab-title">
           <svg viewBox="0 0 24 24" width="24" height="24" class="title-icon"><path fill="currentColor" d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>
           Tactical Suggestions
-          <span class="data-badge data-badge--example" title="Handcrafted illustrative suggestions derived from real match patterns. LoRA-generated suggestions arrive once the eval harness completes.">example</span>
+          <span class="data-badge data-badge--example" data-tooltip="Handcrafted illustrative suggestions derived from real match patterns. LoRA-generated suggestions arrive once the eval harness completes.">example</span>
         </h1>
         <div class="tab-subtitle" data-tooltip="Auto-generated by the LoRA model from pattern analysis of 8 matches. Each suggestion includes evidence from match data.">3 recommendations · auto-generated</div>
       </div>
@@ -446,7 +446,7 @@
         <h1 class="tab-title">
           <svg viewBox="0 0 24 24" width="24" height="24" class="title-icon"><path fill="currentColor" d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/></svg>
           Match Reports
-          <span class="data-badge data-badge--real" title="Report content is generated from data/opponents/results.json — same real fixture data feeding Season Analytics.">real</span>
+          <span class="data-badge data-badge--real" data-tooltip="Report content is generated from data/opponents/results.json — same real fixture data feeding Season Analytics.">real</span>
         </h1>
         <div class="tab-subtitle" data-tooltip="Per-match tactical reports generated on-device. Select a match to view full analysis.">8 match reports available</div>
       </div>
@@ -470,14 +470,14 @@
         <h1 class="tab-title">
           <svg viewBox="0 0 24 24" width="24" height="24" class="title-icon"><path fill="currentColor" d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
           Distribute Game Plan
-          <span class="data-badge data-badge--preview" title="QR code and topic key are real (kazuhikoarase/qrcode-generator + Pears format). Connected peers list is illustrative until you actually spin up a Pears swarm.">preview</span>
+          <span class="data-badge data-badge--preview" data-tooltip="QR code and topic key are real (kazuhikoarase/qrcode-generator + Pears format). Connected peers list is illustrative until you actually spin up a Pears swarm.">preview</span>
         </h1>
         <div class="tab-subtitle" data-tooltip="Game plans are distributed peer-to-peer via Pears. No cloud server — coaches sync directly.">P2P sync via Pears · no cloud required</div>
       </div>
 
       <div class="distribute-container">
         <div class="distribute-card qr-card" data-tooltip="Scan this QR code with the MISTER mobile app to sync this game plan over Pears P2P.">
-          <h3>Scan to Sync <span class="data-badge data-badge--real" title="QR code generated live via kazuhikoarase/qrcode-generator with a real Pears topic key.">real</span></h3>
+          <h3>Scan to Sync <span class="data-badge data-badge--real" data-tooltip="QR code generated live via kazuhikoarase/qrcode-generator with a real Pears topic key.">real</span></h3>
           <div class="qr-wrapper" data-tooltip="Scan with mobile app — opens Pears P2P topic and downloads the game plan.">
             <div id="qr-code" class="qr-code"></div>
           </div>
@@ -490,7 +490,7 @@
         </div>
 
         <div class="distribute-card peers-card" data-tooltip="Connected peers receiving this game plan via Pears P2P sync.">
-          <h3>Connected Peers <span class="data-badge data-badge--preview" title="Illustrative peer list. Real Hyperswarm peer discovery runs in the Electron app.">preview</span></h3>
+          <h3>Connected Peers <span class="data-badge data-badge--preview" data-tooltip="Illustrative peer list. Real Hyperswarm peer discovery runs in the Electron app.">preview</span></h3>
           <div id="peers-list" class="peers-list"></div>
           <div class="distribute-actions">
             <button id="regenerate-key" class="btn-secondary" data-tooltip="Generate a new Pears P2P topic key. Previous key becomes invalid.">
@@ -505,7 +505,7 @@
         </div>
 
         <div class="distribute-card plan-card" data-tooltip="The game plan being distributed. Generated by the on-device LoRA model.">
-          <h3>Game Plan: vs SV Hafen United <span class="data-badge data-badge--real" title="Plan derived from the Hafen United opponent record (data/opponents/opponents.json) and the m01/m04/m07 match results.">real</span></h3>
+          <h3>Game Plan: vs SV Hafen United <span class="data-badge data-badge--real" data-tooltip="Plan derived from the Hafen United opponent record (data/opponents/opponents.json) and the m01/m04/m07 match results.">real</span></h3>
           <div class="plan-details">
             <div class="plan-item" data-tooltip="Formation: 4-3-3 with attacking fullbacks.">
               <span class="plan-label">Formation</span><span class="plan-value">4-3-3</span>
@@ -688,7 +688,7 @@
 <!-- Tooltip -->
 <div id="tooltip" class="tooltip"></div>
 
-<script src="app.js?v=23"></script>
+<script src="app.js?v=24"></script>
 <script>
 // Register PWA service worker (progressive enhancement — silent-fail on unsupported browsers)
 if ('serviceWorker' in navigator) {
