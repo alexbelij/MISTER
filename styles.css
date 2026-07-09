@@ -118,6 +118,31 @@
   background: linear-gradient(180deg, #f0f3f6 0%, var(--bg) 100%);
 }
 :root[data-theme="light"] .hero-dismiss:hover { background: rgba(0,0,0,0.06); }
+:root[data-theme="light"] .hero-eyebrow {
+  background: rgba(255,255,255,0.7);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+:root[data-theme="light"] .hero-chip {
+  background: rgba(255,255,255,0.75);
+  border-color: var(--border);
+  color: var(--text);
+}
+:root[data-theme="light"] .hero-chip svg { color: var(--green); }
+:root[data-theme="light"] .hero-cta--primary {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+:root[data-theme="light"] .hero-cta--ghost {
+  background: rgba(255,255,255,0.7);
+  color: var(--text);
+  border-color: var(--border);
+}
+:root[data-theme="light"] .hero-cta--ghost:hover {
+  background: rgba(0,0,0,0.04);
+  border-color: #9ca3af;
+}
 
 /* Topbar breadcrumb */
 :root[data-theme="light"] .topbar-breadcrumb {
