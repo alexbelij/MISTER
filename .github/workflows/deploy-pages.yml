@@ -1,0 +1,71 @@
+name: Deploy demo to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'demo/**'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Deploy demo/ to gh-pages
+        run: |
+          set -euo pipefail
+
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          SHA_FULL=$(git rev-parse HEAD)
+          COMMIT_MSG=$(git log -1 --pretty=%s)
+
+          # Stage demo/ contents to a temp dir (avoid recursion)
+          STAGE=$(mktemp -d)
+          cp -r demo/. "$STAGE/"
+
+          # Fetch or init gh-pages
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git fetch origin gh-pages:gh-pages
+            git checkout gh-pages
+            # Wipe tracked files (preserve .git)
+            git rm -rf . >/dev/null 2>&1 || true
+          else
+            git checkout --orphan gh-pages
+            git rm -rf . >/dev/null 2>&1 || true
+          fi
+
+          # Copy staged files into worktree root
+          cp -r "$STAGE"/. .
+
+          # Prevent Jekyll processing (keeps files starting with _ , etc.)
+          touch .nojekyll
+
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to deploy."
+            exit 0
+          fi
+
+          git commit \
+            -m "deploy: demo/ from main@${SHA_SHORT}" \
+            -m "Source commit: ${SHA_FULL}" \
+            -m "Message: ${COMMIT_MSG}"
+
+          git push origin gh-pages
