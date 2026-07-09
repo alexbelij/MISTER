@@ -1,7 +1,7 @@
 /* MISTER service worker — offline shell + network-first data
  * bump CACHE_VERSION on every deploy to invalidate old caches
  */
-const CACHE_VERSION = 'mister-v24';
+const CACHE_VERSION = 'mister-v25';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
@@ -12,6 +12,7 @@ const SHELL_ASSETS = [
   './styles.css',
   './app.js',
   './vendor-qrcode.js',
+  './ui-notify.js',
   './favicon.svg',
   './manifest.webmanifest',
   './assets/icon-192.png',
@@ -108,5 +109,6 @@ async function networkFirst(req, cacheName) {
 
 // ---- allow the page to trigger an immediate update ----------------------
 self.addEventListener('message', (event) => {
-  if (event.data === 'SKIP_WAITING') self.skipWaiting();
+  const data = event.data;
+  if (data === 'SKIP_WAITING' || (data && data.type === 'SKIP_WAITING')) self.skipWaiting();
 });

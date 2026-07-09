@@ -2107,3 +2107,254 @@ html.js .initial-skeleton { display: flex; }
 
 /* Hidden state (persisted across sessions) */
 .hero.hero--hidden { display: none; }
+
+/* ==========================================================================
+   UI Notifications — toasts + custom modals (ui-notify.js)
+   ========================================================================== */
+
+/* --- Toast container (bottom-right, stacked) --- */
+.ui-toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+  max-width: 380px;
+  width: calc(100% - 40px);
+}
+.ui-toast-container > * { pointer-events: auto; }
+
+@media (max-width: 640px) {
+  .ui-toast-container {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    max-width: none;
+    width: auto;
+  }
+}
+
+/* --- Individual toast --- */
+.ui-toast {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: start;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2);
+  color: #e6edf3;
+  font-size: 13px;
+  line-height: 1.4;
+  animation: ui-toast-in 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+.ui-toast::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: currentColor;
+  opacity: 0.9;
+}
+.ui-toast--info    { color: #58a6ff; }
+.ui-toast--success { color: #3fb950; }
+.ui-toast--warn    { color: #d29922; }
+.ui-toast--error   { color: #f85149; }
+
+.ui-toast__icon {
+  color: currentColor;
+  display: flex;
+  align-items: center;
+  padding-top: 1px;
+}
+.ui-toast__body {
+  color: #e6edf3;
+  min-width: 0;
+}
+.ui-toast__title {
+  font-weight: 600;
+  color: #e6edf3;
+  margin-bottom: 2px;
+}
+.ui-toast__msg {
+  color: #8b949e;
+  font-size: 12.5px;
+}
+.ui-toast__actions {
+  grid-column: 2 / 4;
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.ui-toast__action {
+  background: transparent;
+  color: currentColor;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.ui-toast__action:hover { background: currentColor; color: #0d1117; }
+.ui-toast__action--primary {
+  background: currentColor;
+  color: #0d1117;
+}
+.ui-toast__action--primary:hover { filter: brightness(1.15); }
+
+.ui-toast__close {
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  align-self: start;
+  transition: color 0.15s;
+}
+.ui-toast__close:hover { color: #e6edf3; }
+
+.ui-toast--leaving {
+  animation: ui-toast-out 0.24s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes ui-toast-in {
+  from { opacity: 0; transform: translateX(20px) scale(0.96); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes ui-toast-out {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to   { opacity: 0; transform: translateX(20px) scale(0.96); }
+}
+
+/* --- Dialog (custom alert/confirm) --- */
+.ui-dialog-host {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ui-dialog-in 0.18s ease-out;
+}
+.ui-dialog-host--leaving { animation: ui-dialog-out 0.18s ease-in forwards; }
+.ui-dialog-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(1, 4, 9, 0.7);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.ui-dialog {
+  position: relative;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  min-width: 320px;
+  max-width: 500px;
+  width: calc(100% - 32px);
+  max-height: calc(100vh - 40px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: ui-dialog-panel-in 0.22s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.ui-dialog__head {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #21262d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.ui-dialog__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e6edf3;
+}
+.ui-dialog__close {
+  background: transparent;
+  border: none;
+  color: #8b949e;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.ui-dialog__close:hover { color: #e6edf3; }
+
+.ui-dialog__body {
+  padding: 16px 20px;
+  color: #c9d1d9;
+  font-size: 14px;
+  line-height: 1.55;
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+.ui-dialog__body p { margin: 0 0 10px; }
+.ui-dialog__body p:last-child { margin-bottom: 0; }
+
+.ui-dialog__footer {
+  padding: 12px 20px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  border-top: 1px solid #21262d;
+  flex-wrap: wrap;
+}
+.ui-dialog__btn {
+  background: #21262d;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.ui-dialog__btn:hover { background: #30363d; border-color: #484f58; }
+.ui-dialog__btn--primary {
+  background: #238636;
+  color: #ffffff;
+  border-color: #238636;
+}
+.ui-dialog__btn--primary:hover { background: #2ea043; border-color: #2ea043; }
+.ui-dialog__btn--danger {
+  background: #da3633;
+  color: #ffffff;
+  border-color: #da3633;
+}
+.ui-dialog__btn--danger:hover { background: #f85149; border-color: #f85149; }
+
+@keyframes ui-dialog-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes ui-dialog-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes ui-dialog-panel-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Reduced motion — kill all UI animations */
+@media (prefers-reduced-motion: reduce) {
+  .ui-toast, .ui-toast--leaving,
+  .ui-dialog-host, .ui-dialog-host--leaving, .ui-dialog {
+    animation: none !important;
+  }
+}
