@@ -1811,10 +1811,70 @@ function init() {
   safe('hypercore-log', initHypercoreLog);
   safe('kaggle-stats', initKaggleStats);
   safe('marketplace', initMarketplace);
+  safe('ocr-notes', initOCRNotes);
+  safe('multi-agent-routing', initMultiAgentRouting);
   safe('landing-hero', initLandingHero);
   safe('routing', initRouting);
   // Skeleton done — fade it out on next paint so the real UI is already visible
   requestAnimationFrame(hideInitialSkeleton);
+}
+
+// ===== OCR NOTES (src/ocr/notes.js) =====
+function initOCRNotes() {
+  const drop = document.getElementById('ocr-drop');
+  if (!drop) return;
+  drop.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      // Demo: show file name + simulated OCR output
+      const resultEl = document.getElementById('ocr-result');
+      const textEl = document.getElementById('ocr-text');
+      if (resultEl && textEl) {
+        textEl.textContent = `[OCR] ${file.name}\n\nIn production, Tesseract.js processes this image on-device.\nExtracted text → structureNote() → SFT training pair:\n{\n  "prompt": "What pressing trigger did the coach note?",\n  "completion": "<extracted text from handwritten notes>"\n}`;
+        resultEl.style.display = 'block';
+      }
+    };
+    input.click();
+  });
+  // Drag & drop
+  drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.style.borderColor = 'var(--green)'; });
+  drop.addEventListener('dragleave', () => { drop.style.borderColor = ''; });
+  drop.addEventListener('drop', (e) => {
+    e.preventDefault();
+    drop.style.borderColor = '';
+    drop.click();
+  });
+}
+
+// ===== MULTI-AGENT ROUTING (src/inference/multi_agent.js) =====
+function initMultiAgentRouting() {
+  const routingEl = document.getElementById('routing-agent');
+  if (!routingEl) return;
+  // Route label changes based on last message topic
+  const AGENTS = ['tactics', 'analysis', 'opponent', 'general'];
+  const KEYWORDS = {
+    tactics: ['formation', 'press', 'flank', 'overload', 'transition', '4-3-3', '3-5-2', 'lineup', 'strategy'],
+    analysis: ['stats', 'xg', 'rating', 'performance', 'metric', 'data', 'trend'],
+    opponent: ['opponent', 'hafen', 'rival', 'weakness', 'scouting', 'next match'],
+  };
+  // Observe new chat messages and update routing label
+  const messagesEl = document.getElementById('chat-messages');
+  if (!messagesEl) return;
+  const observer = new MutationObserver(() => {
+    const userMsgs = messagesEl.querySelectorAll('.chat-msg.user .chat-bubble');
+    if (userMsgs.length === 0) return;
+    const lastText = (userMsgs[userMsgs.length - 1].textContent || '').toLowerCase();
+    let matched = 'general';
+    for (const [agent, kws] of Object.entries(KEYWORDS)) {
+      if (kws.some(k => lastText.includes(k))) { matched = agent; break; }
+    }
+    routingEl.textContent = matched;
+  });
+  observer.observe(messagesEl, { childList: true, subtree: true });
 }
 
 function initLandingHero() {
