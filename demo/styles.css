@@ -5,7 +5,9 @@
   --bg: #0d1117;
   --sidebar-bg: #161b22;
   --card-bg: #161b22;
+  --card-hover: #1c2128;
   --border: #30363d;
+  --border-strong: #484f58;
   --text: #e6edf3;
   --text-muted: #8b949e;
   --green: #238636;
@@ -14,10 +16,48 @@
   --red: #f85149;
   --yellow: #d29922;
   --blue: #58a6ff;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.35);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
   --radius: 8px;
   --sidebar-width: 260px;
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --mono: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  color-scheme: dark;
+}
+
+/* ===== Light theme override =====
+   Applied when <html data-theme="light">. All UI reads from these variables,
+   so no component-level rules need to know about themes. */
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --sidebar-bg: #f6f8fa;
+  --card-bg: #ffffff;
+  --card-hover: #f6f8fa;
+  --border: #d0d7de;
+  --border-strong: #afb8c1;
+  --text: #1f2328;
+  --text-muted: #656d76;
+  --green: #1a7f37;
+  --green-light: #2da44e;
+  --orange: #bc4c00;
+  --red: #cf222e;
+  --yellow: #9a6700;
+  --blue: #0969da;
+  --shadow-sm: 0 1px 2px rgba(31,35,40,0.08);
+  --shadow-md: 0 3px 10px rgba(31,35,40,0.10);
+  --shadow-lg: 0 8px 24px rgba(140,149,159,0.20);
+  color-scheme: light;
+}
+
+/* Respect reduced-motion — disables all transitions/animations globally */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 html { font-size: 15px; }
@@ -28,7 +68,91 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
+
+/* Smooth colour transitions on theme swap for surfaces & borders */
+.sidebar,
+.topbar,
+.card,
+.chip,
+.match-card,
+.report-card,
+.chat-panel,
+.chat-input-row,
+.chat-input,
+input, select, textarea, button,
+.stat-chip,
+.badge {
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.2s ease;
+}
+
+/* ===== Entrance animations ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* Apply entrance animation to freshly-mounted view containers */
+.view.enter {
+  animation: fadeInUp 0.28s ease-out both;
+}
+.card.enter, .stat-chip.enter {
+  animation: fadeInUp 0.32s ease-out both;
+}
+
+/* Stagger children by adding CSS custom property --delay (px → ms) */
+.enter-stagger > * {
+  animation: fadeInUp 0.4s ease-out both;
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
+
+/* ===== Theme toggle button ===== */
+.sidebar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--card-hover);
+  transform: translateY(-1px);
+}
+.theme-toggle:active { transform: translateY(0) scale(0.96); }
+.theme-toggle .theme-icon-light,
+.theme-toggle .theme-icon-dark { transition: transform 0.3s ease, opacity 0.2s ease; }
+:root[data-theme="dark"]  .theme-toggle .theme-icon-light { display: none; }
+:root[data-theme="light"] .theme-toggle .theme-icon-dark  { display: none; }
+.theme-toggle--mobile { border: none; background: transparent; }
+.theme-toggle--mobile:hover { background: var(--card-hover); }
 
 /* ===== Banner ===== */
 .banner {
