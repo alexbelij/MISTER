@@ -68,10 +68,14 @@ body {
 }
 .banner-close:hover { color: var(--text); }
 
-/* ===== App Shell ===== */
+/* ===== App Shell =====
+   --banner-height tracks the sticky banner at the top of the page. JS sets it
+   to 0px when the user closes the banner, which lets the sidebar and topbar
+   snap flush to the viewport edge instead of leaving a phantom 37px gap. */
+:root { --banner-height: 37px; --topbar-height: 52px; }
 .app-shell {
   display: flex;
-  min-height: calc(100vh - 37px);
+  min-height: calc(100vh - var(--banner-height));
 }
 
 /* ===== Sidebar ===== */
@@ -83,8 +87,8 @@ body {
   flex-direction: column;
   flex-shrink: 0;
   position: sticky;
-  top: 37px;
-  height: calc(100vh - 37px);
+  top: var(--banner-height);
+  height: calc(100vh - var(--banner-height));
   overflow-y: auto;
   transition: transform 0.25s ease;
   z-index: 50;
@@ -207,13 +211,17 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  background: var(--sidebar-bg);
+  background: rgba(22, 27, 34, 0.92);
   border-bottom: 1px solid var(--border);
-  /* Pull topbar to the edges of main-content (which has padding:24px)
-     and stick it to the top so it stays visible while scrolling. */
-  margin: -24px -24px 16px;
-  position: sticky;
-  top: 0;
+  /* Fixed positioning (rather than sticky-in-flex-child) so the topbar
+     genuinely pins to the viewport edge on scroll instead of scrolling
+     away with .main-content. Offset by --banner-height so it sits directly
+     below the announcement banner when present, and flush to the top when
+     the user closes it. */
+  position: fixed;
+  top: var(--banner-height);
+  left: 0;
+  right: 0;
   z-index: 90;
   /* Slight blur so tab content shows through subtly on scroll. */
   backdrop-filter: blur(6px);
@@ -1007,6 +1015,8 @@ body {
   .sidebar-close-mobile { display: block; }
   .mobile-topbar { display: flex; }
   .hamburger { display: block; }
+  /* Push page content below the fixed topbar so nothing hides behind it. */
+  .main-content { padding-top: calc(24px + var(--topbar-height)); }
 }
 
 /* Phone (<768): sidebar hidden entirely — bottom-nav replaces it. No topbar. */

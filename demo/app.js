@@ -268,9 +268,25 @@ function initSidebar() {
 // ===== BANNER =====
 function initBanner() {
   const closeBtn = document.getElementById('banner-close');
+  const banner = document.getElementById('banner');
+  if (!banner) {
+    // Banner isn't in the DOM (e.g. dismissed variant) — collapse the
+    // reserved space so the sidebar/topbar snap to the viewport edge.
+    document.documentElement.style.setProperty('--banner-height', '0px');
+    return;
+  }
+  // Sync --banner-height with the actual rendered banner height so the
+  // sidebar top offset and topbar top offset track real layout.
+  const syncBannerHeight = () => {
+    const h = banner.offsetHeight || 0;
+    document.documentElement.style.setProperty('--banner-height', h + 'px');
+  };
+  syncBannerHeight();
+  window.addEventListener('resize', syncBannerHeight);
   if (closeBtn) {
     closeBtn.addEventListener('click', () => {
-      document.getElementById('banner').style.display = 'none';
+      banner.style.display = 'none';
+      document.documentElement.style.setProperty('--banner-height', '0px');
     });
   }
 }
