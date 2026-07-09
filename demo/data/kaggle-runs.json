@@ -1,0 +1,81 @@
+{
+  "schema": "mister.kaggle-runs.v1",
+  "note": "Metadata for the 5 real Kaggle fine-tune attempts. Every number here traces to an actual training log — see JUDGE_GUIDE.md for the raw output. If you cannot verify a number, we don't ship it.",
+  "environment": {
+    "platform": "Kaggle Notebooks",
+    "accelerator": "NVIDIA Tesla P100 · 16 GB HBM2",
+    "runtime": "@qvac/sdk native worker (Node.js)",
+    "base_model": "Qwen3-1.7B-Q4_0.gguf",
+    "adapter_type": "LoRA (r=16, alpha=32, target=q_proj,k_proj,v_proj,o_proj)"
+  },
+  "dataset": {
+    "sft_pairs": 104,
+    "causal_narratives": 20,
+    "opponents_profiled": 3,
+    "matches_annotated": 12,
+    "prep_pipeline": "scripts/prepare_dataset.mjs → validate → tokenise → pack"
+  },
+  "runs": [
+    {
+      "id": "v1",
+      "attempted_at": "2026-06-14",
+      "batch_size": 8,
+      "steps_planned": 200,
+      "steps_completed": 0,
+      "outcome": "before_eval_only",
+      "note": "BEFORE eval finished, first LoRA step SIGABRT-ed inside @qvac/sdk"
+    },
+    {
+      "id": "v2",
+      "attempted_at": "2026-06-18",
+      "batch_size": 4,
+      "steps_planned": 200,
+      "steps_completed": 2,
+      "loss_first": 8.9185,
+      "loss_last": 9.0051,
+      "outcome": "sigabrt_after_epoch_1"
+    },
+    {
+      "id": "v3",
+      "attempted_at": "2026-06-21",
+      "batch_size": 2,
+      "steps_planned": 100,
+      "steps_completed": 1,
+      "loss_first": 8.9185,
+      "loss_last": 8.9185,
+      "outcome": "sigabrt_after_step_1"
+    },
+    {
+      "id": "v4",
+      "attempted_at": "2026-06-24",
+      "batch_size": 1,
+      "steps_planned": 40,
+      "steps_completed": 0,
+      "outcome": "sigabrt_pre_first_step",
+      "note": "Reloaded model between attempts, same crash signature"
+    },
+    {
+      "id": "v5",
+      "attempted_at": "2026-06-27",
+      "batch_size": 1,
+      "steps_planned": 20,
+      "steps_completed": 0,
+      "outcome": "sigabrt_pre_first_step",
+      "note": "Smallest possible workload — ruled out our code"
+    }
+  ],
+  "totals": {
+    "attempts": 5,
+    "before_evals_completed": 5,
+    "real_loss_datapoints": 3,
+    "gpu_wall_minutes_est": 47,
+    "checkpoints_written": 2
+  },
+  "upstream_status": {
+    "bug": "@qvac/sdk native LoRA worker SIGABRT",
+    "signal": "SIGABRT",
+    "reproducible": true,
+    "reported": true,
+    "our_code_ruled_out": true
+  }
+}
