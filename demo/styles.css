@@ -199,6 +199,8 @@ body {
   padding-bottom: 80px;
   overflow-x: hidden;
 }
+/* Cap over-wide layouts on ultra-wide monitors while still filling the frame. */
+.tab-content { max-width: 1600px; margin: 0 auto; }
 
 .mobile-topbar {
   display: none;
@@ -622,7 +624,8 @@ body {
 .chat-container {
   display: flex;
   flex-direction: column;
-  max-width: 800px;
+  width: 100%;
+  max-width: 1100px;
   height: calc(100vh - 180px);
   min-height: 400px;
 }
@@ -765,9 +768,9 @@ body {
 /* ===== Proof ===== */
 .proof-container {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
-  max-width: 900px;
+  width: 100%;
 }
 .proof-card {
   background: var(--card-bg);
@@ -784,21 +787,24 @@ body {
   color: var(--text-secondary, #8b949e);
   line-height: 1.6;
   font-size: 0.92rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 .proof-card code {
   background: rgba(110,118,129,0.15);
   padding: 1px 5px;
   border-radius: 4px;
   font-size: 0.88em;
+  word-break: break-word;
 }
 .proof-table { margin-top: 4px; }
 
 /* ===== Distribute ===== */
 .distribute-container {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
-  max-width: 900px;
+  width: 100%;
 }
 .distribute-card {
   background: var(--card-bg);
@@ -941,24 +947,34 @@ body {
 .bottom-nav-item.active { color: var(--green-light); }
 .bottom-nav-item svg { flex-shrink: 0; }
 
-/* ===== Responsive ===== */
-@media (min-width: 768px) {
+/* ===== Responsive =====
+ * Breakpoints:
+ *   <768px  — phone: drawer sidebar + top hamburger + bottom nav
+ *   768-1023px — tablet: drawer sidebar + top hamburger (content full width)
+ *   >=1024px — desktop: static sidebar, no top hamburger, no bottom nav
+ */
+
+/* Analytics grid (independent of sidebar) */
+@media (min-width: 640px) {
   .analytics-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
   .season-summary-card, .trends-chart-card { grid-column: span 1; }
   .match-history-card, .player-ratings-card, .opponent-card { grid-column: span 2; }
   .distribute-container {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
   .qr-card { grid-column: span 1; }
   .peers-card { grid-column: span 1; }
   .plan-card { grid-column: span 2; }
+  .proof-container {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
 }
 
 @media (min-width: 1024px) {
   .analytics-grid {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   }
   .season-summary-card { grid-column: span 1; }
   .trends-chart-card { grid-column: span 2; }
@@ -966,14 +982,14 @@ body {
   .player-ratings-card { grid-column: span 2; }
   .opponent-card { grid-column: span 1; }
   .distribute-container {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   }
   .qr-card, .peers-card, .plan-card { grid-column: span 1; }
 }
 
-@media (max-width: 767px) {
+/* Drawer sidebar + hamburger below desktop breakpoint (<1024) */
+@media (max-width: 1023px) {
   .sidebar {
-    display: none;
     position: fixed;
     top: 37px;
     left: 0;
@@ -983,12 +999,15 @@ body {
     box-shadow: 4px 0 24px rgba(0,0,0,0.5);
   }
   .sidebar.open {
-    display: flex;
     transform: translateX(0);
   }
   .sidebar-close-mobile { display: block; }
-  .mobile-topbar { display: none; }
-  .hamburger { display: none; }
+  .mobile-topbar { display: flex; }
+  .hamburger { display: block; }
+}
+
+/* Phone-only tweaks */
+@media (max-width: 767px) {
   .main-content {
     padding: 16px;
     padding-bottom: 70px;
