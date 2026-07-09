@@ -441,6 +441,49 @@ function initChat() {
     btn.addEventListener('click', () => sendPrompt(btn.dataset.prompt));
   });
 
+  // ── Before/After comparison ──
+  // Sends same query twice: vanilla (no adapter) and fine-tuned (with adapter).
+  // Shows both responses side-by-side so the user sees the value of LoRA.
+  const sendCompare = async (text) => {
+    addMessage(text + '  ⚡ Compare mode', true);
+    addTyping();
+    const endpoint = QVAC_BRIDGE_URL.replace(/\/$/, '');
+    const vanilla = fetchWithTimeout(endpoint + '/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, vanilla: true }),
+    }, 60000).then(r => r.json()).then(d => d.reply || '(no reply)').catch(e => '⚠️ ' + e.message);
+    const tuned = fetchWithTimeout(endpoint + '/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text }),
+    }, 60000).then(r => r.json()).then(d => d.reply || '(no reply)').catch(e => '⚠️ ' + e.message);
+
+    const [vanillaReply, tunedReply] = await Promise.all([vanilla, tuned]);
+    removeTyping();
+
+    const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const html = `
+      <div class="compare-split">
+        <div class="compare-col compare-vanilla">
+          <div class="compare-label">🔴 Vanilla Qwen3</div>
+          <div class="compare-text">${escapeHtml(vanillaReply)}</div>
+        </div>
+        <div class="compare-col compare-tuned">
+          <div class="compare-label">🟢 MISTER (LoRA fine-tuned)</div>
+          <div class="compare-text">${escapeHtml(tunedReply)}</div>
+        </div>
+      </div>`;
+    addMessage(html, false, true);
+  };
+
+  // Compare button (inserted next to send)
+  const compareBtn = document.createElement('button');
+  compareBtn.className = 'chat-compare-btn';
+  compareBtn.title = 'Compare: vanilla vs fine-tuned';
+  compareBtn.textContent = '⚡';
+  sendBtn.parentNode.insertBefore(compareBtn, sendBtn);
+
   // Send button
   const handleSend = () => {
     const text = inputEl.value.trim();
@@ -448,6 +491,13 @@ function initChat() {
     inputEl.value = '';
     sendToBackend(text);
   };
+
+  compareBtn.addEventListener('click', () => {
+    const text = inputEl.value.trim();
+    if (!text) return;
+    inputEl.value = '';
+    sendCompare(text);
+  });
 
   sendBtn.addEventListener('click', handleSend);
   inputEl.addEventListener('keydown', (e) => {
