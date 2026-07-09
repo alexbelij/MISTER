@@ -903,6 +903,29 @@ body {
 }
 .loss-scrubber-delta.up { color: var(--red); }
 .loss-scrubber-delta.down { color: var(--green-light); }
+
+.loss-scrubber-arrow {
+  display: inline-block;
+  font-weight: 700;
+  will-change: transform;
+  transform-origin: center;
+}
+.loss-scrubber-arrow.arrow-down {
+  animation: loss-arrow-bounce-down 1.2s ease-in-out infinite;
+}
+.loss-scrubber-arrow.arrow-up {
+  animation: loss-arrow-bounce-up 1.2s ease-in-out infinite;
+}
+@keyframes loss-arrow-bounce-down {
+  0%   { transform: translateY(-6px); opacity: 0.55; }
+  50%  { transform: translateY(4px);  opacity: 1; }
+  100% { transform: translateY(-6px); opacity: 0.55; }
+}
+@keyframes loss-arrow-bounce-up {
+  0%   { transform: translateY(4px);  opacity: 0.55; }
+  50%  { transform: translateY(-6px); opacity: 1; }
+  100% { transform: translateY(4px);  opacity: 0.55; }
+}
 .loss-scrubber-slider {
   position: relative;
   height: 32px;
@@ -1632,3 +1655,48 @@ html.js .initial-skeleton { display: flex; }
   .player-cards-card { grid-column: 1 / -1; }
   .filter-chip { padding: 3px 8px; font-size: 0.68rem; }
 }
+
+/* Roadmap card in /proof */
+.roadmap-card { border-color: rgba(88, 166, 255, 0.25); }
+.roadmap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 14px 0 12px;
+}
+.roadmap-role {
+  background: rgba(88, 166, 255, 0.06);
+  border: 1px solid rgba(88, 166, 255, 0.18);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.roadmap-role-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.roadmap-role-scope {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--blue, #58a6ff);
+  margin-bottom: 8px;
+}
+.roadmap-role ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.roadmap-role ul li { margin-bottom: 2px; }
+.roadmap-note {
+  font-size: 0.85rem;
+  color: var(--muted);
+  border-top: 1px dashed rgba(139, 148, 158, 0.2);
+  padding-top: 10px;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+.roadmap-note em { color: var(--text); font-style: normal; font-weight: 600; }

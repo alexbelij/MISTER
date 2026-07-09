@@ -61,12 +61,12 @@
 </script>
 
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="preload" href="styles.css?v=17" as="style">
+<link rel="preload" href="styles.css?v=18" as="style">
 <link rel="preload" href="app.js" as="script">
 <link rel="preload" href="vendor-qrcode.js" as="script">
 <link rel="preconnect" href="https://alexbelij-mister-qvac-inference.hf.space" crossorigin>
 <link rel="dns-prefetch" href="https://alexbelij-mister-qvac-inference.hf.space">
-<link rel="stylesheet" href="styles.css?v=17">
+<link rel="stylesheet" href="styles.css?v=18">
 <script>document.documentElement.classList.add('js');</script>
 <script src="vendor-qrcode.js" defer></script>
 </head>
@@ -520,6 +520,52 @@
           <h3>What we chose NOT to do</h3>
           <p>We did not publish a fake "AFTER" eval score to make the story look finished. The eval harness (<code>src/eval/enhanced_eval.js</code>) is real and fully wired — lexical scoring, embedding cosine similarity via <code>embed()</code>, and LLM-as-judge — and will produce a real delta table automatically the moment the upstream crash is fixed. Until then, the honest status is: real training started, real bug blocked completion, retry/reload infrastructure built and verified working.</p>
         </div>
+
+        <div class="proof-card roadmap-card" data-tooltip="Multi-role access and data ingestion are deliberately out of MVP scope, but designed-for. Roadmap below.">
+          <h3>Roadmap: multi-role access &amp; data ingestion</h3>
+          <p class="proof-card-hint">The current demo runs as a single-coach experience so judges can see the AI’s tactical reasoning in three minutes without auth flow. Production splits into four roles with clear write-scopes — and a data-ingestion path with attribution, review, and rollback.</p>
+
+          <div class="roadmap-grid">
+            <div class="roadmap-role">
+              <div class="roadmap-role-title">Head Coach</div>
+              <div class="roadmap-role-scope">full access</div>
+              <ul>
+                <li>Tactical decisions &amp; lineup calls</li>
+                <li>AI chat &amp; suggestion approval</li>
+                <li>Team &amp; staff management</li>
+              </ul>
+            </div>
+            <div class="roadmap-role">
+              <div class="roadmap-role-title">Assistant Coach</div>
+              <div class="roadmap-role-scope">read + propose</div>
+              <ul>
+                <li>Read all tactical data</li>
+                <li>Draft suggestions, no direct commit</li>
+                <li>Annotate matches for review</li>
+              </ul>
+            </div>
+            <div class="roadmap-role">
+              <div class="roadmap-role-title">Analyst</div>
+              <div class="roadmap-role-scope">read + ingest</div>
+              <ul>
+                <li>Add matches, stats, video refs</li>
+                <li>Tag opponents, phases, set-pieces</li>
+                <li>Every write signed &amp; auditable</li>
+              </ul>
+            </div>
+            <div class="roadmap-role">
+              <div class="roadmap-role-title">Player</div>
+              <div class="roadmap-role-scope">personal read-only</div>
+              <ul>
+                <li>Own profile &amp; personal metrics</li>
+                <li>Assigned drills &amp; feedback</li>
+                <li>No access to opponent tactics</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="roadmap-note">Data ingestion piggybacks on the same Pears hypercore append-only log that stores oracle decisions: every write is signed by the ingesting role, replayable across peers, and reversible by cursor — no destructive edits, ever. This is why the P2P substrate matters even for a coaching app: <em>who added what, when, and why</em> is provable without a central server.</p>
+        </div>
       </div>
     </section>
   </main>
@@ -556,6 +602,6 @@
 <!-- Tooltip -->
 <div id="tooltip" class="tooltip"></div>
 
-<script src="app.js?v=17"></script>
+<script src="app.js?v=18"></script>
 </body>
 </html>
