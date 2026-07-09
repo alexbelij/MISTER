@@ -1226,14 +1226,17 @@ function initLossScrubber() {
     fillEl.style.width = pct + '%';
 
     if (idx === 0) {
-      deltaEl.textContent = 'Baseline datapoint';
+      deltaEl.innerHTML = '<span class="loss-scrubber-delta-text">Baseline datapoint</span>';
       deltaEl.className = 'loss-scrubber-delta';
     } else {
       const prev = points[idx - 1];
       const diff = p.loss - prev.loss;
       const arrow = diff < 0 ? '↓' : diff > 0 ? '↑' : '→';
       const cls = diff < 0 ? 'down' : diff > 0 ? 'up' : '';
-      deltaEl.textContent = `${arrow} ${Math.abs(diff).toFixed(4)} vs previous datapoint (${prev.run} · ${prev.step})`;
+      const arrowCls = diff < 0 ? 'arrow-down' : diff > 0 ? 'arrow-up' : '';
+      deltaEl.innerHTML =
+        `<span class="loss-scrubber-arrow ${arrowCls}">${arrow}</span>` +
+        `<span class="loss-scrubber-delta-text"> ${Math.abs(diff).toFixed(4)} vs previous datapoint (${prev.run} · ${prev.step})</span>`;
       deltaEl.className = 'loss-scrubber-delta ' + cls;
     }
 
