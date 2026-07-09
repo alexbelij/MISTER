@@ -41,7 +41,7 @@
 
     // Announce to screen readers (once wired via UI)
     if (window.UI && typeof window.UI.toast === 'function') {
-      window.UI.toast(theme === LIGHT ? 'Light theme' : 'Dark theme', { level: 'info', duration: 1500 });
+      window.UI.toast({ title: theme === LIGHT ? 'Light theme' : 'Dark theme', variant: 'info', duration: 1500 });
     }
   }
 

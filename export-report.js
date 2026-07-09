@@ -398,7 +398,7 @@
 
   function toast(msg, level, dur) {
     if (window.UI && typeof window.UI.toast === 'function') {
-      window.UI.toast(msg, { level: level || 'info', duration: dur || 2200 });
+      window.UI.toast({ title: msg, variant: level || 'info', duration: dur || 2200 });
     } else {
       console.log('[toast:' + (level || 'info') + ']', msg);
     }
