@@ -148,8 +148,23 @@ const ICONS = {
 // ===== TOOLTIP SYSTEM =====
 const tooltipEl = document.getElementById('tooltip');
 let tooltipTimeout;
+// Hover-driven tooltips only make sense on devices with a real mouse (hover +
+// fine pointer). On touch devices, `mouseover` fires on tap but `mouseout`
+// often never fires (or fires unreliably), leaving the tooltip permanently
+// stuck on screen, duplicating the label underneath. So: don't bind the
+// hover tooltip system at all on touch/coarse-pointer devices.
+const supportsHoverTooltips = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 function initTooltips() {
+  if (!supportsHoverTooltips) {
+    // Safety net: if a tooltip ever ends up visible on a touch device
+    // (e.g. a hybrid laptop+touchscreen), dismiss it on the next tap
+    // anywhere so it can never get stuck.
+    document.addEventListener('touchstart', () => {
+      tooltipEl.classList.remove('visible');
+    }, { passive: true });
+    return;
+  }
   document.addEventListener('mouseover', (e) => {
     const target = e.target.closest('[data-tooltip]');
     if (!target) return;
@@ -183,16 +198,24 @@ function positionTooltip(e) {
 // ===== TAB SWITCHING =====
 // Exposed on window so other sections (e.g. Match History -> Match Report)
 // can navigate tabs programmatically, not just via the sidebar/bottom nav.
-function switchTab(tabName) {
+const VALID_TABS = ['chat', 'analytics', 'suggestions', 'reports', 'distribute', 'proof'];
+
+function switchTab(tabName, pushHistory = true) {
+  if (!VALID_TABS.includes(tabName)) tabName = 'chat';
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(t => t.classList.remove('active'));
   const tab = document.getElementById('tab-' + tabName);
   if (tab) tab.classList.add('active');
   document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(t => t.classList.add('active'));
-  closeSidebar();
+  if (typeof window.closeSidebar === 'function') window.closeSidebar();
   // Scroll to top
   document.querySelector('.main-content').scrollTop = 0;
   window.scrollTo(0, 0);
+  // Real routing: push a history entry per tab so the browser's back/forward
+  // buttons move between tabs instead of leaving the app / doing nothing.
+  if (pushHistory && location.hash.slice(1) !== tabName) {
+    history.pushState({ tab: tabName }, '', '#' + tabName);
+  }
 }
 window.switchTab = switchTab;
 
@@ -203,6 +226,20 @@ function initTabs() {
       switchTab(item.dataset.tab);
     });
   });
+  // Back/forward button support.
+  window.addEventListener('popstate', (e) => {
+    const tab = (e.state && e.state.tab) || (VALID_TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'chat');
+    switchTab(tab, false);
+  });
+}
+
+// Deep-link / reload support: open whatever tab is in the URL hash, and seed
+// the initial history entry so the very first back-press has somewhere to
+// go. Runs last in init(), after every other init*() has wired up its DOM.
+function initRouting() {
+  const initialTab = VALID_TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'chat';
+  switchTab(initialTab, false);
+  history.replaceState({ tab: initialTab }, '', '#' + initialTab);
 }
 
 // ===== SIDEBAR (MOBILE) =====
@@ -814,6 +851,7 @@ function init() {
   renderSuggestions();
   initReports();
   initDistribute();
+  initRouting();
 }
 
 if (document.readyState === 'loading') {
