@@ -1603,6 +1603,39 @@ async function verifyHypercoreChain(root, snapshot, btn) {
   }
 }
 
+// ===== MARKETPLACE =====
+function initMarketplace() {
+  // Buy buttons — show toast with honest status
+  document.querySelectorAll('.marketplace-buy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const listing = btn.dataset.listing;
+      if (window.MisterToast) {
+        window.MisterToast.warn('WDK Transfer', `Gasless USDt transfer for "${listing}" requires a funded Sepolia testnet account + ERC-4337 bundler. See marketplace.js for setup.`);
+      } else {
+        alert('Gasless USDt transfer requires Sepolia testnet setup. See src/wdk/marketplace.js');
+      }
+    });
+  });
+  // Sell button
+  const sellBtn = document.getElementById('mp-sell-btn');
+  if (sellBtn) {
+    sellBtn.addEventListener('click', () => {
+      if (window.MisterToast) {
+        window.MisterToast.info('List Adapter', 'Run: node src/wdk/marketplace.js --sell --adapter=<path> --price=<USDt>');
+      }
+    });
+  }
+  // Demo wallet address (truncated pub key from identity)
+  const addrEl = document.getElementById('mp-wallet-addr');
+  if (addrEl) {
+    try {
+      const pub = localStorage.getItem('mister:signing:pubkey');
+      if (pub) addrEl.textContent = pub.slice(0, 8) + '…' + pub.slice(-8);
+      else addrEl.textContent = 'Generate via CLI: node src/wdk/marketplace.js --wallet';
+    } catch { /* ignore */ }
+  }
+}
+
 function init() {
   // Isolate every init step: a failure in one section must not prevent the rest
   // of the UI from loading. Errors are surfaced to the console (and to a toast
@@ -1629,6 +1662,7 @@ function init() {
   safe('loss-scrubber', initLossScrubber);
   safe('hypercore-log', initHypercoreLog);
   safe('kaggle-stats', initKaggleStats);
+  safe('marketplace', initMarketplace);
   safe('landing-hero', initLandingHero);
   safe('routing', initRouting);
   // Skeleton done — fade it out on next paint so the real UI is already visible
@@ -1841,6 +1875,17 @@ function enableSortableTables(root) {
     if (window.UI_DEBUG) console.warn('[enableSortableTables] failed', err);
   }
 }
+
+// Global error boundary — catch unhandled errors so the app never crashes
+window.addEventListener('error', (e) => {
+  console.error('[MISTER] Uncaught error:', e.error || e.message);
+  if (window.MisterToast) window.MisterToast.error('Something went wrong', e.message || 'Unknown error');
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('[MISTER] Unhandled promise rejection:', e.reason);
+  if (window.MisterToast) window.MisterToast.error('Async error', String(e.reason).slice(0, 120));
+  e.preventDefault();
+});
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
