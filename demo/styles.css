@@ -623,7 +623,6 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 1100px;
   height: calc(100vh - 180px);
   min-height: 400px;
 }
@@ -638,7 +637,7 @@ body {
 .chat-msg {
   display: flex;
   gap: 10px;
-  max-width: 85%;
+  max-width: min(85%, 78ch);
 }
 .chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
 .chat-avatar {
@@ -976,7 +975,7 @@ body {
   }
   .season-summary-card { grid-column: span 1; }
   .trends-chart-card { grid-column: span 2; }
-  .match-history-card { grid-column: span 2; }
+  .match-history-card { grid-column: span 3; }
   .player-ratings-card { grid-column: span 2; }
   .opponent-card { grid-column: span 1; }
   .distribute-container {
