@@ -131,6 +131,38 @@
 /* Sidebar status indicators — softer contrast */
 :root[data-theme="light"] .sidebar { color: var(--text); }
 
+/* Dialog buttons */
+:root[data-theme="light"] .ui-dialog__btn {
+  background: var(--sidebar-bg);
+  color: var(--text);
+  border-color: var(--border);
+}
+:root[data-theme="light"] .ui-dialog__btn:hover { background: var(--card-hover); }
+:root[data-theme="light"] .ui-dialog__foot { border-top-color: var(--border); background: var(--sidebar-bg); }
+
+/* Data table */
+:root[data-theme="light"] .data-table thead th.sortable-th:hover { color: var(--text); }
+
+/* Kaggle / proof chips */
+:root[data-theme="light"] .kaggle-chip {
+  background: var(--sidebar-bg);
+  border-color: var(--border);
+}
+:root[data-theme="light"] .kaggle-chip:hover { border-color: var(--border-strong); }
+:root[data-theme="light"] .kaggle-chip-value { color: var(--text); }
+
+/* Hypercore type badges */
+:root[data-theme="light"] .hypercore-type { color: var(--text-muted); background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); }
+:root[data-theme="light"] .hypercore-meta-item code {
+  color: var(--text);
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.06);
+}
+
+/* Banner text contrast */
+:root[data-theme="light"] .banner a { color: var(--blue); }
+:root[data-theme="light"] .banner code { background: rgba(0,0,0,0.06); color: var(--text); }
+
 /* Respect reduced-motion — disables all transitions/animations globally */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
