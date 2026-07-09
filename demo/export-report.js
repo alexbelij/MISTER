@@ -158,26 +158,36 @@
     }
   }
 
-  function exportEmail() {
-    var report = readReport();
-    if (!report || !report.lines.length) {
-      toast('No report loaded. Select a match first.', 'warning');
-      return;
-    }
+  // Build the message body from a report + optional team + coach context.
+  // Returns { subject, body, truncatedCount } so the caller can react to a
+  // long report (we cap the mailto body at ~40 lines and offer the full
+  // report via clipboard).
+  function buildEmailContent(report) {
+    var team = (window.MisterTeams && window.MisterTeams.getActive()) || null;
+    var signingPub = (window.MisterSigning && window.MisterSigning.getPubkey && window.MisterSigning.getPubkey()) || null;
+    var fingerprint = signingPub ? (signingPub.slice(0, 4) + ' ' + signingPub.slice(4, 8) + ' ' + signingPub.slice(8, 12) + ' ' + signingPub.slice(12, 16)).toUpperCase() : null;
+
     var subject = 'MISTER report \u2014 ' + (report.subtitle || report.title);
-    var body = [
+    if (team && team.name) subject += ' (' + team.name + ')';
+
+    var header = [
       report.title,
       report.subtitle || '',
-      '',
-      'Generated on-device by MISTER \u2014 ' + new Date().toLocaleString(),
-      'View live: https://alexbelij.github.io/MISTER/#reports',
-      '',
-      '\u2014 Summary \u2014',
       ''
     ];
-    // Take first ~40 meaningful lines to fit into a mailto URL
+    if (team) {
+      header.push('From: ' + team.name + (team.formation && team.formation !== '\u2014' ? ' \u00b7 ' + team.formation : '') + (team.coach ? ' \u00b7 ' + team.coach : ''));
+    }
+    header.push('Generated on-device by MISTER \u2014 ' + new Date().toLocaleString());
+    header.push('View live: https://alexbelij.github.io/MISTER/#reports');
+    header.push('');
+    header.push('\u2014 Summary \u2014');
+    header.push('');
+
+    var body = header.slice();
     var count = 0;
-    for (var i = 0; i < report.lines.length && count < 40; i++) {
+    var LIMIT = 40;
+    for (var i = 0; i < report.lines.length && count < LIMIT; i++) {
       var l = report.lines[i];
       var prefix = l.kind === 'h1' ? '\n# '
                 : l.kind === 'h2' ? '\n## '
@@ -187,22 +197,203 @@
       body.push(prefix + l.text);
       count++;
     }
-    if (report.lines.length > 40) {
+    var truncatedCount = 0;
+    if (report.lines.length > LIMIT) {
+      truncatedCount = report.lines.length - LIMIT;
       body.push('');
-      body.push('\u2026 (' + (report.lines.length - 40) + ' more lines \u2014 open the live report or attach the PDF)');
+      body.push('\u2026 (' + truncatedCount + ' more lines \u2014 open the live report or attach the PDF)');
     }
 
-    var mailto = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body.join('\n'));
-    // Guard: some mail clients cap URLs at ~2000 chars
-    if (mailto.length > 8000) {
-      mailto = mailto.slice(0, 8000);
+    if (fingerprint) {
+      body.push('');
+      body.push('---');
+      body.push('Signed on device \u00b7 ed25519 \u00b7 ' + fingerprint);
+      body.push('Any recipient can verify the signature in the MISTER app.');
     }
+
+    return { subject: subject, body: body.join('\n'), truncatedCount: truncatedCount };
+  }
+
+  // Build a full plain-text version of the report for the clipboard fallback
+  // — no line cap, includes signature.
+  function buildFullText(report) {
+    var out = buildEmailContent(report);
+    var lines = [out.subject, ''];
+    for (var i = 0; i < report.lines.length; i++) {
+      var l = report.lines[i];
+      var prefix = l.kind === 'h1' ? '\n# '
+                : l.kind === 'h2' ? '\n## '
+                : l.kind === 'h3' ? '\n### '
+                : l.kind === 'li' ? '  \u2022 '
+                : '';
+      lines.push(prefix + l.text);
+    }
+    return lines.join('\n');
+  }
+
+  function openEmailComposer(report) {
+    // Modal lets the user paste a To: / Cc: address before we assemble the
+    // mailto: link. That saves a step in Gmail/Outlook (which otherwise
+    // demand a recipient before enabling Send) and gives us a natural place
+    // to surface the \u201cAlso download PDF\u201d shortcut and a clipboard
+    // fallback for reports whose body exceeds the URL limit.
+    var content = buildEmailContent(report);
+    var mailtoLen = ('mailto:?subject=' + encodeURIComponent(content.subject) + '&body=' + encodeURIComponent(content.body)).length;
+    var TOO_LONG = mailtoLen > 7500;
+
+    var overlay = document.createElement('div');
+    overlay.className = 'ts-modal-overlay';
+    overlay.innerHTML =
+      '<div class="ts-modal em-modal" role="dialog" aria-modal="true" aria-labelledby="em-title">' +
+        '<div class="ts-modal-header">' +
+          '<h3 id="em-title">Email this report</h3>' +
+          '<button class="ts-modal-close" aria-label="Close">&times;</button>' +
+        '</div>' +
+        '<div class="ts-modal-body">' +
+          '<label class="ts-field">' +
+            '<span>To</span>' +
+            '<input type="email" id="em-to" placeholder="coach@fc-alexandria.example" multiple />' +
+          '</label>' +
+          '<label class="ts-field">' +
+            '<span>Cc <em class="em-optional">(optional)</em></span>' +
+            '<input type="email" id="em-cc" placeholder="analyst@fc-alexandria.example" multiple />' +
+          '</label>' +
+          '<label class="ts-field">' +
+            '<span>Subject</span>' +
+            '<input type="text" id="em-subject" value="' + escapeAttr(content.subject) + '" />' +
+          '</label>' +
+          '<label class="ts-field">' +
+            '<span>Message</span>' +
+            '<textarea id="em-body" rows="9">' + escapeHtml(content.body) + '</textarea>' +
+          '</label>' +
+          '<div class="em-meta">' +
+            '<span class="em-meta-item"><strong>' + report.lines.length + '</strong> lines in report</span>' +
+            (content.truncatedCount ? '<span class="em-meta-item em-warn">' + content.truncatedCount + ' trimmed \u2014 attach the PDF for the full text</span>' : '') +
+            (TOO_LONG ? '<span class="em-meta-item em-warn">Body is long \u2014 some clients cap the URL. Use \u201cCopy report\u201d as a backup.</span>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="ts-modal-footer em-footer">' +
+          '<button class="ts-btn ts-btn-secondary" data-role="copy">Copy report</button>' +
+          '<button class="ts-btn ts-btn-secondary" data-role="pdf">Download PDF too</button>' +
+          '<button class="ts-btn ts-btn-primary" data-role="send">Open mail client</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    var toEl = overlay.querySelector('#em-to');
+    var ccEl = overlay.querySelector('#em-cc');
+    var subjEl = overlay.querySelector('#em-subject');
+    var bodyEl = overlay.querySelector('#em-body');
+
+    // Remember last-used recipients across sessions.
     try {
-      window.location.href = mailto;
-      toast('Opening mail client\u2026 tip: attach the PDF you exported.', 'info', 3500);
-    } catch (err) {
-      toast('Could not open mail client. Copy the report manually.', 'error');
+      toEl.value = localStorage.getItem('mister:email:last-to') || '';
+      ccEl.value = localStorage.getItem('mister:email:last-cc') || '';
+    } catch (_) {}
+
+    setTimeout(function () { toEl.focus(); }, 60);
+
+    function close() {
+      overlay.classList.add('is-closing');
+      setTimeout(function () { overlay.remove(); }, 160);
     }
+
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+    overlay.querySelector('.ts-modal-close').addEventListener('click', close);
+    overlay.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+
+    overlay.querySelector('[data-role="copy"]').addEventListener('click', function () {
+      var text = buildFullText(report);
+      copyToClipboard(text).then(function () {
+        toast('Full report copied \u2014 paste it into your mail client.', 'success', 2600);
+      }).catch(function () {
+        toast('Clipboard blocked \u2014 select the message text and copy manually.', 'warning');
+      });
+    });
+
+    overlay.querySelector('[data-role="pdf"]').addEventListener('click', function () {
+      exportPdf();
+    });
+
+    overlay.querySelector('[data-role="send"]').addEventListener('click', function () {
+      var to = (toEl.value || '').trim();
+      var cc = (ccEl.value || '').trim();
+      var subject = (subjEl.value || '').trim() || content.subject;
+      var bodyStr = bodyEl.value || content.body;
+
+      try {
+        localStorage.setItem('mister:email:last-to', to);
+        localStorage.setItem('mister:email:last-cc', cc);
+      } catch (_) {}
+
+      var qs = [];
+      if (cc) qs.push('cc=' + encodeURIComponent(cc));
+      qs.push('subject=' + encodeURIComponent(subject));
+      qs.push('body=' + encodeURIComponent(bodyStr));
+      var mailto = 'mailto:' + encodeURIComponent(to).replace(/%40/g, '@').replace(/%2C/g, ',') + '?' + qs.join('&');
+
+      // Some clients (macOS Mail, Outlook web) start dropping the URL past
+      // ~7\u2013\u00a08k. Preflight: if we\u2019re over the limit, warn instead of
+      // silently truncating.
+      if (mailto.length > 12000) {
+        toast('Body is too long for a direct mailto: link \u2014 copy the report and paste instead.', 'warning', 4000);
+        return;
+      }
+
+      try {
+        // Attempt to open. Use a hidden anchor so Safari behaves like Chrome.
+        var a = document.createElement('a');
+        a.href = mailto;
+        a.rel = 'noopener';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () { a.remove(); }, 200);
+        toast('Opening mail client\u2026 tip: attach the PDF via \u201cDownload PDF too\u201d.', 'info', 3500);
+        close();
+      } catch (err) {
+        toast('Could not open mail client. Use \u201cCopy report\u201d instead.', 'error');
+      }
+    });
+  }
+
+  function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function (resolve, reject) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        ta.remove();
+        if (ok) resolve(); else reject();
+      } catch (e) { reject(e); }
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+  function escapeAttr(s) {
+    return escapeHtml(s).replace(/"/g, '&quot;');
+  }
+
+  function exportEmail() {
+    var report = readReport();
+    if (!report || !report.lines.length) {
+      toast('No report loaded. Select a match first.', 'warning');
+      return;
+    }
+    openEmailComposer(report);
   }
 
   function toast(msg, level, dur) {
