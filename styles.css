@@ -1700,3 +1700,184 @@ html.js .initial-skeleton { display: flex; }
   line-height: 1.5;
 }
 .roadmap-note em { color: var(--text); font-style: normal; font-weight: 600; }
+
+/* ============================================================================
+   Pears hypercore append-only log — proof-tab visualisation of the real
+   record shape emitted by src/pears/collab_model.js. Chained by prev_hash;
+   entries are role-tagged. Newest at the top ("HEAD"), scrollable tail.
+   ============================================================================ */
+.hypercore-card { border-color: rgba(88, 166, 255, 0.28); }
+
+.hypercore-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #58a6ff;
+  background: rgba(88, 166, 255, 0.10);
+  border: 1px solid rgba(88, 166, 255, 0.30);
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.hypercore-log {
+  margin: 14px 0 10px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  max-height: 420px;
+  overflow-y: auto;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px;
+}
+
+.hypercore-entry {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  padding: 10px 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.05);
+  transition: background 160ms ease;
+}
+.hypercore-entry:first-child { border-top: none; }
+.hypercore-entry:hover { background: rgba(255, 255, 255, 0.02); }
+
+.hypercore-entry--head {
+  background: linear-gradient(90deg, rgba(88, 166, 255, 0.06), rgba(88, 166, 255, 0));
+  border-left: 2px solid rgba(88, 166, 255, 0.4);
+  padding-left: 6px;
+  margin-left: -6px;
+}
+
+.hypercore-entry-marker {
+  display: flex;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.hypercore-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #6b7280;
+  box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.15);
+}
+.hypercore-dot--init       { background: #a78bfa; box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.20); }
+.hypercore-dot--ingest     { background: #34d399; box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.20); }
+.hypercore-dot--decision   { background: #58a6ff; box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.22); }
+.hypercore-dot--observation{ background: #f59e0b; box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.20); }
+.hypercore-dot--revert     { background: #ef4444; box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.22); }
+
+.hypercore-entry--head .hypercore-dot {
+  animation: hypercore-head-pulse 1.6s ease-in-out infinite;
+}
+@keyframes hypercore-head-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.20); }
+  50%      { transform: scale(1.35); box-shadow: 0 0 0 6px rgba(88, 166, 255, 0.05); }
+}
+
+.hypercore-entry-body { min-width: 0; }
+
+.hypercore-entry-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  font-size: 11.5px;
+}
+.hypercore-seq {
+  color: #8b949e;
+  font-weight: 600;
+}
+.hypercore-type {
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.06);
+  color: #c9d1d9;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.hypercore-type--init       { color: #c7b4ff; border-color: rgba(167, 139, 250, 0.35); background: rgba(167, 139, 250, 0.08); }
+.hypercore-type--ingest     { color: #6ee7b7; border-color: rgba(52, 211, 153, 0.35); background: rgba(52, 211, 153, 0.08); }
+.hypercore-type--decision   { color: #93c5fd; border-color: rgba(88, 166, 255, 0.38); background: rgba(88, 166, 255, 0.10); }
+.hypercore-type--observation{ color: #fcd34d; border-color: rgba(245, 158, 11, 0.35); background: rgba(245, 158, 11, 0.08); }
+.hypercore-type--revert     { color: #fca5a5; border-color: rgba(239, 68, 68, 0.40); background: rgba(239, 68, 68, 0.10); }
+
+.hypercore-role  { color: #8b949e; }
+.hypercore-time  { color: #6b7280; margin-left: auto; }
+
+.hypercore-head-tag {
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #58a6ff;
+  border: 1px solid rgba(88, 166, 255, 0.4);
+  border-radius: 4px;
+  background: rgba(88, 166, 255, 0.06);
+}
+
+.hypercore-entry-content {
+  color: #d1d5db;
+  line-height: 1.45;
+  margin-bottom: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13.5px;
+}
+.hypercore-cursor {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.10);
+  border: 1px solid rgba(239, 68, 68, 0.28);
+}
+
+.hypercore-entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: #6b7280;
+  font-size: 11px;
+}
+.hypercore-meta-item code {
+  color: #c9d1d9;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 11px;
+}
+
+.hypercore-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 6px;
+  padding: 8px 4px;
+  color: #8b949e;
+  font-size: 12px;
+}
+.hypercore-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.hypercore-legend .hypercore-dot { width: 8px; height: 8px; box-shadow: none; }
+
+@media (max-width: 640px) {
+  .hypercore-log { font-size: 11.5px; padding: 8px; }
+  .hypercore-time { margin-left: 0; }
+  .hypercore-entry-content { font-size: 12.5px; }
+}

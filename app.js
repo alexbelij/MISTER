@@ -1252,6 +1252,171 @@ function initLossScrubber() {
   paint(0);
 }
 
+// ============================================================================
+// Pears hypercore append-only log — visualises the real record shape emitted
+// by src/pears/collab_model.js (Corestore + Autobase). Entries below mirror
+// live log tail we would see on a running peer: init → ingest → observation
+// → oracle decision → revert-by-cursor. Hashes are chained (prev_hash of
+// entry N = short hash of entry N-1 payload) so the sequence is verifiable.
+// ============================================================================
+function initHypercoreLog() {
+  const root = document.getElementById('hypercore-log');
+  if (!root) return;
+
+  // Deterministic small hash so the visualisation is stable across reloads
+  // and the prev_hash column actually chains correctly. Not crypto — the real
+  // signing/hashing lives in collab_model.js on the Autobase side.
+  const shortHash = (s) => {
+    let h = 0xdeadbeef ^ s.length;
+    for (let i = 0; i < s.length; i++) {
+      h = Math.imul(h ^ s.charCodeAt(i), 2654435761);
+    }
+    h = (h ^ (h >>> 16)) >>> 0;
+    return ('00000000' + h.toString(16)).slice(-8);
+  };
+
+  // Realistic tail of a game-model hypercore, using the exact fields emitted
+  // by collab_model.js: id (generateId prefix), type, author, timestamp, content.
+  // Types & authors match the four roles in the roadmap card above.
+  const now = Date.now();
+  const mins = (m) => new Date(now - m * 60_000).toISOString();
+  const raw = [
+    {
+      seq: 42,
+      id: 'gmi_9a4c',
+      type: 'init',
+      role: 'system',
+      author: 'system',
+      timestamp: mins(2880),
+      content: 'Game model initialized for FC Metall Nord',
+    },
+    {
+      seq: 43,
+      id: 'obs_1f8b',
+      type: 'ingest',
+      role: 'analyst',
+      author: 'analyst@metall',
+      timestamp: mins(2158),
+      content: 'Match ingested: vs FC Hafen (H, 1–0) — xG 1.42, PPDA 8.1, 24 pressing triggers',
+    },
+    {
+      seq: 44,
+      id: 'obs_2c07',
+      type: 'observation',
+      role: 'assistant',
+      author: 'assistant@metall',
+      timestamp: mins(1440),
+      content: 'Mahler cracked under high press — 3/7 completed passes in own third under pressure',
+    },
+    {
+      seq: 45,
+      id: 'orc_5e12',
+      type: 'decision',
+      role: 'oracle',
+      author: 'qvac-worker',
+      timestamp: mins(1439),
+      content: 'LoRA training step accepted: loss 0.7124 → 0.5988 on 156 tactical pairs (v3 step 1)',
+    },
+    {
+      seq: 46,
+      id: 'obs_7d31',
+      type: 'ingest',
+      role: 'analyst',
+      author: 'analyst@metall',
+      timestamp: mins(732),
+      content: 'Set-piece phase tagged: corner routine “Short-9 → near-post flick” recurred vs Hafen',
+    },
+    {
+      seq: 47,
+      id: 'obs_a208',
+      type: 'observation',
+      role: 'coach',
+      author: 'head@metall',
+      timestamp: mins(390),
+      content: 'Away-day plan: drop press line to mid-block from minute 65 if leading by one',
+    },
+    {
+      seq: 48,
+      id: 'rev_b119',
+      type: 'revert',
+      role: 'coach',
+      author: 'head@metall',
+      timestamp: mins(112),
+      content: 'Revert-by-cursor: seq 46 tag “Short-9” superseded — confirmed as opponent decoy, not a routine',
+      cursor: 46,
+    },
+    {
+      seq: 49,
+      id: 'orc_c744',
+      type: 'decision',
+      role: 'oracle',
+      author: 'qvac-worker',
+      timestamp: mins(28),
+      content: 'Ingest gate: seq 48 revert accepted, downstream fine-tune batch re-hashed (no rewrite of history)',
+    },
+  ];
+
+  // Chain them: prev_hash + sig derived deterministically from payload.
+  const entries = [];
+  let prev = '00000000';
+  for (const r of raw) {
+    const payload = JSON.stringify({ seq: r.seq, id: r.id, type: r.type, author: r.author, timestamp: r.timestamp, content: r.content, cursor: r.cursor });
+    const hash = shortHash(prev + payload);
+    const sig = shortHash(hash + r.author).slice(0, 6);
+    entries.push({ ...r, prev_hash: prev, hash, sig });
+    prev = hash;
+  }
+
+  const typeDotCls = {
+    init: 'hypercore-dot--init',
+    ingest: 'hypercore-dot--ingest',
+    decision: 'hypercore-dot--decision',
+    observation: 'hypercore-dot--observation',
+    revert: 'hypercore-dot--revert',
+  };
+
+  const fmtTime = (iso) => {
+    const d = new Date(iso);
+    const dd = String(d.getUTCDate()).padStart(2, '0');
+    const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const hh = String(d.getUTCHours()).padStart(2, '0');
+    const mi = String(d.getUTCMinutes()).padStart(2, '0');
+    return `${dd}‑${mm} ${hh}:${mi}Z`;
+  };
+
+  const escape = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  // Newest-first tail (last 6 entries) with head-of-chain highlighted.
+  const tail = entries.slice(-6).reverse();
+  const html = tail.map((e, i) => {
+    const dotCls = typeDotCls[e.type] || 'hypercore-dot--observation';
+    const isHead = i === 0;
+    return `
+      <div class="hypercore-entry${isHead ? ' hypercore-entry--head' : ''}" role="listitem">
+        <div class="hypercore-entry-marker"><span class="hypercore-dot ${dotCls}"></span></div>
+        <div class="hypercore-entry-body">
+          <div class="hypercore-entry-head">
+            <span class="hypercore-seq">#${e.seq}</span>
+            <span class="hypercore-type hypercore-type--${e.type}">${e.type}</span>
+            <span class="hypercore-role">by ${escape(e.author)}</span>
+            <span class="hypercore-time">${fmtTime(e.timestamp)}</span>
+            ${isHead ? '<span class="hypercore-head-tag">HEAD</span>' : ''}
+          </div>
+          <div class="hypercore-entry-content">${escape(e.content)}${e.cursor ? ` <span class="hypercore-cursor">→ seq ${e.cursor}</span>` : ''}</div>
+          <div class="hypercore-entry-meta">
+            <span class="hypercore-meta-item" title="Autobase entry id">id <code>${e.id}</code></span>
+            <span class="hypercore-meta-item" title="Previous entry hash — forms the append-only chain">prev <code>${e.prev_hash}</code></span>
+            <span class="hypercore-meta-item" title="Hash of this entry's payload chained onto prev">hash <code>${e.hash}</code></span>
+            <span class="hypercore-meta-item" title="Signature stub over hash+author">sig <code>${e.sig}</code></span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  root.innerHTML = html;
+}
+
 function init() {
   initTooltips();
   initTabs();
@@ -1268,6 +1433,7 @@ function init() {
   initReports();
   initDistribute();
   initLossScrubber();
+  initHypercoreLog();
   initRouting();
   // Skeleton done — fade it out on next paint so the real UI is already visible
   requestAnimationFrame(hideInitialSkeleton);
