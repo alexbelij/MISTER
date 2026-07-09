@@ -69,18 +69,18 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MISTER">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="preload" href="styles.css?v=27" as="style">
+<link rel="preload" href="styles.css?v=28" as="style">
 <link rel="preload" href="app.js" as="script">
 <link rel="preload" href="vendor-qrcode.js" as="script">
 <link rel="preload" href="ui-notify.js" as="script">
 <link rel="preload" href="site-tour.js" as="script">
 <link rel="preconnect" href="https://alexbelij-mister-qvac-inference.hf.space" crossorigin>
 <link rel="dns-prefetch" href="https://alexbelij-mister-qvac-inference.hf.space">
-<link rel="stylesheet" href="styles.css?v=27">
+<link rel="stylesheet" href="styles.css?v=28">
 <script>document.documentElement.classList.add('js');</script>
 <script src="vendor-qrcode.js" defer></script>
-<script src="ui-notify.js?v=27" defer></script>
-<script src="site-tour.js?v=27" defer></script>
+<script src="ui-notify.js?v=28" defer></script>
+<script src="site-tour.js?v=28" defer></script>
 </head>
 <body>
 
@@ -542,9 +542,15 @@
       </div>
 
       <div class="proof-container">
-        <div class="proof-card" data-tooltip="Five real fine-tune attempts were run against a real cloud GPU on Kaggle, not simulated locally.">
+        <div class="proof-card kaggle-card" data-tooltip="Five real fine-tune attempts were run against a real cloud GPU on Kaggle, not simulated locally. Numbers below are pulled from the actual run metadata file.">
           <h3>5 real runs on Kaggle (Tesla P100 GPU)</h3>
           <p>Every run loaded the real <code>Qwen3-1.7B-Q4_0.gguf</code> model via <code>@qvac/sdk</code>, ran a real BEFORE evaluation, and started real gradient-descent training.</p>
+          <div class="kaggle-stats" id="kaggle-stats" aria-live="polite">
+            <div class="kaggle-skeleton" aria-hidden="true">
+              <span class="skel-chip"></span><span class="skel-chip"></span><span class="skel-chip"></span><span class="skel-chip"></span>
+            </div>
+          </div>
+          <div class="kaggle-runs-table" id="kaggle-runs-table"></div>
         </div>
 
         <div class="proof-card" data-tooltip="Interactive comparison across real training runs. Values are pulled from the actual QVAC worker output.">
@@ -692,7 +698,7 @@
 <!-- Tooltip -->
 <div id="tooltip" class="tooltip"></div>
 
-<script src="app.js?v=27"></script>
+<script src="app.js?v=28"></script>
 <script>
 // Register PWA service worker (progressive enhancement — silent-fail on unsupported browsers)
 // Also surfaces an update prompt via the UI toast system when a new version is available.
