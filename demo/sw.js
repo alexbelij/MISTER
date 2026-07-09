@@ -15,6 +15,7 @@ const SHELL_ASSETS = [
   './ui-notify.js',
   './site-tour.js',
   './theme-toggle.js',
+  './keyboard-shortcuts.js',
   './favicon.svg',
   './manifest.webmanifest',
   './assets/icon-192.png',

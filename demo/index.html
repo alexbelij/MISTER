@@ -89,6 +89,7 @@
 <link rel="preload" href="ui-notify.js" as="script">
 <link rel="preload" href="site-tour.js" as="script">
 <link rel="preload" href="theme-toggle.js" as="script">
+<link rel="preload" href="keyboard-shortcuts.js" as="script">
 <link rel="preconnect" href="https://alexbelij-mister-qvac-inference.hf.space" crossorigin>
 <link rel="dns-prefetch" href="https://alexbelij-mister-qvac-inference.hf.space">
 <link rel="stylesheet" href="styles.css?v=30">
@@ -97,6 +98,7 @@
 <script src="ui-notify.js?v=30" defer></script>
 <script src="site-tour.js?v=30" defer></script>
 <script src="theme-toggle.js?v=30" defer></script>
+<script src="keyboard-shortcuts.js?v=30" defer></script>
 </head>
 <body>
 
@@ -210,6 +212,9 @@
           <span>Pears Connected</span>
         </div>
       </div>
+      <button id="kbd-help-btn" class="kbd-help-btn" data-tooltip="Keyboard shortcuts (press ?)" onclick="window.KbdShortcuts && window.KbdShortcuts.showHelp()">
+        <kbd>?</kbd> <span>Shortcuts</span>
+      </button>
     </div>
   </aside>
 
