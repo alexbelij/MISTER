@@ -2358,3 +2358,42 @@ html.js .initial-skeleton { display: flex; }
     animation: none !important;
   }
 }
+
+/* --- Sortable table headers --- */
+.data-table thead th.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-right: 20px;
+  transition: color 0.15s;
+}
+.data-table thead th.sortable-th:hover { color: #e6edf3; }
+.data-table thead th.sortable-th:focus-visible {
+  outline: 2px solid #58a6ff;
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+.data-table thead th.sortable-th::after {
+  content: "";
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #484f58;
+  opacity: 0.5;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.data-table thead th.sortable-th:hover::after { opacity: 0.9; }
+.data-table thead th.sortable-th.sorted-asc::after {
+  border-top: none;
+  border-bottom: 5px solid #58a6ff;
+  opacity: 1;
+}
+.data-table thead th.sortable-th.sorted-desc::after {
+  border-top: 5px solid #58a6ff;
+  opacity: 1;
+}
