@@ -13,11 +13,19 @@ const { readJSON, fileExists, chunkText } = require('../utils/helpers');
 
 const WORKSPACE_NAME = 'mister_club_data';
 let workspaceReady = false;
+let ingestPromise = null;
 
 /**
  * Ingest all club data into a QVAC RAG workspace.
  */
 async function ingestClubData(dataDir = 'data', workspaceName = WORKSPACE_NAME) {
+  // Guard against concurrent calls — return existing promise if already ingesting
+  if (ingestPromise) return ingestPromise;
+  ingestPromise = _doIngest(dataDir, workspaceName);
+  try { return await ingestPromise; } finally { ingestPromise = null; }
+}
+
+async function _doIngest(dataDir, workspaceName) {
   log.info('rag', 'Starting RAG ingestion', { dir: dataDir, workspace: workspaceName });
 
   // Check existing workspaces
@@ -85,6 +93,14 @@ async function ingestClubData(dataDir = 'data', workspaceName = WORKSPACE_NAME) 
  * Semantic search over club data.
  */
 async function search(query, topK = null) {
+  // Wait for ingest to finish if it's still running
+  if (ingestPromise) {
+    log.info('rag', 'Search waiting for ingest to complete…');
+    await ingestPromise;
+  }
+  if (!workspaceReady) {
+    log.warn('rag', 'RAG workspace not ready — call ingestClubData() first');
+  }
   const k = topK || config.rag.topK;
   return qvac.ragSearch(WORKSPACE_NAME, query, k);
 }

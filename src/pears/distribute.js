@@ -97,10 +97,35 @@ async function main() {
       const blobs = new Hyperblobs(store.get({ name: 'adapter-blobs' }));
       // Receive blob
       const adapterData = await blobs.get(topicKey);
+
+      // --- Verify Ed25519 signature (if metadata present) ---
+      const metaKey = Buffer.concat([topicKey, Buffer.from(':meta')]);
+      let verified = false;
+      try {
+        const metaRaw = await blobs.get(metaKey);
+        if (metaRaw) {
+          const meta = JSON.parse(metaRaw.toString());
+          if (meta.signature && meta.pubkey) {
+            const { verify } = require('../identity/keypair');
+            const adapterHash = crypto.createHash('sha256').update(adapterData).digest('hex');
+            verified = verify(adapterHash, meta.signature, meta.pubkey);
+            if (!verified) {
+              console.error('✗ SIGNATURE INVALID — adapter rejected. Possible tampering.');
+              swarm.destroy();
+              process.exit(1);
+            }
+            console.log(`✓ Signature verified (author: ${meta.pubkey.slice(0, 16)}…)`);
+          }
+        }
+      } catch (e) {
+        log.warn('distribute', 'No signature metadata — accepting unsigned adapter', { err: e.message });
+      }
+
       const outputPath = 'received_adapter.gguf';
       fs.writeFileSync(outputPath, adapterData);
       console.log(`✓ Adapter received and saved: ${outputPath}`);
       console.log(`  Size: ${(adapterData.length / 1024 / 1024).toFixed(1)} MB`);
+      if (!verified) console.log('  ⚠ Warning: adapter was not signed. Consider requesting a signed distribution.');
       swarm.destroy();
     });
 
@@ -121,6 +146,18 @@ async function main() {
     
     // Create topic from adapter hash
     const hash = crypto.createHash('sha256').update(adapterData).digest();
+
+    // --- Sign adapter with Ed25519 keypair ---
+    try {
+      const { loadOrCreate, sign } = require('../identity/keypair');
+      const kp = loadOrCreate();
+      const sig = sign(hash.toString('hex'), kp.secretKey);
+      const metaKey = Buffer.concat([hash.slice(0, 32), Buffer.from(':meta')]);
+      await blobs.put(Buffer.from(JSON.stringify({ pubkey: kp.publicKey, signature: sig, hash: hash.toString('hex') })), { key: metaKey });
+      log.info('distribute', 'Adapter signed', { pubkey: kp.publicKey.slice(0, 16) });
+    } catch (e) {
+      log.warn('distribute', 'Could not sign adapter (identity not available)', { err: e.message });
+    }
     const topic = hash.slice(0, 32);
     
     swarm.join(topic, { client: false, server: true });

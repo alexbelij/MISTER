@@ -51,18 +51,18 @@
     "delete-data": "node -e \"require('./src/security/crypto').deleteAllClubData(); console.log('All data deleted')\""
   },
   "dependencies": {
-    "@qvac/sdk": "latest",
+    "@qvac/sdk": "0.9.0",
     "@tetherto/wdk": "1.0.0-beta.13",
-    "hyperswarm": "latest",
-    "hyperblobs": "latest",
-    "corestore": "latest",
-    "autobase": "latest",
+    "hyperswarm": "4.9.2",
+    "hyperblobs": "2.4.2",
+    "corestore": "6.19.3",
+    "autobase": "6.2.1",
     "qrcode": "^1.5.4",
     "@tetherto/wdk-wallet-evm": "^1.0.0-beta.15",
-    "@tetherto/wdk-wallet-evm-erc-4337": "latest"
+    "@tetherto/wdk-wallet-evm-erc-4337": "1.0.0-beta.15"
   },
   "devDependencies": {
-    "electron": "latest"
+    "electron": "35.2.1"
   },
   "keywords": [
     "qvac",
