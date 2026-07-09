@@ -586,7 +586,7 @@ function renderPlayerCards(filter = 'all') {
 
   const list = PLAYERS
     .filter(p => filter === 'all' || positionGroup(p.pos) === filter)
-    .map(p => ({ ...p, _avg: playerAverage(p) }))
+    .map(p => ({ ...p, _avg: playerAverage(p), _origIndex: PLAYERS.indexOf(p) }))
     .sort((a, b) => b._avg - a._avg);
 
   if (!list.length) {
@@ -604,7 +604,7 @@ function renderPlayerCards(filter = 'all') {
     const initials = playerInitials(p.name);
     return `<div class="player-card avatar-${POS_COLOUR[group]}"
               role="button" tabindex="0"
-              data-player-index="${PLAYERS.indexOf(p)}"
+              data-player-index="${p._origIndex}"
               data-tooltip="${p.name} (#${p.num}, ${p.pos}) — avg ${p._avg.toFixed(2)}. Click for the full 8-criteria breakdown."
               aria-label="Open ${p.name} details"
               style="--card-delay:${idx * 20}ms">
