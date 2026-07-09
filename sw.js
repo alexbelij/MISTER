@@ -1,7 +1,7 @@
 /* MISTER service worker — offline shell + network-first data
  * bump CACHE_VERSION on every deploy to invalidate old caches
  */
-const CACHE_VERSION = 'mister-v26';
+const CACHE_VERSION = 'mister-v27';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const DATA_CACHE = `${CACHE_VERSION}-data`;
 
@@ -13,6 +13,7 @@ const SHELL_ASSETS = [
   './app.js',
   './vendor-qrcode.js',
   './ui-notify.js',
+  './site-tour.js',
   './favicon.svg',
   './manifest.webmanifest',
   './assets/icon-192.png',
