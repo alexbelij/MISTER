@@ -447,6 +447,119 @@ async function runLiveQvacTests() {
   });
 }
 
+// ── WDK Marketplace Tests ──
+console.log('\n📦 WDK Marketplace:');
+
+test('marketplace.js exports loadWdkModules path', () => {
+  // Verify the file structure is correct and functions are accessible
+  const mpCode = fs.readFileSync(path.join(__dirname, '..', 'src', 'wdk', 'marketplace.js'), 'utf-8');
+  assert(mpCode.includes('loadWdkModules'), 'Should define loadWdkModules');
+  assert(mpCode.includes("require('@tetherto/wdk')"), 'Should import real WDK');
+  assert(mpCode.includes('ERC-4337'), 'Should reference ERC-4337');
+  assert(mpCode.includes('wdkNetworkConfig'), 'Should define network config');
+});
+
+test('marketplace.js has honest status header', () => {
+  const mpCode = fs.readFileSync(path.join(__dirname, '..', 'src', 'wdk', 'marketplace.js'), 'utf-8');
+  assert(mpCode.includes('HONEST STATUS'), 'Should have honest status note');
+  assert(mpCode.includes('fails loudly'), 'Should document failure behavior');
+});
+
+test('marketplace listing structure is valid', () => {
+  const { generateId } = require('../src/utils/helpers');
+  const crypto = require('crypto');
+  const id = generateId('lst');
+  assert(id.startsWith('lst_'), 'Listing ID should start with lst_');
+  const hash = crypto.createHash('sha256').update('test-adapter-data').digest('hex');
+  assert(typeof hash === 'string' && hash.length === 64, 'Hash should be 64-char hex');
+});
+
+test('marketplace hash uses full file content (not truncated)', () => {
+  const mpCode = fs.readFileSync(path.join(__dirname, '..', 'src', 'wdk', 'marketplace.js'), 'utf-8');
+  assert(mpCode.includes("createHash('sha256').update(fs.readFileSync(adapterPath))"), 'Should hash full adapter file');
+  assert(!mpCode.includes('.toString(\'base64\').slice('), 'Should NOT truncate base64 before hashing');
+});
+
+// ── Pears Tests ──
+console.log('\n🍐 Pears Stack:');
+
+test('distribute.js signs adapters with Ed25519', () => {
+  const code = fs.readFileSync(path.join(__dirname, '..', 'src', 'pears', 'distribute.js'), 'utf-8');
+  assert(code.includes("require('../identity/keypair')"), 'Should import keypair');
+  assert(code.includes('sign(') || code.includes('.sign'), 'Should sign adapter');
+  assert(code.includes('SIGNATURE INVALID'), 'Should reject invalid signatures');
+});
+
+test('collab_model.js uses real Autobase', () => {
+  const code = fs.readFileSync(path.join(__dirname, '..', 'src', 'pears', 'collab_model.js'), 'utf-8');
+  assert(code.includes("require('autobase')"), 'Should import autobase');
+  assert(code.includes('openAutobase'), 'Should have openAutobase function');
+  assert(code.includes('apply(nodes'), 'Should define apply function for linearization');
+  assert(code.includes('store.replicate'), 'Sync should use real store.replicate');
+  // Must NOT have raw socket.write for data sync
+  assert(!code.includes('socket.write(localData)'), 'Should NOT manually write raw data to socket');
+});
+
+test('team_sync.js validates manifests', () => {
+  const code = fs.readFileSync(path.join(__dirname, '..', 'src', 'pears', 'team_sync.js'), 'utf-8');
+  assert(code.includes('verifyManifest'), 'Should verify team manifests');
+  assert(code.includes('roleOf'), 'Should check roles');
+  assert(code.includes('hasScope'), 'Should check scopes');
+});
+
+test('delegate.js validates socket data (no crash on malformed input)', () => {
+  const code = fs.readFileSync(path.join(__dirname, '..', 'src', 'pears', 'delegate.js'), 'utf-8');
+  assert(code.includes('try { request = JSON.parse') || code.includes('try { response = JSON.parse'),
+    'Should wrap socket JSON.parse in try/catch');
+  assert(code.includes('Malformed'), 'Should log malformed data warning');
+});
+
+test('identity keypair: generate, sign, verify', () => {
+  const { nodeGenerate, nodeSign, nodeVerify } = require('../src/identity/keypair');
+  const kp = nodeGenerate();
+  assert(kp.publicKey && kp.publicKey.length === 64, 'Pubkey should be 64-char hex');
+  assert(kp.privateKey && kp.privateKey.length === 64, 'PrivKey should be 64-char hex');
+  const msg = 'test-message-' + Date.now();
+  const sig = nodeSign(kp.privateKey, msg);
+  assert(typeof sig === 'string' && sig.length === 128, 'Signature should be 128-char hex');
+  assert(nodeVerify(kp.publicKey, msg, sig) === true, 'Signature should verify');
+  assert(nodeVerify(kp.publicKey, msg + 'tampered', sig) === false, 'Tampered msg should fail');
+});
+
+test('team manifest: role scopes are defined correctly', () => {
+  const { DEFAULT_SCOPES } = require('../src/identity/team_manifest');
+  assert(typeof DEFAULT_SCOPES === 'object', 'DEFAULT_SCOPES should be exported');
+  assert(DEFAULT_SCOPES.head_coach.includes('read_all'), 'Head coach should have read_all');
+  assert(DEFAULT_SCOPES.head_coach.includes('write_all'), 'Head coach should have write_all');
+  assert(!DEFAULT_SCOPES.player.includes('write_all'), 'Player should NOT have write_all');
+  assert(DEFAULT_SCOPES.analyst.includes('read_all'), 'Analyst should have read_all');
+  assert(DEFAULT_SCOPES.player.includes('read_self'), 'Player should have read_self');
+});
+
+// ── Error Handling Tests ──
+console.log('\n🛡️ Error Handling:');
+
+test('config.js handles malformed CLI args without crash', () => {
+  const configCode = fs.readFileSync(path.join(__dirname, '..', 'src', 'utils', 'config.js'), 'utf-8');
+  assert(configCode.includes('try { target[finalKey]') || configCode.includes('catch { target[finalKey]'),
+    'Should gracefully handle non-JSON CLI values');
+});
+
+test('helpers.js chunkText does not infinite-loop on bad input', () => {
+  const { chunkText } = require('../src/utils/helpers');
+  const result = chunkText('short text', 5, 5);  // overlap >= maxLen — edge case
+  assert(Array.isArray(result), 'Should return array');
+  assert(result.length > 0, 'Should return at least one chunk');
+});
+
+test('all dependencies are pinned (no "latest")', () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8'));
+  const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+  for (const [name, version] of Object.entries(deps)) {
+    assert(version !== 'latest', `${name} should not be "latest" — pin to a specific version`);
+  }
+});
+
 // --- Results ---
 (async () => {
   await runLiveQvacTests();

@@ -106,9 +106,9 @@ async function main() {
         if (metaRaw) {
           const meta = JSON.parse(metaRaw.toString());
           if (meta.signature && meta.pubkey) {
-            const { verify } = require('../identity/keypair');
+            const { nodeVerify } = require('../identity/keypair');
             const adapterHash = crypto.createHash('sha256').update(adapterData).digest('hex');
-            verified = verify(adapterHash, meta.signature, meta.pubkey);
+            verified = nodeVerify(meta.pubkey, adapterHash, meta.signature);
             if (!verified) {
               console.error('✗ SIGNATURE INVALID — adapter rejected. Possible tampering.');
               swarm.destroy();
@@ -149,9 +149,9 @@ async function main() {
 
     // --- Sign adapter with Ed25519 keypair ---
     try {
-      const { loadOrCreate, sign } = require('../identity/keypair');
-      const kp = loadOrCreate();
-      const sig = sign(hash.toString('hex'), kp.secretKey);
+      const { nodeGenerate, nodeSign } = require('../identity/keypair');
+      const kp = nodeGenerate();  // Fresh keypair for signing (or loadOrCreate in production)
+      const sig = nodeSign(kp.privateKey, hash.toString('hex'));
       const metaKey = Buffer.concat([hash.slice(0, 32), Buffer.from(':meta')]);
       await blobs.put(Buffer.from(JSON.stringify({ pubkey: kp.publicKey, signature: sig, hash: hash.toString('hex') })), { key: metaKey });
       log.info('distribute', 'Adapter signed', { pubkey: kp.publicKey.slice(0, 16) });
