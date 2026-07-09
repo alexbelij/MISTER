@@ -16,6 +16,16 @@
 **[⚙️ Run it locally](#run-the-real-thing)** &nbsp;·&nbsp;
 **[🔬 See the proof](https://alexbelij.github.io/MISTER/#proof)**
 
+<br>
+
+| Chat | Analytics |
+|:---:|:---:|
+| ![Chat](screenshots/chat.png) | ![Analytics](screenshots/analytics.png) |
+
+| Distribute | Proof |
+|:---:|:---:|
+| ![Distribute](screenshots/distribute.png) | ![Proof](screenshots/proof.png) |
+
 </div>
 
 ---
