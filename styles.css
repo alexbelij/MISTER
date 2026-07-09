@@ -190,6 +190,57 @@
   .chat-bubble { max-width: 95%; }
 }
 
+/* ── Chat routing + E2E indicators ── */
+.chat-routing-indicator, .chat-e2e-indicator { font-size: 0.72rem; color: var(--text-secondary, #8b949e); display: inline-flex; align-items: center; gap: 3px; margin-left: 8px; }
+.chat-e2e-indicator { color: var(--green); }
+
+/* ── Language selector ── */
+.chat-lang-select { background: var(--bg-card, #161b22); color: var(--text-secondary, #8b949e); border: 1px solid var(--border, #30363d); border-radius: 6px; padding: 2px 4px; font-size: 0.75rem; cursor: pointer; }
+[data-theme="light"] .chat-lang-select { background: #fff; color: #1f2328; border-color: #d0d7de; }
+
+/* ── OCR + Footage cards ── */
+.ocr-drop-zone, .footage-upload { border: 2px dashed var(--border, #30363d); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: border-color 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text-secondary, #8b949e); }
+.ocr-drop-zone:hover, .footage-upload:hover { border-color: var(--green); }
+.ocr-result { margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+.ocr-text { font-family: monospace; font-size: 0.85rem; white-space: pre-wrap; margin-bottom: 8px; }
+
+/* ── Team Sync ── */
+.sync-status-grid { display: flex; flex-direction: column; gap: 8px; }
+.sync-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.sync-dot--ok { background: var(--green); }
+.sync-dot--pending { background: var(--orange, #f78166); animation: voicePulse 1.5s infinite; }
+.sync-time { margin-left: auto; color: var(--text-secondary, #8b949e); font-size: 0.75rem; }
+
+/* ── Delegate ── */
+.delegate-status { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.delegate-row { display: flex; justify-content: space-between; font-size: 0.85rem; }
+.delegate-label { color: var(--text-secondary, #8b949e); }
+.delegate-toggle { width: 100%; }
+
+/* ── Crypto card ── */
+.crypto-details { display: flex; flex-direction: column; gap: 6px; }
+.crypto-row { display: flex; justify-content: space-between; font-size: 0.85rem; }
+.crypto-label { color: var(--text-secondary, #8b949e); }
+
+/* ── Pipeline flow ── */
+.pipeline-flow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
+.pipeline-step { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 12px; background: rgba(255,255,255,0.04); border-radius: 8px; min-width: 100px; }
+.pipeline-icon { font-size: 1.2rem; }
+.pipeline-name { font-size: 0.78rem; font-weight: 600; color: var(--green); }
+.pipeline-desc { font-size: 0.7rem; color: var(--text-secondary, #8b949e); }
+.pipeline-arrow { font-size: 1.2rem; color: var(--text-secondary, #8b949e); }
+[data-theme="light"] .pipeline-step { background: rgba(0,0,0,0.04); }
+
+/* ── Config selector ── */
+.config-selector { margin: 4px 0; padding: 4px 8px; display: flex; align-items: center; gap: 8px; }
+.config-label { font-size: 0.8rem; color: var(--text-secondary, #8b949e); white-space: nowrap; }
+.config-dropdown { background: var(--bg-card, #161b22); color: var(--text-primary, #f0f6fc); border: 1px solid var(--border, #30363d); border-radius: 6px; padding: 3px 6px; font-size: 0.78rem; cursor: pointer; flex: 1; }
+[data-theme="light"] .config-dropdown { background: #fff; color: #1f2328; border-color: #d0d7de; }
+
+/* ── Eval table ── */
+.eval-table td:last-child { color: var(--green); font-weight: 600; }
+
 /* ── Before/After Compare ── */
 .compare-split { display: flex; gap: 12px; width: 100%; }
 .compare-col { flex: 1; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); }
