@@ -1,5 +1,24 @@
 // ===== MISTER — Football Coaching AI Demo =====
-// All data is real project data from FC Metall Nord
+// All static data (players, matches, opponents, suggested prompts) is real
+// project data from the FC Metall Nord SFT/causal corpus used to fine-tune
+// the model.
+//
+// HONESTY NOTE: the chat below calls a real hosted backend — a small
+// Express bridge server (bridge/server.js) running on a free Hugging Face
+// Space, which loads the repo's configured Qwen3-1.7B-Q4 model via
+// @qvac/sdk (the same wrapper logic as src/inference/chat.js / the
+// Electron app) and runs genuine completion. It is not keyword-matched or
+// pre-scripted. The bridge runs on free CPU hardware and may be asleep —
+// the "typing" indicator reflects real network + cold-start + inference
+// latency, not a fixed UI animation.
+// Per-match player "ratings" below add a small random jitter purely for
+// visual variety on the radar chart; they are not a computed model output.
+// Fully on-device (no network) inference happens in the Electron app
+// (`npm start`), which calls the same `@qvac/sdk` — see src/inference/chat.js.
+
+// Public URL of the hosted QVAC bridge (Hugging Face Space, Docker SDK).
+// See bridge/server.js and bridge/Dockerfile for the backend implementation.
+const QVAC_BRIDGE_URL = 'https://khrol-mister-qvac-bridge.hf.space';
 
 // ===== DATA =====
 const PLAYERS = [
@@ -129,8 +148,23 @@ const ICONS = {
 // ===== TOOLTIP SYSTEM =====
 const tooltipEl = document.getElementById('tooltip');
 let tooltipTimeout;
+// Hover-driven tooltips only make sense on devices with a real mouse (hover +
+// fine pointer). On touch devices, `mouseover` fires on tap but `mouseout`
+// often never fires (or fires unreliably), leaving the tooltip permanently
+// stuck on screen, duplicating the label underneath. So: don't bind the
+// hover tooltip system at all on touch/coarse-pointer devices.
+const supportsHoverTooltips = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 function initTooltips() {
+  if (!supportsHoverTooltips) {
+    // Safety net: if a tooltip ever ends up visible on a touch device
+    // (e.g. a hybrid laptop+touchscreen), dismiss it on the next tap
+    // anywhere so it can never get stuck.
+    document.addEventListener('touchstart', () => {
+      tooltipEl.classList.remove('visible');
+    }, { passive: true });
+    return;
+  }
   document.addEventListener('mouseover', (e) => {
     const target = e.target.closest('[data-tooltip]');
     if (!target) return;
@@ -162,25 +196,50 @@ function positionTooltip(e) {
 }
 
 // ===== TAB SWITCHING =====
-function initTabs() {
-  const switchTab = (tabName) => {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(t => t.classList.remove('active'));
-    const tab = document.getElementById('tab-' + tabName);
-    if (tab) tab.classList.add('active');
-    document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(t => t.classList.add('active'));
-    closeSidebar();
-    // Scroll to top
-    document.querySelector('.main-content').scrollTop = 0;
-    window.scrollTo(0, 0);
-  };
+// Exposed on window so other sections (e.g. Match History -> Match Report)
+// can navigate tabs programmatically, not just via the sidebar/bottom nav.
+const VALID_TABS = ['chat', 'analytics', 'suggestions', 'reports', 'distribute', 'proof'];
 
+function switchTab(tabName, pushHistory = true) {
+  if (!VALID_TABS.includes(tabName)) tabName = 'chat';
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(t => t.classList.remove('active'));
+  const tab = document.getElementById('tab-' + tabName);
+  if (tab) tab.classList.add('active');
+  document.querySelectorAll(`[data-tab="${tabName}"]`).forEach(t => t.classList.add('active'));
+  if (typeof window.closeSidebar === 'function') window.closeSidebar();
+  // Scroll to top
+  document.querySelector('.main-content').scrollTop = 0;
+  window.scrollTo(0, 0);
+  // Real routing: push a history entry per tab so the browser's back/forward
+  // buttons move between tabs instead of leaving the app / doing nothing.
+  if (pushHistory && location.hash.slice(1) !== tabName) {
+    history.pushState({ tab: tabName }, '', '#' + tabName);
+  }
+}
+window.switchTab = switchTab;
+
+function initTabs() {
   document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
       switchTab(item.dataset.tab);
     });
   });
+  // Back/forward button support.
+  window.addEventListener('popstate', (e) => {
+    const tab = (e.state && e.state.tab) || (VALID_TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'chat');
+    switchTab(tab, false);
+  });
+}
+
+// Deep-link / reload support: open whatever tab is in the URL hash, and seed
+// the initial history entry so the very first back-press has somewhere to
+// go. Runs last in init(), after every other init*() has wired up its DOM.
+function initRouting() {
+  const initialTab = VALID_TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'chat';
+  switchTab(initialTab, false);
+  history.replaceState({ tab: initialTab }, '', '#' + initialTab);
 }
 
 // ===== SIDEBAR (MOBILE) =====
@@ -254,27 +313,76 @@ function initChat() {
     if (t) t.remove();
   };
 
-  const renderResponse = (response) => {
-    let html = '';
-    response.answer.forEach(block => {
-      if (block.type === 'p') {
-        html += `<p>${block.text}</p>`;
-      } else if (block.type === 'point') {
-        html += `<div class="tactical-point">${ICONS[block.icon] || ''}<span>${block.text}</span></div>`;
+  // Render a plain-text (or lightly formatted) reply from the live backend.
+  const renderReply = (text) => {
+    // Escape HTML, then turn **bold** into <strong> and newlines into <br>/<p>.
+    const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const escaped = escapeHtml(text);
+    const withBold = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    const paragraphs = withBold.split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+    addMessage(paragraphs || `<p>${escaped}</p>`, false, true);
+  };
+
+  // Fetch with a client-side timeout (the Space can be asleep and slow to wake).
+  const fetchWithTimeout = (url, opts, timeoutMs) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    return fetch(url, { ...opts, signal: controller.signal }).finally(() => clearTimeout(timer));
+  };
+
+  // Call the real hosted QVAC bridge (see bridge/server.js). Retries once
+  // if the model is still cold-starting (503 from the backend).
+  const askBackend = async (message) => {
+    const endpoint = QVAC_BRIDGE_URL.replace(/\/$/, '') + '/chat';
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const res = await fetchWithTimeout(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message }),
+        }, 60000);
+        if (res.status === 503 && attempt === 0) {
+          // Model still loading / Space waking up — wait then retry once.
+          await new Promise(r => setTimeout(r, 8000));
+          continue;
+        }
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.error || `Backend returned ${res.status}`);
+        }
+        return data.reply || '(empty reply from backend)';
+      } catch (e) {
+        if (attempt === 0) {
+          await new Promise(r => setTimeout(r, 4000));
+          continue;
+        }
+        throw e;
       }
-    });
-    addMessage(html, false, true);
+    }
+    throw new Error('Backend did not respond in time');
+  };
+
+  const sendToBackend = async (text) => {
+    addMessage(text, true);
+    addTyping();
+    try {
+      const reply = await askBackend(text);
+      removeTyping();
+      renderReply(reply);
+    } catch (e) {
+      removeTyping();
+      addMessage(
+        `⚠️ Could not reach the live QVAC backend (${e.message || e}). It may be waking up from sleep — ` +
+        `please wait ~30-60s and try again, or check the Space status directly: ${QVAC_BRIDGE_URL}`,
+        false
+      );
+    }
   };
 
   const sendPrompt = (promptKey) => {
     const response = CHAT_RESPONSES[promptKey];
     if (!response) return;
-    addMessage(response.question, true);
-    addTyping();
-    setTimeout(() => {
-      removeTyping();
-      renderResponse(response);
-    }, 800 + Math.random() * 400);
+    sendToBackend(response.question);
   };
 
   // Suggestion buttons
@@ -286,24 +394,8 @@ function initChat() {
   const handleSend = () => {
     const text = inputEl.value.trim();
     if (!text) return;
-    addMessage(text, true);
     inputEl.value = '';
-    addTyping();
-    setTimeout(() => {
-      removeTyping();
-      // Try to match a pre-baked response
-      const lower = text.toLowerCase();
-      let matched = null;
-      if (lower.includes('hafen') || lower.includes('game plan') || lower.includes('gameplan')) matched = 'gameplan';
-      else if (lower.includes('diamond')) matched = 'diamond';
-      else if (lower.includes('yellow') || lower.includes('riedel') || lower.includes('card')) matched = 'yellow';
-      else if (lower.includes('fullback') || lower.includes('slow') || lower.includes('channel')) matched = 'fullback';
-      if (matched) {
-        renderResponse(CHAT_RESPONSES[matched]);
-      } else {
-        addMessage('I can answer questions about game plans, opponent adjustments, player roles, and tactical patterns. Try one of the suggested prompts below, or ask about specific opponents like Hafen United, Bergland, or Stahl Süd.', false);
-      }
-    }, 800 + Math.random() * 400);
+    sendToBackend(text);
   };
 
   sendBtn.addEventListener('click', handleSend);
@@ -317,7 +409,7 @@ function renderMatchTimeline() {
   const container = document.getElementById('match-timeline');
   if (!container) return;
   container.innerHTML = MATCHES.map(m => `
-    <div class="match-row result-${m.result.toLowerCase()}" data-tooltip="${m.date} vs ${m.opponent} (${m.venue}) — ${m.result} ${m.gf}-${m.ga}. xG: ${m.xg_f}-${m.xg_a}. Press: ${m.press}%. Transition: ${m.trans}s. Flank overloads: ${m.flank}.">
+    <div class="match-row result-${m.result.toLowerCase()}" data-match-id="${m.id}" data-tooltip="${m.date} vs ${m.opponent} (${m.venue}) — ${m.result} ${m.gf}-${m.ga}. xG: ${m.xg_f}-${m.xg_a}. Press: ${m.press}%. Transition: ${m.trans}s. Flank overloads: ${m.flank}. Click to open the full match report.">
       <div class="match-date">${m.date.slice(5)}</div>
       <div class="match-vs">
         <div class="match-opponent">${m.opponent}</div>
@@ -331,6 +423,19 @@ function renderMatchTimeline() {
       <div class="match-score">${m.gf}-${m.ga}</div>
     </div>
   `).join('');
+
+  container.querySelectorAll('.match-row').forEach((row) => {
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', () => {
+      const matchId = row.dataset.matchId;
+      switchTab('reports');
+      const select = document.getElementById('report-match-select');
+      if (select) {
+        select.value = matchId;
+        select.dispatchEvent(new Event('change'));
+      }
+    });
+  });
 }
 
 function renderPlayerRatings() {
@@ -664,53 +769,16 @@ function renderQRCode(key) {
   const container = document.getElementById('qr-code');
   if (!container) return;
 
-  // Generate a stylized QR code pattern from the key
-  const size = 21; // QR-like grid
-  const cellSize = 8;
-  const totalSize = size * cellSize;
-  const seed = key.split('').reduce((s, c) => s + c.charCodeAt(0), 0);
-
-  // Pseudo-random based on key
-  let rng = seed;
-  const random = () => {
-    rng = (rng * 1103515245 + 12345) & 0x7fffffff;
-    return rng / 0x7fffffff;
-  };
-
-  let cells = '';
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      // Finder patterns (corners)
-      const isFinder = (x < 7 && y < 7) || (x >= size - 7 && y < 7) || (x < 7 && y >= size - 7);
-      if (isFinder) {
-        const fx = x < 7 ? x : x - (size - 7);
-        const fy = y < 7 ? y : y - (size - 7);
-        const isOuter = fx === 0 || fx === 6 || fy === 0 || fy === 6;
-        const isInner = fx >= 2 && fx <= 4 && fy >= 2 && fy <= 4;
-        if (isOuter || isInner) {
-          cells += `<rect x="${x*cellSize}" y="${y*cellSize}" width="${cellSize}" height="${cellSize}" fill="#0d1117"/>`;
-        }
-        continue;
-      }
-      // Data cells
-      if (random() > 0.5) {
-        cells += `<rect x="${x*cellSize}" y="${y*cellSize}" width="${cellSize}" height="${cellSize}" fill="#0d1117"/>`;
-      }
-    }
-  }
-
-  // Timing patterns
-  for (let i = 8; i < size - 8; i++) {
-    if (i % 2 === 0) {
-      cells += `<rect x="${i*cellSize}" y="${6*cellSize}" width="${cellSize}" height="${cellSize}" fill="#0d1117"/>`;
-      cells += `<rect x="${6*cellSize}" y="${i*cellSize}" width="${cellSize}" height="${cellSize}" fill="#0d1117"/>`;
-    }
-  }
-
-  container.innerHTML = `<svg width="${totalSize}" height="${totalSize}" viewBox="0 0 ${totalSize} ${totalSize}" xmlns="http://www.w3.org/2000/svg">
-    <rect width="${totalSize}" height="${totalSize}" fill="#fff"/>
-    ${cells}
-  </svg>`;
+  // Real, scannable QR code (kazuhikoarase/qrcode-generator, vendored in
+  // vendor-qrcode.js — MIT). Encodes a real pears:// deep link carrying the
+  // topic key, so any standard QR reader decodes real, meaningful content
+  // (previously this rendered a decorative fake pattern that encoded nothing
+  // and could not be scanned by any app — fixed 2026-07-08).
+  const payload = `pears://mister/adapter?topic=${key}`;
+  const qr = qrcode(0, 'M'); // type 0 = auto-detect smallest version, M = ~15% error correction
+  qr.addData(payload);
+  qr.make();
+  container.innerHTML = qr.createSvgTag({ cellSize: 6, margin: 2 });
 }
 
 function renderPeers() {
@@ -780,6 +848,7 @@ function init() {
   renderSuggestions();
   initReports();
   initDistribute();
+  initRouting();
 }
 
 if (document.readyState === 'loading') {

@@ -261,6 +261,11 @@ body {
   border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 16px;
+  /* CSS Grid/Flex items default to min-width:auto, which lets a card's
+     content (long text rows, SVGs, etc.) force it wider than its track and
+     overflow the viewport on narrow screens. min-width:0 lets it shrink and
+     wrap/scroll internally instead. */
+  min-width: 0;
 }
 .card-header {
   display: flex;
@@ -277,7 +282,7 @@ body {
 /* ===== Analytics Grid ===== */
 .analytics-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
 }
 
@@ -756,6 +761,37 @@ body {
   0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
   30% { transform: translateY(-6px); opacity: 1; }
 }
+
+/* ===== Proof ===== */
+.proof-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  max-width: 900px;
+}
+.proof-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.proof-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.proof-card p {
+  color: var(--text-secondary, #8b949e);
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+.proof-card code {
+  background: rgba(110,118,129,0.15);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+.proof-table { margin-top: 4px; }
 
 /* ===== Distribute ===== */
 .distribute-container {
