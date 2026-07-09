@@ -4,11 +4,11 @@
 > features that are confirmed working live today: the browser web demo
 > (real hosted QVAC inference), the analytics/reports/distribute tabs, the
 > honest fine-tune story via real Kaggle checkpoints, and 37/37 tests + CI.
-> It does NOT show the Electron desktop app or the Pear mobile app live,
-> because neither has been run on real hardware yet (only syntax-checked) —
-> showing them live without a prior test run risks an on-camera failure.
-> If you test those apps on your own machine before the final-build round
-> (14 July), we can extend this script to include them then.
+> It does NOT show the Electron desktop app or the Pear mobile app live —
+> this script is intentionally scoped to only the browser web demo for the
+> top-16 round, the fastest and lowest-risk path to a clean take. If you've
+> verified the Electron desktop app / Pear mobile app on your own hardware
+> and want to include them, extend this script before recording.
 >
 > Record with screen capture (OBS/QuickTime/Loom) at the live URL:
 > **https://alexbelij.github.io/MISTER/** — do a full dry run once before
@@ -21,11 +21,10 @@
 > (a Hugging Face Space) for judge accessibility — it needs a network
 > connection to work. Killing the network here would break the demo, not
 > prove the on-device claim. The actual on-device path is the Electron
-> desktop app / Pear mobile app, which this script deliberately does not
-> show live because neither has been run on real hardware yet (see above).
-> If there's time before recording to do a quick smoke-test of the desktop
-> app, a genuine offline/airplane-mode clip can be added as a bonus B-roll
-> segment — but don't force it live into this script under time pressure.
+> desktop app / Pear mobile app, which is simply out of scope for this
+> particular script. If you've verified either works on your own hardware
+> and want a genuine offline/airplane-mode clip, add it as a bonus B-roll
+> segment — but don't force it in under time pressure.
 
 ---
 

@@ -261,6 +261,11 @@ body {
   border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 16px;
+  /* CSS Grid/Flex items default to min-width:auto, which lets a card's
+     content (long text rows, SVGs, etc.) force it wider than its track and
+     overflow the viewport on narrow screens. min-width:0 lets it shrink and
+     wrap/scroll internally instead. */
+  min-width: 0;
 }
 .card-header {
   display: flex;
@@ -277,7 +282,7 @@ body {
 /* ===== Analytics Grid ===== */
 .analytics-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
 }
 
