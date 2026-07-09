@@ -25,6 +25,42 @@ const { ensureDir, writeJSON, generateId } = require('../utils/helpers');
 const STORAGE_DIR = path.join(process.cwd(), config.pears.storageDir, 'game-model');
 const LOG_FILE = path.join(STORAGE_DIR, 'local_log.jsonl');
 
+// ── Shared Autobase instance ──
+let _store = null;
+let _autobase = null;
+
+/**
+ * Open (or reuse) the Autobase + Corestore for this game-model.
+ * Falls back to local JSONL if Pears modules are not installed.
+ */
+async function openAutobase() {
+  if (_autobase) return _autobase;
+
+  const Corestore = require('corestore');
+  const Autobase = require('autobase');
+
+  ensureDir(STORAGE_DIR);
+  _store = new Corestore(path.join(STORAGE_DIR, 'cores'));
+  _autobase = new Autobase(_store, {
+    valueEncoding: 'json',
+    open(store) {
+      // linearised output core — Autobase merges all writers here
+      return store.get({ name: 'game-model-view' });
+    },
+    async apply(nodes, view, host) {
+      // apply() is called by Autobase when it linearises writes.
+      // Each node.value is the JSON entry we appended.
+      for (const node of nodes) {
+        await view.append(node.value);
+      }
+    },
+  });
+
+  await _autobase.ready();
+  log.info('collab', 'Autobase ready', { writers: _autobase.inputs?.length || 1 });
+  return _autobase;
+}
+
 async function main() {
   const action = process.argv.find(a => a.startsWith('--'))?.replace('--', '');
 
@@ -52,35 +88,6 @@ async function main() {
 async function initGameModel() {
   const clubName = process.argv.find(a => a.startsWith('--club='))?.split('=')[1] || 'FC Metall Nord';
 
-  ensureDir(STORAGE_DIR);
-
-  // Initialize local log
-  if (!fs.existsSync(LOG_FILE)) {
-    fs.writeFileSync(LOG_FILE, '');
-  }
-
-  // Load Pears modules for Autobase
-  let Corestore, Autobase;
-  try {
-    Corestore = require('corestore');
-    Autobase = require('autobase');
-  } catch (e) {
-    log.warn('collab', 'Pears modules not installed, using local file log only', { hint: 'npm install corestore autobase' });
-  }
-
-  const store = new Corestore(STORAGE_DIR);
-
-  // Create or load Autobase
-  let autobase;
-  if (Autobase) {
-    autobase = new Autobase({
-      store,
-      name: 'game-model',
-    });
-    log.info('collab', 'Autobase initialized', { club: clubName });
-  }
-
-  // Add initial entry
   const initEntry = {
     id: generateId('gmi'),
     type: 'init',
@@ -90,15 +97,19 @@ async function initGameModel() {
     content: `Game model initialized for ${clubName}`,
   };
 
-  appendLocal(initEntry);
-
-  if (autobase) {
-    await autobase.append(JSON.stringify(initEntry));
+  try {
+    const ab = await openAutobase();
+    await ab.append(JSON.stringify(initEntry));
+    log.info('collab', 'Init entry appended to Autobase', { club: clubName });
+  } catch (e) {
+    log.warn('collab', 'Autobase unavailable, using local log', { err: e.message });
   }
+
+  // Always mirror to local JSONL as backup
+  appendLocal(initEntry);
 
   console.log(`✓ Game model initialized for ${clubName}`);
   console.log(`  Storage: ${STORAGE_DIR}`);
-  console.log(`  Log: ${LOG_FILE}`);
 }
 
 async function addObservation() {
@@ -121,38 +132,62 @@ async function addObservation() {
     timestamp: new Date().toISOString(),
   };
 
+  // Primary: Autobase
+  try {
+    const ab = await openAutobase();
+    await ab.append(JSON.stringify(entry));
+    log.info('collab', 'Observation appended to Autobase', { id: entry.id });
+  } catch (e) {
+    log.warn('collab', 'Autobase unavailable, local only', { err: e.message });
+  }
+
+  // Backup: local JSONL
   appendLocal(entry);
 
-  // Try to append to Autobase if available
-  try {
-    let Corestore, Autobase;
-    Corestore = require('corestore');
-    Autobase = require('autobase');
-
-    const store = new Corestore(STORAGE_DIR);
-    const autobase = new Autobase({ store, name: 'game-model' });
-    await autobase.append(JSON.stringify(entry));
-    log.info('collab', 'Observation added to Autobase', { id: entry.id });
-  } catch (e) {
-    log.info('collab', 'Observation added to local log', { id: entry.id });
-  }
-
-  console.log(`✓ Observation added: ${content.substring(0, 80)}...`);
-  console.log(`  ID: ${entry.id}`);
-  console.log(`  Type: ${type}`);
-  console.log(`  Author: ${author}`);
+  console.log(`✓ Observation added: ${content.substring(0, 80)}${content.length > 80 ? '…' : ''}`);
+  console.log(`  ID: ${entry.id} | Type: ${type} | Author: ${author}`);
 }
 
-async function viewLog() {
-  if (!fs.existsSync(LOG_FILE)) {
-    console.log('No game model log found. Run --init first.');
-    return;
+/**
+ * Read entries from Autobase linearised view first, fall back to JSONL.
+ */
+async function readEntries() {
+  try {
+    const ab = await openAutobase();
+    await ab.update();
+    const view = ab.view;
+    const len = view.length;
+    const entries = [];
+    for (let i = 0; i < len; i++) {
+      const block = await view.get(i);
+      if (block) {
+        const entry = typeof block === 'string' ? JSON.parse(block) : block;
+        entries.push(entry);
+      }
+    }
+    if (entries.length > 0) {
+      log.info('collab', 'Read from Autobase view', { count: entries.length });
+      return entries;
+    }
+  } catch (e) {
+    log.warn('collab', 'Autobase read failed, falling back to JSONL', { err: e.message });
   }
 
-  const entries = fs.readFileSync(LOG_FILE, 'utf-8')
+  // Fallback: JSONL
+  if (!fs.existsSync(LOG_FILE)) return [];
+  return fs.readFileSync(LOG_FILE, 'utf-8')
     .trim().split('\n')
     .filter(line => line.trim())
     .map(JSON.parse);
+}
+
+async function viewLog() {
+  const entries = await readEntries();
+
+  if (entries.length === 0) {
+    console.log('No game model log found. Run --init first.');
+    return;
+  }
 
   console.log(`\nGame Model Log (${entries.length} entries)\n`);
   console.log('─'.repeat(80));
@@ -170,15 +205,12 @@ async function viewLog() {
 async function exportLog() {
   const outputPath = process.argv.find(a => a.startsWith('--export='))?.split('=')[1] || 'game_model_log.json';
 
-  if (!fs.existsSync(LOG_FILE)) {
+  const entries = await readEntries();
+
+  if (entries.length === 0) {
     console.log('No game model log found.');
     return;
   }
-
-  const entries = fs.readFileSync(LOG_FILE, 'utf-8')
-    .trim().split('\n')
-    .filter(line => line.trim())
-    .map(JSON.parse);
 
   writeJSON(outputPath, {
     exportedAt: new Date().toISOString(),
@@ -192,26 +224,24 @@ async function exportLog() {
 async function syncP2P() {
   const topicKey = process.argv.find(a => a.startsWith('--topic='))?.split('=')[1];
 
-  let Hyperswarm, Corestore, Autobase;
-  try {
-    Hyperswarm = require('hyperswarm');
-    Corestore = require('corestore');
-    Autobase = require('autobase');
-  } catch (e) {
-    log.error('collab', 'Pears modules not found. npm install hyperswarm corestore autobase');
-    process.exit(1);
-  }
+  const Hyperswarm = require('hyperswarm');
 
-  const store = new Corestore(STORAGE_DIR);
+  const ab = await openAutobase();
   const swarm = new Hyperswarm();
 
+  // Replicate Autobase's underlying corestore over every Hyperswarm connection.
+  // This is the real Pears replication protocol — no manual socket.write/read.
+  swarm.on('connection', (socket) => {
+    log.info('collab', 'Peer connected — replicating Autobase');
+    _store.replicate(socket);
+  });
+
   if (topicKey) {
-    // Join existing network
     const topic = Buffer.from(topicKey, 'hex');
     swarm.join(topic, { client: true, server: true });
     log.info('collab', 'Joining game model network', { topic: topicKey });
+    console.log(`Joined game model network: ${topicKey}`);
   } else {
-    // Create new network
     const crypto = require('crypto');
     const topic = crypto.randomBytes(32);
     swarm.join(topic, { client: false, server: true });
@@ -226,34 +256,7 @@ async function syncP2P() {
     console.log('═══════════════════════════════════════════════\n');
   }
 
-  swarm.on('connection', (socket) => {
-    log.info('collab', 'Peer connected');
-
-    // Sync local log to peer
-    if (fs.existsSync(LOG_FILE)) {
-      const localData = fs.readFileSync(LOG_FILE, 'utf-8');
-      socket.write(localData);
-    }
-
-    socket.on('data', (data) => {
-      const lines = data.toString().trim().split('\n');
-      for (const line of lines) {
-        try {
-          const entry = JSON.parse(line);
-          // Merge: only add if we don't have this ID
-          const existing = fs.existsSync(LOG_FILE)
-            ? fs.readFileSync(LOG_FILE, 'utf-8')
-            : '';
-          if (!existing.includes(entry.id)) {
-            appendLocal(entry);
-            log.info('collab', 'Synced entry from peer', { id: entry.id });
-          }
-        } catch { /* partial data */ }
-      }
-    });
-  });
-
-  console.log('Syncing... (Ctrl+C to stop)');
+  console.log('Syncing via Autobase replication... (Ctrl+C to stop)');
 }
 
 function appendLocal(entry) {
