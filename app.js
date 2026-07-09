@@ -835,6 +835,13 @@ function initDistribute() {
 }
 
 // ===== INIT =====
+function hideInitialSkeleton() {
+  const sk = document.getElementById('initial-skeleton');
+  if (!sk) return;
+  sk.classList.add('faded');
+  setTimeout(() => { sk.remove(); }, 300);
+}
+
 function init() {
   initTooltips();
   initTabs();
@@ -849,6 +856,8 @@ function init() {
   initReports();
   initDistribute();
   initRouting();
+  // Skeleton done — fade it out on next paint so the real UI is already visible
+  requestAnimationFrame(hideInitialSkeleton);
 }
 
 if (document.readyState === 'loading') {
