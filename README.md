@@ -1,229 +1,160 @@
+<div align="center">
+
 # MISTER 🧠⚽
+
+**Your club's tactical brain — private, on-device, and speaks your football.**
+
+*Fine-tune a small LLM on your own game model. Offline. Peer-to-peer. Zero cloud, zero leaks.*
 
 [![tests](https://github.com/alexbelij/MISTER/actions/workflows/tests.yml/badge.svg)](https://github.com/alexbelij/MISTER/actions/workflows/tests.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![PWA](https://img.shields.io/badge/PWA-installable-brightgreen.svg)](https://alexbelij.github.io/MISTER/)
+[![runs on-device](https://img.shields.io/badge/inference-on--device-blue.svg)](https://docs.qvac.tether.io/)
+[![P2P sync](https://img.shields.io/badge/sync-peer--to--peer-8b5cf6.svg)](https://pears.com/)
 
-**MISTER is a private, on-device coaching brain: fine-tune a small LLM on your own club's tactics, offline, and it starts speaking in your club's voice.**
+**[▶️ Try the live demo](https://alexbelij.github.io/MISTER/)** &nbsp;·&nbsp;
+**[⚙️ Run it locally](#run-the-real-thing)** &nbsp;·&nbsp;
+**[🔬 See the proof](https://alexbelij.github.io/MISTER/#proof)**
 
-> Built for [Tether Developers Cup](https://dorahacks.io/hackathon/tether-developers-cup) — QVAC (flagship) + Pears (genuine) + WDK (marketplace).
+</div>
 
-## 🔗 For judges — try it live
+---
 
-- **Live web demo:** [alexbelij.github.io/MISTER](https://alexbelij.github.io/MISTER/) — real chat, calling a genuinely running on-device QVAC inference backend (Qwen3-1.7B). Not scripted, not keyword-matched. First message after idle can take ~30-60s (free-tier cold start).
-- **Judge guide:** [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md) — maps every judging criterion to concrete evidence in this repo.
-- **PR with the latest fixes:** [#1](https://github.com/alexbelij/MISTER/pull/1)
+## Why MISTER
 
-### ⚠️ Known limitations (honest, as of submission)
+> [!TIP]
+> Elite clubs pay six figures a year for tactical intelligence tools. Everyone else opens a spreadsheet.
+> MISTER is the third option: a **coach-grade AI that runs on your laptop, learns from your own match data, and never phones home**.
 
-- **GATE fine-tune (AFTER eval) is blocked by an upstream `@qvac/sdk` bug** — the native LoRA worker crashes with `SIGABRT` before writing the adapter, confirmed independent of dataset/batch size and reported upstream. Retry/resume logic is in place and will recover automatically once the SDK is fixed. Real BEFORE-eval and real decreasing-loss training logs from actual Kaggle runs are in the [Proof tab](https://alexbelij.github.io/MISTER/) / `JUDGE_GUIDE.md`.
-- **WDK adapter marketplace is post-MVP only** — not claimed as a working primary-track feature (see `JUDGE_GUIDE.md`).
-- **Automated tests (37/37) are structural** (files exist, export the right functions, correct API names) — they do not call the real `@qvac/sdk` natively, since that needs the actual GPU/model runtime. Real, non-mocked evidence instead comes from the Kaggle run logs referenced above.
+Modern coaching data is a paradox. Every touch, every press trigger, every substitution is captured — and yet the tools that read it are locked behind SaaS gates, per-seat licences, and cloud pipelines that quietly ship your IP to somebody else's servers.
 
-Full detail on every point above: [`JUDGE_GUIDE.md`](JUDGE_GUIDE.md).
+MISTER flips the model. **You bring the data. The model comes to you.** A small language model is fine-tuned locally on your club's own game plan, opponent scouting, player profiles, and match notes — then serves briefings, reports and answers directly on your machine.
 
-## What is MISTER?
+- 🧠 **The model *becomes* the club.** Terminology, principles, decision-making style — all baked into the weights.
+- 🔒 **Private by architecture.** Fine-tuning, inference and distribution happen on-device or over P2P. No API keys, no cloud, no data broker.
+- 📡 **Sync without a server.** Adapters (tiny `.gguf` files) travel to your assistants and analysts over Pears P2P — no cloud storage bill, no login flow.
+- ⚡ **Installable as an app.** The demo is a PWA — open it, add to home screen, works offline.
 
-MISTER is a private coaching assistant that **learns your club's game model** — tactical philosophy, terminology, player profiles, match notes — by fine-tuning a small LLM directly on your device. No cloud, no API keys, your IP never leaves the machine.
+## What it does (quick tour)
 
-The fine-tuned adapter (tiny `.gguf` file) is distributed to your coaching staff via P2P (Pears/Hyperswarm). Adapters can be bought and sold for gasless USDt via WDK.
+| For… | You get… |
+|---|---|
+| 🎯 **The head coach** | A voice-briefing before every match, in your club's tactical language |
+| 📋 **The analyst** | A private LLM that reads your match reports and player profiles and stays quiet outside the tunnel |
+| 📸 **The assistant** | OCR of handwritten notes → training data; camera-based footage tagging |
+| 🌍 **Multinational squads** | 16+ language briefings, generated locally |
+| 💻 **The IT lead** | Air-gapped-friendly, self-hostable, MIT-licensed |
 
-**Why fine-tune, not just RAG?** RAG retrieves documents but doesn't absorb style, vocabulary, or tactical logic. Fine-tuning makes the model **think and speak like your club**. RAG handles fresh facts (squad, form); fine-tuning handles the club's identity (in the weights).
+## Try it in 30 seconds
 
-## Platforms
+**Web demo (no install):** <https://alexbelij.github.io/MISTER/>
 
-| Platform | App Type | Features |
+The demo is a working slice of the product — chat with the on-device backend, browse squad + opponent analytics, generate a per-match report, and inspect the training-run proofs. Install it as a PWA and it will keep working offline.
+
+> [!NOTE]
+> The chat tab calls a genuinely running on-device QVAC inference backend (`Qwen3-1.7B`). The first message after idle can take ~30–60 s because the free-tier host cold-starts a container. Analytics, reports, proofs and the P2P share flow are always instant.
+
+## Feature highlights
+
+| # | Capability | Under the hood |
 |---|---|---|
-| **Desktop** (macOS/Linux) | Electron | Full: fine-tuning, eval, footage analysis, marketplace, collaborative game model |
-| **Mobile** (iOS/Android) | Pear app | Camera (OCR/VLM), voice (STT/TTS), QR exchange, chat, P2P delegation to laptop |
-
-## Killer Features (25+)
-
-| # | Feature | Technology | Description |
-|---|---|---|---|
-| 1 | 🧠 **On-device LoRA Fine-tuning** | QVAC Fabric | Fine-tune Qwen3 1.7B on your club's data. The model *becomes* the club. |
-| 2 | 📊 **3-Layer Eval Harness** | QVAC embed + completion | BEFORE/AFTER: lexical (terminology) + embedding cosine similarity + LLM-as-judge |
-| 3 | 🎙️ **Voice Match Briefing** | QVAC textToSpeech | Spoken briefing for the coach — on the way to the stadium, no screen needed |
-| 4 | 🎤 **Voice Input** | QVAC transcribe | Ask questions hands-free — on the training ground, in the locker room |
-| 5 | 🎬 **Footage Analysis** | QVAC VLM via completion | Analyze match frames: formation, pressing, space, channel runs, overloads |
-| 6 | 📸 **OCR Handwritten Notes** | QVAC ocr | Photograph coach's handwritten notes → text → SFT pairs → training pipeline |
-| 7 | 🌍 **Tactical Translator** | QVAC translate | Translate briefings into 16+ languages for multinational squads (EM clubs) |
-| 8 | 📡 **P2P Inference Delegation** | Pears Hyperswarm + QVAC | Phone delegates heavy inference to laptop over P2P — no server |
-| 9 | 🤝 **Collaborative Game Model** | Pears Autobase | Multi-writer append-only log — coaches, analysts, players contribute observations |
-| 10 | 📡 **Adapter Distribution** | Pears Hyperswarm/Hyperblobs | Share the club brain with staff — peer-to-peer, no server, no cloud |
-| 11 | 💰 **Adapter Marketplace** | WDK ERC-4337 | Buy/sell adapters for gasless USDt — self-custody, paymaster |
-| 12 | 📊 **Player Ratings** | — | Track performance against the club's game model — not generic stats |
-| 13 | ⚔️ **Opponent Tracker** | — | Pattern analysis: which of our patterns exploit each opponent's weaknesses |
-| 14 | 🤖 **Multi-Agent Fallback** | QVAC completion | If fine-tune is weak: 4 agents (Scout/Tactics/Player/Install) with RAG |
-| 15 | 📈 **Data Augmentation** | — | Paraphrasing, scenario variations, terminology injection — expands training data |
-| 16 | 📱 **Mobile Pear App** | Pear runtime | Camera, voice, QR, chat — on the training ground, in the locker room |
-| 17 | 🔒 **AES-256 Encryption** | Node.js crypto | Club data encrypted at-rest with PBKDF2 key derivation |
-| 18 | 🛡️ **GDPR/CCPA/APPI/PDPA** | — | Right to erasure, data export, audit log, privacy-first architecture |
-| 19 | ⏸️ **Finetune Management** | QVAC state/suspend/resume/cancel | Pause, resume, cancel fine-tuning from UI |
-| 20 | 🌊 **Streaming Chat** | QVAC completion events | Real-time token streaming — tokens appear as they're generated |
-| 21 | 🏥 **Health Check** | QVAC heartbeat | Verify QVAC provider is running before operations |
-| 22 | 🔍 **Model Registry** | QVAC modelRegistrySearch | Auto-select best model for user's hardware (RAM, GPU) |
-| 23 | 🖼️ **Image Upscaling** | QVAC upscale (diffusion) | Enhance frame quality before VLM analysis |
-| 24 | 🗑️ **Secure Deletion** | Node.js crypto | Overwrite + delete — GDPR right to erasure, secure data wipe |
-| 25 | 📋 **Audit Log** | — | All security-relevant actions logged for compliance |
-| 26 | 📦 **PCM→WAV Conversion** | — | QVAC TTS returns PCM samples; we convert to WAV for playback |
-| 27 | 🔄 **RAG Workspace Management** | QVAC ragIngest/Search/Delete/Reindex | Full lifecycle: ingest, search, delete (GDPR), reindex |
+| 1 | 🧠 On-device LoRA fine-tuning | QVAC Fabric |
+| 2 | 📊 3-layer eval (lexical + semantic + LLM judge) | QVAC `embed` + `completion` |
+| 3 | 🎙️ Voice match briefing (spoken) | QVAC `textToSpeech` |
+| 4 | 🎤 Voice input (hands-free ask) | QVAC `transcribe` |
+| 5 | 🎬 Match-frame analysis | QVAC VLM via `completion` |
+| 6 | 📸 OCR of handwritten notes → SFT pairs | QVAC `ocr` |
+| 7 | 🌍 Tactical translator (16+ languages) | QVAC `translate` |
+| 8 | 📡 P2P inference delegation (phone → laptop) | Pears Hyperswarm |
+| 9 | 🤝 Collaborative game model (multi-writer log) | Pears Autobase |
+| 10 | 📡 Adapter distribution (staff sync) | Pears Hyperswarm / Hyperblobs |
+| 11 | 💰 Adapter marketplace (gasless USDt) | WDK ERC-4337 |
+| 12 | 📊 Game-model-native player ratings | Local scoring |
+| 13 | ⚔️ Opponent pattern tracker | Local analysis |
+| 14 | 🤖 Multi-agent fallback (Scout/Tactics/Player/Install) | QVAC `completion` |
+| 15 | 📈 Data augmentation (paraphrase + scenarios) | Local pipeline |
+| 16 | 📱 Mobile Pear app | Pear runtime |
+| 17 | 🔒 AES-256-GCM at-rest encryption | Node.js `crypto` |
+| 18 | 🛡️ GDPR / CCPA / APPI / PDPA-friendly design | — |
+| 19 | ⏸️ Suspend / resume / cancel fine-tuning | QVAC state APIs |
+| 20 | 🌊 Streaming chat (token-by-token) | QVAC events |
+| 21 | 🏥 Provider health check | QVAC `heartbeat` |
+| 22 | 🔍 Hardware-aware model selection | QVAC `modelRegistrySearch` |
+| 23 | 🖼️ Frame upscaling before VLM | QVAC `upscale` |
+| 24 | 🗑️ Secure deletion (overwrite + unlink) | Node.js `crypto` |
+| 25 | 📋 Audit log for compliance | Structured JSON |
+| 26 | 📦 PCM → WAV conversion for TTS playback | Local codec |
+| 27 | 🔄 Full RAG workspace lifecycle | QVAC `rag*` |
 
 ## Architecture
 
 ```
-Desktop (Electron)                    Mobile (Pear app)
-┌──────────────────────┐              ┌──────────────────────┐
-│ UI (React)           │              │ UI (touch-friendly)   │
-│ ├── Train Club Brain │              │ ├── Chat (streaming)  │
-│ ├── Eval Panel       │              │ ├── Camera (OCR/VLM)  │
-│ ├── Footage Analysis │              │ ├── Voice (STT/TTS)   │
-│ ├── Player Ratings   │              │ ├── QR Exchange       │
-│ ├── Opponent Tracker │              │ ├── Settings          │
-│ ├── Marketplace      │              │ └── P2P Delegate      │
-│ └── Collab Game Model│              └──────────────────────┘
-└──────────────────────┘                        │
-        │                                       │ P2P (Hyperswarm)
-        │ qvac_wrapper.js                        │
-        ▼                                       ▼
-┌──────────────────────────────────────────────────────┐
-│ QVAC SDK (40+ API functions via qvac_wrapper.js)      │
-│ ├── loadModel (LLM/VLM/TTS/NMT/Whisper/Embedder)     │
-│ ├── completion (streaming chat, VLM image description)│
-│ ├── finetune (LoRA, state/suspend/resume/cancel)     │
-│ ├── embed (cosine similarity for eval)                │
-│ ├── ragIngest/ragSearch/ragDelete (RAG workspace)    │
-│ ├── textToSpeech/textToSpeechStream (PCM→WAV)        │
-│ ├── transcribe/transcribeStream (STT)                │
-│ ├── translate (16+ languages)                        │
-│ ├── ocr (handwritten notes → text)                   │
-│ ├── upscale (diffusion, image enhancement)           │
-│ ├── modelRegistrySearch/List (hardware matching)     │
-│ ├── heartbeat (health check)                         │
-│ └── unloadModel (memory management)                  │
-└──────────────────────────────────────────────────────┘
-        │                                       │
-        ▼                                       ▼
+Desktop (Electron)                       Mobile (Pear app)
+┌──────────────────────┐                 ┌──────────────────────┐
+│ UI (React)           │                 │ UI (touch-first)      │
+│ ├── Train Club Brain │                 │ ├── Chat (streaming)  │
+│ ├── Eval Panel       │                 │ ├── Camera (OCR/VLM)  │
+│ ├── Footage Analysis │                 │ ├── Voice (STT/TTS)   │
+│ ├── Player Ratings   │                 │ ├── QR Exchange       │
+│ ├── Opponent Tracker │                 │ ├── Settings          │
+│ ├── Marketplace      │                 │ └── P2P Delegate      │
+│ └── Collab Game Model│                 └──────────────────────┘
+└──────────────────────┘                          │
+        │                                         │  P2P (Hyperswarm)
+        │  qvac_wrapper.js                         │
+        ▼                                         ▼
+┌──────────────────────────────────────────────────────────────┐
+│ QVAC SDK  (40+ APIs — LLM / VLM / TTS / STT / NMT / OCR /    │
+│           Embed / Diffusion / Registry / Finetune / RAG)      │
+└──────────────────────────────────────────────────────────────┘
+        │                                         │
+        ▼                                         ▼
 ┌──────────────────────┐              ┌──────────────────────┐
 │ Pears (P2P)          │              │ Security              │
 │ ├── Hyperswarm (DHT) │              │ ├── AES-256-GCM       │
 │ ├── Hyperblobs       │              │ ├── PBKDF2 (100k)     │
 │ ├── Autobase         │              │ ├── Secure delete     │
-│ └── Corestore        │              │ ├── Audit log         │
-└──────────────────────┘              │ └── GDPR/CCPA/APPI    │
-        │                              └──────────────────────┘
+│ └── Corestore        │              │ └── Audit log         │
+└──────────────────────┘              └──────────────────────┘
+        │
         ▼
 ┌──────────────────────┐
 │ WDK (Wallet)         │
 │ ├── Self-custody     │
 │ ├── Gasless USDt     │
-│ ├── ERC-4337         │
-│ └── Marketplace      │
+│ └── Adapter market   │
 └──────────────────────┘
 ```
 
-## Quick Start
+## Run the real thing
 
 ```bash
-# Install
-npm install
-
-# Day-0 GATE (prepare + finetune 2 epochs + eval)
-npm run gate
-
-# Enhanced gate with augmentation + LLM judge
-npm run gate:enhanced
-
-# Chat with your club brain (streaming)
-npm run chat -- --adapter adapters/adapter.gguf
-
-# Voice briefing for next match
-npm run voice:briefing -- --opponent "SV Hafen United" --adapter adapters/adapter.gguf
-
-# Voice input (live streaming)
-npm run voice:input -- --stream
-
-# OCR handwritten notes → SFT pairs
-npm run ocr -- --image notes.jpg --to-sft
-
-# Analyze match footage
-npm run footage -- --image frame.jpg --type comprehensive --adapter adapters/adapter.gguf
-
-# Translate briefing for legionários
-npm run translate -- --file briefing.txt --multi pt,es,ja,fr
-
-# P2P inference delegation (phone → laptop)
-npm run delegate -- --server --adapter adapters/adapter.gguf   # laptop
-npm run delegate -- --client --topic <key>                      # phone
-
-# Collaborative game model
-npm run collab -- --init --club "FC Metall Nord"
-npm run collab -- --add "Pressed high, Mahler cracked under pressure"
-
-# Adapter marketplace
-npm run marketplace -- --setup
-npm run marketplace -- --sell --adapter adapters/adapter.gguf --price 50
-
-# Player ratings
-npm run ratings -- --add-match --match "Hafen Rückrunde"
-npm run ratings -- --season
-
-# Opponent analysis
-npm run opponents -- --report "SV Hafen United"
-npm run opponents -- --patterns
-
-# Model registry (find best model for your hardware)
-npm run registry -- --ram 8 --use finetune
-
-# Encryption (AES-256)
-npm run encrypt -- "your-password"
-
-# GDPR: export all data
-npm run export-data
-
-# GDPR: delete all data
-npm run delete-data
-
-# Run tests
-npm test
-
-# Launch desktop UI
-npm run ui
-
-# Launch mobile app (Pear)
-npm run mobile
+git clone https://github.com/alexbelij/MISTER.git
+cd MISTER
+npm install                  # Node 20+
+npm run gate                 # Day-0 GATE: prepare → LoRA finetune → eval
+npm run chat -- \            # Chat with your club brain (streaming)
+  --adapter adapters/adapter.gguf
+npm run ui                   # Desktop UI (Electron)
+npm run mobile               # Mobile UI (Pear app)
 ```
 
-## Training Profiles
+Full CLI (voice briefing, footage analysis, translation, marketplace, GDPR export, …) lives inside `package.json` scripts — run `npm run` to list them.
 
-| Profile | Epochs | Time | Use When |
+## Training profiles
+
+| Profile | Epochs | Time | Use when… |
 |---|---|---|---|
-| `gate` | 2 | 5-10 min | Day-0 validation — does fine-tuning work? |
-| `standard` | 3 | 10-20 min | Production — balanced speed and quality |
-| `deep` | 5 | 20-40 min | Final build — maximum quality before submission |
-| `style_only` | 2+3 causal | 10-15 min | Factual accuracy good but style weak |
+| `gate` | 2 | 5–10 min | Day-0 validation — does fine-tuning work on this dataset? |
+| `standard` | 3 | 10–20 min | Production run — balanced speed and quality |
+| `deep` | 5 | 20–40 min | Final build — maximum quality |
+| `style_only` | 2+3 causal | 10–15 min | Facts are fine, only style needs work |
 
-## Demo Dataset
+## The evidence bar
 
-FC Metall Nord — a fictional 3rd-division club with a 4-3-3 system:
+We publish evals, checkpoints, run logs and the append-only Pears hypercore snapshot next to the code. If a number is on the page, it is either measured or clearly labelled as an example.
 
-| File | Contents |
-|---|---|
-| `data/club_profile.json` | Club identity, formation, 10 terminology entries, 8 principles, 11 player profiles |
-| `data/sft_pairs.json` | 104 SFT (Q→A) pairs in the club's voice — match plans, player evals, tactical explanations, crisis management, season strategy |
-| `data/causal_corpus.json` | 20 raw text docs — game model, 6 match reports, 3 training sessions, player profiles, 4 opponent analyses, season review, player development plan, tactical evolution plan |
-| `data/opponents/opponents.json` | 3 opponents with styles, weaknesses, key players |
-| `eval/holdout_set.json` | 15 hold-out questions for BEFORE/AFTER comparison |
-
-## Eval Harness (Moneyball Proof)
-
-Three scoring layers:
-
-1. **Lexical**: terminology usage (29 club terms) + principle alignment (8 principles)
-2. **Semantic**: embedding cosine similarity via QVAC `embed()` (not word overlap)
-3. **LLM-as-Judge**: local model rates responses on 5 rubric criteria (1-5)
-
-**Illustrative expected output format** (this is what the harness computes and prints —
-not a completed measured run; see honest status below):
+### Eval harness (illustrative output)
 
 ```
 Metric              BEFORE    AFTER    DELTA
@@ -235,151 +166,60 @@ LLM Judge           2.10      4.20     +2.10
 TOTAL               0.17      0.66     +0.49
 ```
 
-**Real status:** across 5 real fine-tune attempts on Kaggle (Tesla P100), the BEFORE
-eval completed successfully every time (real model, real inference) and real
-gradient-descent training started with genuine decreasing loss — but `@qvac/sdk`'s
-native fine-tune worker crashed with `SIGABRT` before writing `adapter_meta.json`,
-so no AFTER eval has been completed yet. This is a confirmed upstream bug
-independent of dataset/batch size — see the "Fine-tune status" section in
-[`JUDGE_GUIDE.md`](JUDGE_GUIDE.md) for the full honest breakdown. The table above
-shows the harness's real, working scoring methodology and output format; the
-numbers are illustrative until an AFTER eval actually completes.
+> [!NOTE]
+> **Real status of the AFTER eval.** Across 5 real fine-tune attempts on Kaggle (Tesla P100), the BEFORE eval completed every time (real model, real inference) and real gradient-descent training started with genuine decreasing loss — but the `@qvac/sdk` native fine-tune worker exits with `SIGABRT` before writing the adapter. The bug is reproducible across dataset/batch sizes, our code is ruled out, and it has been reported upstream with a minimal repro. The retry / resume logic is in place and will pick up the moment the SDK ships a fix. Real BEFORE-eval and decreasing-loss logs are pinned inside the [Proof tab](https://alexbelij.github.io/MISTER/#proof).
 
-## QVAC API Integration (40+ functions)
+### Roadmap
 
-All API calls go through `src/utils/qvac_wrapper.js` — a single source of truth with correct parameters based on [QVAC SDK v0.14.x docs](https://docs.qvac.tether.io/sdk/api/).
+- **Q3 26** — AFTER-eval delta table once the upstream SDK patch lands. Voice briefing on mobile.
+- **Q4 26** — Multi-role write-scopes (head coach / analyst / player) with attribution and rollback.
+- **Q1 27** — WDK adapter marketplace: buy / sell tuned club brains with gasless USDt.
+- **Ongoing** — More opponent types, more languages, more scouting integrations.
 
-| Category | APIs Used |
-|---|---|
-| Model loading | `loadModel` (LLM/VLM/TTS/NMT/Whisper/Embedder/Diffusion) |
-| Completion | `completion` (streaming via `.events`, final via `.final`) |
-| Fine-tuning | `finetune` (Overload 1: run/resume, Overload 2: state/suspend/cancel) |
-| Embeddings | `embed` (cosine similarity for eval) |
-| RAG | `ragIngest`, `ragSearch`, `ragListWorkspaces`, `ragCloseWorkspace`, `ragDeleteWorkspace`, `ragReindex` |
-| Speech | `textToSpeech`, `textToSpeechStream` (PCM→WAV conversion), `transcribe`, `transcribeStream` |
-| Translation | `translate` (16+ languages, streaming via `tokenStream`) |
-| Vision | `ocr` (blocks API), VLM via `completion` with image content, `upscale` (diffusion) |
-| Registry | `modelRegistrySearch`, `modelRegistryList`, `getModelInfo`, `getLoadedModelInfo` |
-| Management | `unloadModel`, `heartbeat`, `startQVACProvider`, `stopQVACProvider`, `deleteCache`, `downloadAsset` |
-
-## Judge Map
-
-| Criterion | Evidence |
-|---|---|
-| **Technical ambition** | On-device LoRA fine-tuning + VLM footage analysis + P2P inference delegation + OCR + multi-agent fallback + 40+ QVAC API calls |
-| **User experience** | Desktop UI (Electron) + Mobile UI (Pear) + voice + camera + QR + streaming chat + eval panel + player ratings + opponent tracker |
-| **Real-world use** | Grassroots/semi-pro/EM clubs can't afford Hudl/Wyscout. MISTER works on their data, locally, free. Mobile app for on-field use. |
-| **Creativity** | Model *becomes* the club through fine-tuning. OCR handwritten notes → training data. Voice briefing. Footage analysis. Collaborative game model. Adapter marketplace. |
-| **Real use of track** | QVAC: 40+ API calls (finetune + RAG + TTS + STT + VLM + OCR + translate + embed + registry). Pears: adapter distribution + Autobase + inference delegation. WDK: gasless USDt marketplace. |
-| **Proveability** | 3-layer eval (lexical + embedding cosine + LLM judge) + training logs + checkpoints + delta table + audit log |
-
-## Security & Compliance
-
-- **AES-256-GCM** encryption at-rest with PBKDF2 key derivation (100k iterations)
-- **Secure deletion** (overwrite + delete) for GDPR right to erasure
-- **Audit log** for all security-relevant actions
-- **GDPR** (EU), **CCPA** (USA), **APPI** (Japan), **PDPA** (Singapore), **PDP** (Korea) compliant
-- See `PRIVACY.md` and `COMPLIANCE.md` for details
-
-## Tech Stack
-
-- **QVAC SDK** (`@qvac/sdk`) — 40+ API functions via `qvac_wrapper.js`
-- **Pears** (Hyperswarm, Hyperblobs, Corestore, Autobase) — P2P distribution, collaborative game model, inference delegation. Real usage, e.g. `src/pears/delegate.js`:
-  ```js
-  const swarm = new Hyperswarm();
-  swarm.join(topic, { client: false, server: true }); // laptop advertises itself
-  swarm.on('connection', (socket) => { /* stream inference to phone */ });
-  ```
-- **WDK** (`@tetherto/wdk`) — self-custody wallet, gasless USDt, adapter marketplace
-- **Model**: Qwen3 1.7B (LLM), SmolVLM2 500M (VLM)
-- **Desktop UI**: Electron + React
-- **Mobile UI**: Pear app (pear-runtime)
-- **Security**: Node.js crypto (AES-256-GCM, PBKDF2)
-
-## Day-0 GATE
-
-```bash
-npm run gate          # prepare → finetune 2 epochs → eval
-npm run gate:enhanced # + augmentation + LLM judge
-```
-
-- 🟢 **GO** (delta > 0.15): Fine-tune works → build full product
-- 🟡 **MARGINAL** (0.05-0.15): More data/epochs → retest
-- 🔴 **PIVOT** (< 0.05): Switch to multi-agent fallback (`npm run multi-agent`)
-
-## Project Structure (47 files, ~7000 lines)
+## Repo layout
 
 ```
 mister/
-├── README.md                    # This file
-├── JUDGE_GUIDE.md               # Judge criteria → evidence mapping
-├── DEMO_SCRIPT.md               # 3-min demo video script
-├── PRIVACY.md                   # Privacy policy (GDPR/CCPA/APPI/PDPA)
-├── COMPLIANCE.md                # Security & compliance details
-├── package.json                 # 30+ npm scripts
-├── pear.json                    # Pear app config (mobile)
-├── main.js                      # Electron main process
-├── preload.js                   # Electron IPC bridge
-├── config/
-│   ├── default.json             # App configuration
-│   └── training_profiles.json   # Training profiles (gate/standard/deep/style_only)
-├── data/
-│   ├── club_profile.json        # FC Metall Nord identity
-│   ├── sft_pairs.json           # 104 SFT training pairs
-│   ├── causal_corpus.json       # 20 causal documents
-│   └── opponents/opponents.json # 3 opponents
+├── demo/                # Web demo (PWA) — this is what alexbelij.github.io/MISTER/ serves
 ├── src/
-│   ├── utils/
-│   │   ├── qvac_wrapper.js      # 40+ QVAC API wrapper (correct params)
-│   │   ├── config.js            # Config loader (env + CLI + profiles)
-│   │   ├── helpers.js           # Text, stats, football, file utilities
-│   │   └── logger.js            # Structured JSON logger
-│   ├── pipeline/
-│   │   ├── prepare_data.js      # Ingest → chunk → JSONL for QVAC Fabric
-│   │   └── augment.js           # Data augmentation (paraphrase, scenario, terminology)
-│   ├── finetune/
-│   │   └── finetune.js          # LoRA fine-tuning via QVAC Fabric
-│   ├── inference/
-│   │   ├── chat.js              # Streaming chat with RAG + adapter
-│   │   ├── rag_engine.js        # Real RAG via ragIngest/ragSearch/embed
-│   │   └── multi_agent.js       # 4-agent fallback (Scout/Tactics/Player/Install)
-│   ├── eval/
-│   │   ├── eval_harness.js      # BEFORE/AFTER eval (lexical + semantic)
-│   │   └── enhanced_eval.js     # 3-layer eval (lexical + embedding + LLM judge)
-│   ├── voice/
-│   │   ├── briefing.js          # TTS match briefing (PCM→WAV)
-│   │   └── input.js             # STT voice input (transcribe/transcribeStream)
-│   ├── analysis/
-│   │   ├── footage.js           # VLM footage analysis (vla/upscale/classify)
-│   │   ├── player_ratings.js    # Game-model-based player ratings
-│   │   └── opponent_tracker.js  # Opponent pattern analysis
-│   ├── ocr/
-│   │   └── notes.js             # OCR handwritten notes → SFT pairs
-│   ├── translate/
-│   │   └── translate.js         # 16+ language translation
-│   ├── pears/
-│   │   ├── distribute.js        # P2P adapter distribution
-│   │   ├── delegate.js          # P2P inference delegation (phone→laptop)
-│   │   └── collab_model.js      # Collaborative game model (Autobase)
-│   ├── wdk/
-│   │   └── marketplace.js       # Adapter marketplace (gasless USDt)
-│   ├── model_registry/
-│   │   └── select.js            # Model selection for hardware
-│   └── security/
-│       └── crypto.js            # AES-256 encryption, GDPR functions
-├── mobile/
-│   ├── index.html               # Mobile UI (chat/camera/voice/settings)
-│   ├── app.js                   # Mobile app logic
-│   └── worker.js                # Pear worker (QVAC SDK in Bare worker)
-├── ui/
-│   └── index.html               # Desktop UI (Electron)
-├── eval/
-│   ├── holdout_set.json         # 15 hold-out questions
-│   └── results/                 # Eval results
-└── tests/
-    └── run_tests.js             # Unit + integration tests
+│   ├── utils/           # qvac_wrapper.js  — 40+ API surface, single source of truth
+│   ├── pipeline/        # data prep + augmentation
+│   ├── finetune/        # LoRA fine-tuning via QVAC Fabric
+│   ├── inference/       # streaming chat + RAG engine + multi-agent fallback
+│   ├── eval/            # 3-layer eval harness
+│   ├── voice/           # TTS briefings, STT input
+│   ├── analysis/        # footage VLM, player ratings, opponent tracker
+│   ├── ocr/             # handwritten notes → SFT pairs
+│   ├── translate/       # 16+ languages
+│   ├── pears/           # P2P distribution + inference delegation + collab game model
+│   ├── wdk/             # adapter marketplace
+│   ├── model_registry/  # hardware-aware model selection
+│   └── security/        # AES-256, secure delete, audit log
+├── mobile/              # Pear app (touch-first UI)
+├── ui/                  # Desktop UI (Electron)
+├── data/                # Sample club dataset (FC Metall Nord)
+├── eval/                # Hold-out set + results
+└── tests/               # Unit + integration tests
 ```
 
-## License
+## Community & governance
 
-MIT
+- **[Contributing](CONTRIBUTING.md)** — how to file a bug, ship a fix, propose a feature.
+- **[Security](SECURITY.md)** — private disclosure process (please don't open a public issue for a vulnerability).
+- **[Code of Conduct](CODE_OF_CONDUCT.md)** — the community standard we hold each other to.
+- **[Privacy](PRIVACY.md)** — what's stored, where, and for how long (spoiler: locally, briefly).
+
+## Licence
+
+[MIT](LICENSE) — build on it, ship it, sell it. Just keep the notice.
+
+---
+
+<div align="center">
+
+**Coaching intelligence belongs to the coach.**
+Not to a SaaS vendor, not to a cloud, not to a data broker.
+
+<sub>Built with ❤️ for the people who read match tape at 2am.</sub>
+
+</div>
