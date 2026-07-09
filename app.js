@@ -155,31 +155,58 @@ let tooltipTimeout;
 // hover tooltip system at all on touch/coarse-pointer devices.
 const supportsHoverTooltips = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
+let tooltipsInitialised = false;
+let activeTooltipTarget = null;
 function initTooltips() {
+  // Guard against multiple registrations — initTooltips() used to be called
+  // both from init() and from renderPlayerCards()/renderMatchTimeline(), so
+  // mouseover/mouseout/mousemove handlers piled up on document and tooltips
+  // flickered on every micro-move. One binding is enough for the whole app.
+  if (tooltipsInitialised) return;
+  tooltipsInitialised = true;
+
   if (!supportsHoverTooltips) {
-    // Safety net: if a tooltip ever ends up visible on a touch device
-    // (e.g. a hybrid laptop+touchscreen), dismiss it on the next tap
-    // anywhere so it can never get stuck.
+    // Touch/coarse-pointer device: skip the hover tooltip system entirely so
+    // tooltips can never appear on mobile / tablet. `data-tooltip` remains as
+    // accessible metadata but never renders a bubble.
+    // Safety net for hybrid laptop+touchscreen: dismiss on any tap.
     document.addEventListener('touchstart', () => {
       tooltipEl.classList.remove('visible');
+      activeTooltipTarget = null;
     }, { passive: true });
     return;
   }
+
+  // mouseover fires whenever the cursor enters ANY nested element, so tracking
+  // the active target and only showing/hiding when it actually changes prevents
+  // the tooltip from flashing off-and-on with every pixel of movement inside a
+  // single [data-tooltip] container.
   document.addEventListener('mouseover', (e) => {
     const target = e.target.closest('[data-tooltip]');
     if (!target) return;
+    if (target === activeTooltipTarget) return;      // same target, no work
     clearTimeout(tooltipTimeout);
+    activeTooltipTarget = target;
     const text = target.getAttribute('data-tooltip');
     tooltipEl.textContent = text;
     tooltipEl.classList.add('visible');
     positionTooltip(e);
   });
+
   document.addEventListener('mouseout', (e) => {
-    if (!e.target.closest('[data-tooltip]')) return;
-    tooltipTimeout = setTimeout(() => {
-      tooltipEl.classList.remove('visible');
-    }, 100);
+    if (!activeTooltipTarget) return;
+    // relatedTarget is the element the cursor moved INTO. If it's still inside
+    // the same [data-tooltip] ancestor we're on, the pointer never really left
+    // — keep the tooltip up. This is the fix for the "disappears every pixel"
+    // regression.
+    const to = e.relatedTarget;
+    if (to && activeTooltipTarget.contains(to)) return;
+    // Genuine exit — tear down without the 100ms delay (the delay caused the
+    // tooltip to lag behind the cursor and reappear briefly on fast moves).
+    tooltipEl.classList.remove('visible');
+    activeTooltipTarget = null;
   });
+
   document.addEventListener('mousemove', (e) => {
     if (tooltipEl.classList.contains('visible')) positionTooltip(e);
   });
@@ -268,9 +295,25 @@ function initSidebar() {
 // ===== BANNER =====
 function initBanner() {
   const closeBtn = document.getElementById('banner-close');
+  const banner = document.getElementById('banner');
+  if (!banner) {
+    // Banner isn't in the DOM (e.g. dismissed variant) — collapse the
+    // reserved space so the sidebar/topbar snap to the viewport edge.
+    document.documentElement.style.setProperty('--banner-height', '0px');
+    return;
+  }
+  // Sync --banner-height with the actual rendered banner height so the
+  // sidebar top offset and topbar top offset track real layout.
+  const syncBannerHeight = () => {
+    const h = banner.offsetHeight || 0;
+    document.documentElement.style.setProperty('--banner-height', h + 'px');
+  };
+  syncBannerHeight();
+  window.addEventListener('resize', syncBannerHeight);
   if (closeBtn) {
     closeBtn.addEventListener('click', () => {
-      document.getElementById('banner').style.display = 'none';
+      banner.style.display = 'none';
+      document.documentElement.style.setProperty('--banner-height', '0px');
     });
   }
 }
@@ -577,16 +620,20 @@ function renderPlayerCards(filter = 'all') {
     </button>`;
   }).join('');
 
-  // Wire card clicks — opens the detail modal.
-  grid.querySelectorAll('.player-card').forEach(el => {
-    el.addEventListener('click', () => {
-      const idx = Number(el.dataset.playerIndex);
-      openPlayerModal(PLAYERS[idx]);
+  // Wire card clicks — use one delegated listener on the grid so we don't
+  // accumulate per-card listeners on every re-render (filter chips re-render
+  // the whole grid). Bind exactly once via a flag on the container.
+  if (!grid.dataset.clickBound) {
+    grid.addEventListener('click', (e) => {
+      const card = e.target.closest('.player-card');
+      if (!card || !grid.contains(card)) return;
+      const idx = Number(card.dataset.playerIndex);
+      if (!Number.isNaN(idx) && PLAYERS[idx]) openPlayerModal(PLAYERS[idx]);
     });
-  });
-
-  // Re-bind tooltips for the freshly rendered cards.
-  if (typeof initTooltips === 'function') initTooltips();
+    grid.dataset.clickBound = '1';
+  }
+  // Card DOM changed — no need to re-init tooltips: they use delegated
+  // listeners on the document, already active from init().
 }
 
 function initPlayerFilter() {
