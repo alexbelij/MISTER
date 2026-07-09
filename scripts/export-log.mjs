@@ -27,7 +27,10 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
-const OUT = join(ROOT, 'data', 'hypercore-tail.json');
+// Snapshot is served by GitHub Pages from demo/, so write there.
+// Repo-root copy stays as the canonical source of truth.
+const OUT = join(ROOT, 'demo', 'data', 'hypercore-tail.json');
+const OUT_ROOT = join(ROOT, 'data', 'hypercore-tail.json');
 
 // ---------- deterministic identities ----------
 // ed25519 keys generated per-run (public_key exported so verifiers can
@@ -227,6 +230,7 @@ const head = verify(entries);
 
 // ---------- write snapshot ----------
 mkdirSync(dirname(OUT), { recursive: true });
+mkdirSync(dirname(OUT_ROOT), { recursive: true });
 
 const snapshot = {
   schema: 'mister.hypercore-tail.v1',
@@ -244,8 +248,11 @@ const snapshot = {
   entries,
 };
 
-writeFileSync(OUT, JSON.stringify(snapshot, null, 2) + '\n');
+const json = JSON.stringify(snapshot, null, 2) + '\n';
+writeFileSync(OUT, json);
+writeFileSync(OUT_ROOT, json);
 
 console.log(`✓ Verified chain of ${entries.length} entries`);
 console.log(`✓ Head: ${shortHash(head)} (full: ${head})`);
 console.log(`✓ Wrote ${OUT}`);
+console.log(`✓ Wrote ${OUT_ROOT}`);
