@@ -158,6 +158,20 @@
 .marketplace-honest-note strong { color: var(--yellow); }
 .marketplace-honest-note code { font-size: 11px; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 3px; }
 
+/* ── Voice button ── */
+.voice-btn { background: none; border: none; color: var(--text-secondary, #8b949e); cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: all 0.15s; display: flex; align-items: center; }
+.voice-btn:hover { color: var(--green); background: rgba(35,134,54,0.1); }
+.voice-btn.listening { color: #f85149; animation: voicePulse 1s infinite; }
+@keyframes voicePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+/* ── Role selector ── */
+.role-selector { margin: 8px 0; padding: 6px 8px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; gap: 8px; }
+.role-label { font-size: 0.8rem; color: var(--text-secondary, #8b949e); white-space: nowrap; }
+#role-badge { color: var(--green); font-weight: 600; text-transform: capitalize; }
+.role-dropdown { background: var(--bg-card, #161b22); color: var(--text-primary, #f0f6fc); border: 1px solid var(--border, #30363d); border-radius: 6px; padding: 3px 6px; font-size: 0.78rem; cursor: pointer; flex: 1; }
+[data-theme="light"] .role-selector { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .role-dropdown { background: #fff; color: #1f2328; border-color: #d0d7de; }
+
 /* ── Streaming cursor ── */
 .streaming-cursor { animation: blink 0.6s infinite; color: var(--green); }
 @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
