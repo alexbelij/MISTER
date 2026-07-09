@@ -464,6 +464,245 @@ function renderPlayerRatings() {
   table.innerHTML = header + body;
 }
 
+// ===== Player Cards =====
+// Position groups used by the filter chips above the squad grid.
+const POS_GROUPS = {
+  GK:  ['GK'],
+  DEF: ['CB', 'LB', 'RB'],
+  MID: ['CM', 'AM'],
+  FWD: ['ST', 'RW', 'LW'],
+};
+// Colour tokens per group (kept in sync with .avatar-* classes in styles.css).
+const POS_COLOUR = { GK: 'gk', DEF: 'def', MID: 'mid', FWD: 'fwd' };
+
+function positionGroup(pos) {
+  for (const [group, list] of Object.entries(POS_GROUPS)) {
+    if (list.includes(pos)) return group;
+  }
+  return 'MID';
+}
+
+function playerInitials(name) {
+  return name
+    .replace(/[^\p{L}\s.]/gu, '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(part => part[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
+
+function playerAverage(p) {
+  return CRITERIA.reduce((s, c) => s + p.ratings[c], 0) / CRITERIA.length;
+}
+
+function ratingClass(v) {
+  return v >= 7 ? 'rating-high' : v >= 5.5 ? 'rating-mid' : 'rating-low';
+}
+
+// Deterministic per-player "last 8 matches" spark from the base rating,
+// so the sparkline shape is stable across page loads.
+function sparkPointsFor(player) {
+  const base = playerAverage(player);
+  const seed = player.num * 31 + player.name.length;
+  const pts = [];
+  for (let i = 0; i < 8; i++) {
+    const noise = Math.sin(seed + i * 1.37) * 1.2;
+    pts.push(Math.max(3, Math.min(9.5, base + noise)));
+  }
+  return pts;
+}
+
+function sparklineSVG(points, w = 90, h = 24) {
+  const min = 3, max = 10;
+  const step = w / (points.length - 1);
+  const coords = points.map((v, i) => {
+    const x = i * step;
+    const y = h - ((v - min) / (max - min)) * h;
+    return [x, y];
+  });
+  const d = coords.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+  const last = coords[coords.length - 1];
+  return `<svg class="player-spark" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">
+    <path d="${d}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="2" fill="currentColor"/>
+  </svg>`;
+}
+
+function topStrengths(player, n = 2) {
+  return Object.entries(player.ratings)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, n)
+    .map(([k, v]) => ({ key: k, label: CRITERIA_LABELS[k], value: v }));
+}
+
+function renderPlayerCards(filter = 'all') {
+  const grid = document.getElementById('player-cards-grid');
+  if (!grid) return;
+
+  const list = PLAYERS
+    .filter(p => filter === 'all' || positionGroup(p.pos) === filter)
+    .map(p => ({ ...p, _avg: playerAverage(p) }))
+    .sort((a, b) => b._avg - a._avg);
+
+  if (!list.length) {
+    grid.innerHTML = '<div class="player-cards-empty">No players in this position.</div>';
+    return;
+  }
+
+  grid.innerHTML = list.map((p, idx) => {
+    const group = positionGroup(p.pos);
+    const avgCls = ratingClass(p._avg);
+    const strengths = topStrengths(p, 2)
+      .map(s => `<span class="strength-badge">${s.label} ${s.value.toFixed(1)}</span>`)
+      .join('');
+    const spark = sparklineSVG(sparkPointsFor(p));
+    const initials = playerInitials(p.name);
+    return `<button class="player-card avatar-${POS_COLOUR[group]}"
+              data-player-index="${PLAYERS.indexOf(p)}"
+              data-tooltip="${p.name} (#${p.num}, ${p.pos}) — avg ${p._avg.toFixed(2)}. Click for the full 8-criteria breakdown."
+              aria-label="Open ${p.name} details"
+              style="--card-delay:${idx * 20}ms">
+      <div class="player-card-head">
+        <div class="player-avatar" aria-hidden="true"><span>${initials}</span></div>
+        <div class="player-meta">
+          <div class="player-name">${p.name}</div>
+          <div class="player-sub">${p.pos} · #${p.num}</div>
+        </div>
+        <div class="player-avg ${avgCls}">${p._avg.toFixed(1)}</div>
+      </div>
+      <div class="player-strengths">${strengths}</div>
+      <div class="player-spark-wrap">${spark}<span class="player-spark-label">Last 8 matches</span></div>
+    </button>`;
+  }).join('');
+
+  // Wire card clicks — opens the detail modal.
+  grid.querySelectorAll('.player-card').forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = Number(el.dataset.playerIndex);
+      openPlayerModal(PLAYERS[idx]);
+    });
+  });
+
+  // Re-bind tooltips for the freshly rendered cards.
+  if (typeof initTooltips === 'function') initTooltips();
+}
+
+function initPlayerFilter() {
+  const chips = document.querySelectorAll('.player-filter .filter-chip');
+  if (!chips.length) return;
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => {
+        c.classList.remove('active');
+        c.setAttribute('aria-selected', 'false');
+      });
+      chip.classList.add('active');
+      chip.setAttribute('aria-selected', 'true');
+      renderPlayerCards(chip.dataset.pos);
+    });
+  });
+}
+
+// Radar chart — 8 tactical criteria on an octagon.
+function radarSVG(player, size = 220) {
+  const cx = size / 2, cy = size / 2;
+  const rMax = size / 2 - 22;
+  const n = CRITERIA.length;
+  const angle = i => (-Math.PI / 2) + (i * 2 * Math.PI / n);
+
+  // Rings at 2.5 / 5 / 7.5 / 10.
+  const ringsSVG = [0.25, 0.5, 0.75, 1].map(f => {
+    const pts = Array.from({ length: n }, (_, i) => {
+      const r = rMax * f;
+      return `${(cx + Math.cos(angle(i)) * r).toFixed(1)},${(cy + Math.sin(angle(i)) * r).toFixed(1)}`;
+    }).join(' ');
+    return `<polygon points="${pts}" fill="none" stroke="rgba(139,148,158,0.18)" stroke-width="1"/>`;
+  }).join('');
+
+  // Axes + labels.
+  const axesSVG = CRITERIA.map((c, i) => {
+    const x = cx + Math.cos(angle(i)) * rMax;
+    const y = cy + Math.sin(angle(i)) * rMax;
+    const lx = cx + Math.cos(angle(i)) * (rMax + 12);
+    const ly = cy + Math.sin(angle(i)) * (rMax + 12);
+    return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(139,148,158,0.14)"/>
+      <text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#8b949e">${CRITERIA_LABELS[c]}</text>`;
+  }).join('');
+
+  // Data polygon (values / 10).
+  const dataPts = CRITERIA.map((c, i) => {
+    const r = rMax * (player.ratings[c] / 10);
+    return `${(cx + Math.cos(angle(i)) * r).toFixed(1)},${(cy + Math.sin(angle(i)) * r).toFixed(1)}`;
+  }).join(' ');
+
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="Tactical radar">
+    ${ringsSVG}
+    ${axesSVG}
+    <polygon points="${dataPts}" fill="rgba(35,134,54,0.28)" stroke="#238636" stroke-width="1.6"/>
+  </svg>`;
+}
+
+function openPlayerModal(player) {
+  let modal = document.getElementById('player-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'player-modal';
+    modal.className = 'player-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.innerHTML = '<div class="player-modal-backdrop"></div><div class="player-modal-body"></div>';
+    document.body.appendChild(modal);
+    modal.querySelector('.player-modal-backdrop').addEventListener('click', closePlayerModal);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePlayerModal(); });
+  }
+
+  const group = positionGroup(player.pos);
+  const avg = playerAverage(player);
+  const avgCls = ratingClass(avg);
+  const initials = playerInitials(player.name);
+
+  const rows = CRITERIA.map(c => {
+    const v = player.ratings[c];
+    const pct = Math.max(0, Math.min(100, v * 10));
+    const cls = ratingClass(v);
+    return `<div class="criteria-row">
+      <span class="criteria-label">${CRITERIA_LABELS[c]}</span>
+      <div class="criteria-bar"><div class="criteria-fill ${cls}" style="width:${pct}%"></div></div>
+      <span class="criteria-value ${cls}">${v.toFixed(1)}</span>
+    </div>`;
+  }).join('');
+
+  modal.querySelector('.player-modal-body').innerHTML = `
+    <button class="player-modal-close" aria-label="Close">&times;</button>
+    <div class="player-modal-head avatar-${POS_COLOUR[group]}">
+      <div class="player-avatar big" aria-hidden="true"><span>${initials}</span></div>
+      <div class="player-modal-meta">
+        <h3>${player.name} <span class="player-num">#${player.num}</span></h3>
+        <div class="player-sub">${player.pos} · ${group}</div>
+      </div>
+      <div class="player-avg big ${avgCls}">${avg.toFixed(1)}</div>
+    </div>
+    <div class="player-modal-grid">
+      <div class="radar-wrap">${radarSVG(player)}</div>
+      <div class="criteria-list">${rows}</div>
+    </div>
+    <div class="player-modal-foot">All ratings averaged from 8 matches · computed on-device from WDK event exports.</div>
+  `;
+
+  modal.querySelector('.player-modal-close').addEventListener('click', closePlayerModal);
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePlayerModal() {
+  const modal = document.getElementById('player-modal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
 function getCriteriaTooltip(c) {
   const tooltips = {
     pressing: 'Pressing: first-touch pressure success rate. Higher = more successful press triggers.',
@@ -849,6 +1088,8 @@ function init() {
   initBanner();
   initChat();
   renderMatchTimeline();
+  renderPlayerCards();
+  initPlayerFilter();
   renderPlayerRatings();
   renderOpponentRecords();
   renderPressingChart();

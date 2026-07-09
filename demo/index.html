@@ -325,6 +325,22 @@
           <div id="match-timeline" class="match-timeline"></div>
         </div>
 
+        <!-- Player Cards Grid -->
+        <div class="card player-cards-card" data-tooltip="Squad overview — 16 players with position, average rating and top-2 strengths. Click a card for the full 8-criteria breakdown.">
+          <div class="card-header">
+            <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <h2>Squad</h2>
+            <div class="player-filter" role="tablist" aria-label="Filter by position">
+              <button class="filter-chip active" data-pos="all" role="tab" aria-selected="true">All</button>
+              <button class="filter-chip" data-pos="GK" role="tab" aria-selected="false">GK</button>
+              <button class="filter-chip" data-pos="DEF" role="tab" aria-selected="false">DEF</button>
+              <button class="filter-chip" data-pos="MID" role="tab" aria-selected="false">MID</button>
+              <button class="filter-chip" data-pos="FWD" role="tab" aria-selected="false">FWD</button>
+            </div>
+          </div>
+          <div id="player-cards-grid" class="player-cards-grid"></div>
+        </div>
+
         <!-- Player Ratings -->
         <div class="card player-ratings-card" data-tooltip="Per-player average ratings across 8 tactical criteria. Color-coded: green ≥7.0, yellow 5.0-6.9, red <5.0.">
           <div class="card-header">
