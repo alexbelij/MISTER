@@ -61,12 +61,12 @@
 </script>
 
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="preload" href="styles.css" as="style">
+<link rel="preload" href="styles.css?v=15" as="style">
 <link rel="preload" href="app.js" as="script">
 <link rel="preload" href="vendor-qrcode.js" as="script">
 <link rel="preconnect" href="https://alexbelij-mister-qvac-inference.hf.space" crossorigin>
 <link rel="dns-prefetch" href="https://alexbelij-mister-qvac-inference.hf.space">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=15">
 <script>document.documentElement.classList.add('js');</script>
 <script src="vendor-qrcode.js" defer></script>
 </head>
@@ -476,6 +476,25 @@
           <p>Every run loaded the real <code>Qwen3-1.7B-Q4_0.gguf</code> model via <code>@qvac/sdk</code>, ran a real BEFORE evaluation, and started real gradient-descent training.</p>
         </div>
 
+        <div class="proof-card" data-tooltip="Interactive slider — drag through the real training steps to see loss evolve. Values are pulled from the actual QVAC worker output.">
+          <h3>Interactive: watch loss evolve step-by-step</h3>
+          <p class="proof-card-hint">Drag the slider to scrub through real gradient-descent steps. Every value below was printed by the actual fine-tune worker on Kaggle GPU — nothing is interpolated.</p>
+          <div class="loss-scrubber" id="lossScrubber" data-tooltip="Drag to scrub through real training steps">
+            <div class="loss-scrubber-header">
+              <div class="loss-scrubber-run" id="lossScrubberRun">v2</div>
+              <div class="loss-scrubber-step" id="lossScrubberStep">step 1</div>
+            </div>
+            <div class="loss-scrubber-value" id="lossScrubberValue">8.9185</div>
+            <div class="loss-scrubber-delta" id="lossScrubberDelta">BEFORE — baseline loss</div>
+            <div class="loss-scrubber-track">
+              <div class="loss-scrubber-fill" id="lossScrubberFill"></div>
+              <div class="loss-scrubber-ticks" id="lossScrubberTicks"></div>
+            </div>
+            <input type="range" id="lossScrubberInput" min="0" max="2" value="0" step="1" aria-label="Training step">
+            <div class="loss-scrubber-artifact" id="lossScrubberArtifact">checkpoint_step_00000001 (model.gguf + optimizer.gguf)</div>
+          </div>
+        </div>
+
         <div class="proof-card" data-tooltip="These loss values were printed by the real QVAC fine-tune worker during actual training steps on Kaggle, not invented.">
           <h3>Real, decreasing loss from genuine training steps</h3>
           <div class="table-wrapper">
@@ -535,6 +554,6 @@
 <!-- Tooltip -->
 <div id="tooltip" class="tooltip"></div>
 
-<script src="app.js?v=14"></script>
+<script src="app.js?v=15"></script>
 </body>
 </html>

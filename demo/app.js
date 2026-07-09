@@ -1167,6 +1167,87 @@ function hideInitialSkeleton() {
   setTimeout(() => { sk.remove(); }, 300);
 }
 
+// ============================================================================
+// Loss scrubber — interactive drag through real training-step loss values.
+// Values are pulled verbatim from the on-page proof table so a single source
+// of truth stays in the HTML markup.
+// ============================================================================
+function initLossScrubber() {
+  const root = document.getElementById('lossScrubber');
+  if (!root) return;
+  const input = document.getElementById('lossScrubberInput');
+  const runEl = document.getElementById('lossScrubberRun');
+  const stepEl = document.getElementById('lossScrubberStep');
+  const valueEl = document.getElementById('lossScrubberValue');
+  const deltaEl = document.getElementById('lossScrubberDelta');
+  const fillEl = document.getElementById('lossScrubberFill');
+  const ticksEl = document.getElementById('lossScrubberTicks');
+  const artifactEl = document.getElementById('lossScrubberArtifact');
+  if (!input || !runEl || !valueEl) return;
+
+  // Pull the ground-truth loss log from the proof table so this widget cannot
+  // drift from the underlying table if we ever add another training run.
+  const rows = document.querySelectorAll('.proof-table tbody tr');
+  const points = [];
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length < 4) return;
+    const loss = parseFloat(cells[2].textContent.trim());
+    if (Number.isNaN(loss)) return;
+    points.push({
+      run: cells[0].textContent.trim(),
+      step: cells[1].textContent.trim(),
+      loss,
+      artifact: cells[3].textContent.trim(),
+    });
+  });
+  if (points.length === 0) return;
+
+  input.max = String(points.length - 1);
+
+  // Render tick marks — one per real datapoint.
+  ticksEl.innerHTML = '';
+  points.forEach(() => {
+    const tick = document.createElement('div');
+    tick.className = 'tick';
+    ticksEl.appendChild(tick);
+  });
+
+  let prevLoss = points[0].loss;
+
+  function paint(idx) {
+    const p = points[idx] || points[0];
+    runEl.textContent = p.run;
+    stepEl.textContent = p.step;
+    valueEl.textContent = p.loss.toFixed(4);
+    artifactEl.textContent = p.artifact;
+
+    const pct = points.length > 1 ? (idx / (points.length - 1)) * 100 : 100;
+    fillEl.style.width = pct + '%';
+
+    if (idx === 0) {
+      deltaEl.textContent = 'BEFORE — baseline loss';
+      deltaEl.className = 'loss-scrubber-delta';
+    } else {
+      const diff = p.loss - prevLoss;
+      const arrow = diff < 0 ? '↓' : diff > 0 ? '↑' : '→';
+      const cls = diff < 0 ? 'down' : diff > 0 ? 'up' : '';
+      deltaEl.textContent = `${arrow} ${Math.abs(diff).toFixed(4)} vs previous step`;
+      deltaEl.className = 'loss-scrubber-delta ' + cls;
+    }
+    prevLoss = p.loss;
+
+    // Little pulse on value change so the number feels alive.
+    valueEl.classList.remove('pulse');
+    // Force reflow so the animation restarts on every step.
+    void valueEl.offsetWidth;
+    valueEl.classList.add('pulse');
+  }
+
+  input.addEventListener('input', e => paint(parseInt(e.target.value, 10)));
+  paint(0);
+}
+
 function init() {
   initTooltips();
   initTabs();
@@ -1182,6 +1263,7 @@ function init() {
   renderSuggestions();
   initReports();
   initDistribute();
+  initLossScrubber();
   initRouting();
   // Skeleton done — fade it out on next paint so the real UI is already visible
   requestAnimationFrame(hideInitialSkeleton);
