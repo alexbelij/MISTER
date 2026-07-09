@@ -1434,8 +1434,8 @@ function renderHypercoreLog(root, snapshot) {
   }).join('');
 
   const badge = isReal
-    ? '<span class="data-badge data-badge--real" title="Real cryptographic snapshot: sha256 hash-chain + ed25519 signatures. Verifiable in-page.">real</span>'
-    : '<span class="data-badge data-badge--example" title="Deterministic example tail. Real snapshot lives in data/hypercore-tail.json — served in production.">example</span>';
+    ? '<span class="data-badge data-badge--real" data-tooltip="Real cryptographic snapshot: sha256 hash-chain + ed25519 signatures. Verifiable in-page.">real</span>'
+    : '<span class="data-badge data-badge--example" data-tooltip="Deterministic example tail. Real snapshot lives in data/hypercore-tail.json — served in production.">example</span>';
 
   const verifyBtn = isReal && snapshot.head_hash
     ? `<button type="button" class="hypercore-verify-btn" data-action="verify">Verify chain</button>
