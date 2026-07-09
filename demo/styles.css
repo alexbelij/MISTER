@@ -1150,7 +1150,8 @@ html.js .initial-skeleton { display: flex; }
 
 
 /* ===== Player Cards (Squad grid + detail modal) ===== */
-.player-cards-card { grid-column: span 2; }
+/* Squad grid needs the whole row — 16 cards look starved in 2/3 of the width. */
+.player-cards-card { grid-column: 1 / -1; }
 
 .player-cards-card .card-header { flex-wrap: wrap; gap: 10px; }
 .player-filter {
