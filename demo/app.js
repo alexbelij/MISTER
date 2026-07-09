@@ -1526,9 +1526,52 @@ function init() {
   initDistribute();
   initLossScrubber();
   initHypercoreLog();
+  initLandingHero();
   initRouting();
   // Skeleton done — fade it out on next paint so the real UI is already visible
   requestAnimationFrame(hideInitialSkeleton);
+}
+
+function initLandingHero() {
+  const hero = document.getElementById('landing-hero');
+  if (!hero) return;
+
+  // Restore dismissed state.
+  try {
+    if (localStorage.getItem('mister:hero:dismissed') === '1') {
+      hero.classList.add('hero--hidden');
+    }
+  } catch (_) { /* private mode: hero stays visible */ }
+
+  // Dismiss button.
+  const dismissBtn = document.getElementById('hero-dismiss');
+  if (dismissBtn) {
+    dismissBtn.addEventListener('click', () => {
+      hero.classList.add('hero--hidden');
+      try { localStorage.setItem('mister:hero:dismissed', '1'); } catch (_) {}
+    });
+  }
+
+  // "See the proof" jumps to proof tab (not #hash-anchor).
+  hero.querySelectorAll('[data-tab-jump]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      const tab = el.getAttribute('data-tab-jump');
+      if (tab && window.switchTab) {
+        e.preventDefault();
+        window.switchTab(tab);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // "Try the chat" scrolls past the hero to the chat container.
+  hero.querySelectorAll('[data-hero-scroll]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector('.chat-container');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
 }
 
 if (document.readyState === 'loading') {
